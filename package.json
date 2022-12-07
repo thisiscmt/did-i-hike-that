@@ -6,10 +6,10 @@
     "private": true,
     "license": "MIT",
     "scripts": {
-        "start": "react-scripts start",
         "build": "react-scripts build",
-        "test": "react-scripts test",
-        "eject": "react-scripts eject"
+        "eject": "react-scripts eject",
+        "start": "react-scripts start",
+        "test": "react-scripts test --watchAll=false"
     },
     "dependencies": {
         "@testing-library/jest-dom": "^5.16.5",
@@ -19,8 +19,10 @@
         "@types/node": "^16.11.65",
         "@types/react": "^18.0.21",
         "@types/react-dom": "^18.0.6",
+        "@types/react-image-gallery": "^1.2.0",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
+        "react-image-gallery": "^1.2.11",
         "react-scripts": "5.0.1",
         "typescript": "^4.8.4",
         "web-vitals": "^2.1.4"
