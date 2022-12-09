@@ -1,15 +1,20 @@
 import React from 'react';
-import './App.css';
+import {BrowserRouter, Route, Routes} from 'react-router-dom';
+
+import ErrorPage from './pages/ErrorPage/ErrorPage';
+import Home from './pages/Home/Home';
+import './App.scss';
 
 function App() {
     return (
-        <div className="App">
-            <header className="App-header">
-                <p>
-                    Edit <code>src/App.tsx</code> and save to reload.
-                </p>
-            </header>
-        </div>
+        <main className='main-content'>
+            <BrowserRouter>
+                <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="*" element={<ErrorPage />} />
+                </Routes>
+            </BrowserRouter>
+        </main>
     );
 }
 
