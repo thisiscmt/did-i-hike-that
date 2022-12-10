@@ -1,4 +1,5 @@
 import React, {useEffect} from 'react';
+import {Box} from '@mui/material';
 
 const ErrorPage = () => {
     useEffect(() => {
@@ -6,10 +7,10 @@ const ErrorPage = () => {
     });
 
     return (
-        <main className='error-page'>
+        <Box>
             <p>The page you are trying to reach can't be found</p>
-        </main>
+        </Box>
     )
-}
+};
 
 export default ErrorPage;

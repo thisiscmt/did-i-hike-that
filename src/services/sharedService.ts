@@ -5,7 +5,7 @@ class SharedService {
         return createTheme({
             palette: {
                 primary: {
-                    main: 'black'
+                    main: '#000000'
                 }
             },
             // props: {

@@ -4,7 +4,7 @@ import {Box} from '@mui/material';
 const Home: FC = () => {
     return (
         <Box>
-
+            Home
         </Box>
     )
 };
