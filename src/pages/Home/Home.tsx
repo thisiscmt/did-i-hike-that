@@ -4,7 +4,7 @@ import {Box} from '@mui/material';
 const Home: FC = () => {
     return (
         <Box>
-            Home
+            This is the home page...
         </Box>
     )
 };
