@@ -1,6 +1,5 @@
 import React from 'react';
 import {BrowserRouter, Route, Routes} from 'react-router-dom';
-import {Paper} from '@mui/material';
 
 import Home from './pages/Home/Home';
 import ViewHike from './pages/ViewHike/ViewHike';
@@ -14,15 +13,15 @@ function App() {
     return (
         <main>
             <BrowserRouter>
-                    <Header />
+                <Header />
 
-                    <Routes>
-                        <Route path="/" element={<Home />} />
-                        <Route path="/hike/:hikeId" element={<ViewHike />} />
-                        <Route path="/hike/:hikeId/edit" element={<EditHike />} />
-                        <Route path="/preferences" element={<Preferences />} />
-                        <Route path="*" element={<ErrorPage />} />
-                    </Routes>
+                <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/hike/:hikeId" element={<ViewHike />} />
+                    <Route path="/hike/:hikeId/edit" element={<EditHike />} />
+                    <Route path="/preferences" element={<Preferences />} />
+                    <Route path="*" element={<ErrorPage />} />
+                </Routes>
             </BrowserRouter>
         </main>
     );
