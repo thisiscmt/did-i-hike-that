@@ -1,7 +1,5 @@
 # Did I Hike That?
 
-## A handy tracker for the trails you've travelled
-
 This web application provides a nice way to record hikes you've 
 taken. It was born out of a desire by my spouse and I to answer questions like, 'When was the last time we did this 
 trail?' or, 'What was the weather like around this time in prior years?'.
