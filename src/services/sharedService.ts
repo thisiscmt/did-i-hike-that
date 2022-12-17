@@ -1,13 +1,19 @@
 import { createTheme } from '@mui/material/styles';
+import {grey} from '@mui/material/colors';
 
 class SharedService {
     static buildTheme = (overrides?: Record<string, string>) => {
         return createTheme({
-            palette: {
-                primary: {
-                    main: '#000000'
-                }
+            typography: {
+                allVariants: {
+                    color: grey[800]
+                },
             },
+            // palette: {
+            //     primary: {
+            //         main: '#000000'
+            //     }
+            // },
             // props: {
             //     MuiButtonBase: {
             //         disableRipple: true

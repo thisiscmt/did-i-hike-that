@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import {Box, Button, Typography} from '@mui/material';
+import {Button, Typography} from '@mui/material';
 import {makeStyles} from 'tss-react/mui';
 
 const useStyles = makeStyles()((theme) => ({
@@ -32,7 +32,7 @@ const Header = () => {
 
             <Button variant='text' component={Link} to='/'>Home</Button>
             <Button variant='text' component={Link} to='preferences/'>Preferences</Button>
-            <Button component={Link} variant='contained' to='/hike' className={cx(classes.addButton)}>Add Hike</Button>
+            <Button component={Link} variant='contained' to='/hike' color="primary" className={cx(classes.addButton)}>Add Hike</Button>
         </header>
     )
 }
