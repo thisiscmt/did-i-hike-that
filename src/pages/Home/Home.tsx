@@ -1,6 +1,9 @@
-import React, {FC} from 'react';
-import {TextField, Box, InputLabel, Typography} from '@mui/material';
+import React, {FC, useContext} from 'react';
+import {TextField, Box, InputLabel, Typography, Button} from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
+
+import * as DataService from '../../services/dataService';
+import {MainContext} from '../../contexts/MainContext';
 
 const useStyles = makeStyles()((theme) => ({
     searchContainer: {
@@ -16,6 +19,17 @@ const useStyles = makeStyles()((theme) => ({
 
 const Home: FC = () => {
     const { classes, cx } = useStyles();
+    const { searchText, setSearchText } = useContext(MainContext);
+
+    const handleSearchTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchText(event.target.value);
+    };
+
+    const handleSearch = async () => {
+        await DataService.getHikes();
+
+
+    };
 
     return (
         <Box>
@@ -29,10 +43,9 @@ const Home: FC = () => {
 
             <Box className={cx(classes.searchContainer)}>
                 <InputLabel>Search</InputLabel>
+                <TextField onChange={handleSearchTextChange} value={searchText} />
 
-                <TextField>
-
-                </TextField>
+                <Button color='primary' onClick={handleSearch} title='Search' />
             </Box>
         </Box>
     )
