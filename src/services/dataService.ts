@@ -1,19 +1,21 @@
 import Axios, {AxiosProgressEvent, AxiosRequestConfig} from 'axios';
 
-import {Hike} from '../models/models';
+import {Hike, HikeSearchParams} from '../models/models';
 
-export const getHikes = (searchText: string, searchType: HikeSearchType) => {
-    const config = {
+export const getHikes = async (searchParams?: HikeSearchParams): Promise<{ rows: Hike[]; count: number }> => {
+    const config: AxiosRequestConfig = {
         headers: {
             'Content-Type': 'application/json',
             'x-diht-agent': process.env.REACT_APP_USER_AGENT
         }
     };
 
+    if (searchParams) {
+        config.params = { ...searchParams };
+    }
 
-
-
-    return Axios.get(process.env.REACT_APP_API_URL + '/hike', config)
+    const response = await Axios.get(process.env.REACT_APP_API_URL + '/hike', config)
+    return response.data;
 };
 
 export const getHike = (hikeId: string) => {

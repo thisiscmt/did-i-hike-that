@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 
 interface MainContextProps {
     searchText: string;
+
+
     setSearchText: React.Dispatch<React.SetStateAction<string>>;
 }
 
@@ -16,6 +18,8 @@ export const MainContext = React.createContext<MainContextProps>({
 
 export const MainProvider = ({ children }: MainProviderProps) => {
     const [ searchText, setSearchText ] = useState<string>('');
+    // const [ searchText, setSearchText ] = useState<string>('');
+    // const [ searchText, setSearchText ] = useState<string>('');
 
     return (
         <MainContext.Provider value={{ searchText, setSearchText }}>
