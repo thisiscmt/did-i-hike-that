@@ -35,7 +35,7 @@ export const getHike = (hikeId: string) => {
 export const createHike = (hike: Hike, onUploadProgress?: (axiosProgressEvent: AxiosProgressEvent) => void) => {
     const formData = new FormData();
     formData.append('trail', hike.trail);
-    formData.append('dateOfHike', hike.dateOfHike.toDateString());
+    formData.append('dateOfHike', hike.dateOfHike);
 
     if (hike.description) {
         formData.append('description', hike.description);

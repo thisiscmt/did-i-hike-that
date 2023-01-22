@@ -22,6 +22,7 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     contentColumn: {
+        marginBottom: '20px',
         marginTop: '20px',
         width: '70%'
     },
