@@ -6,17 +6,23 @@ class SharedService {
         return createTheme({
             typography: {
                 allVariants: {
-                    color: grey[800]
+                    color: grey[800],
+                    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans'"
                 },
             },
+            components: {
+                MuiOutlinedInput: {
+                    styleOverrides: {
+                        root: {
+                            borderRadius: '6px',
+                            paddingRight: '6px'
+                        }
+                    }
+                },
+            }
             // palette: {
             //     primary: {
             //         main: '#000000'
-            //     }
-            // },
-            // props: {
-            //     MuiButtonBase: {
-            //         disableRipple: true
             //     }
             // },
             // overrides: {

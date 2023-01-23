@@ -1,12 +1,21 @@
 import React, { FC } from 'react';
-import { Box, Typography, Chip} from '@mui/material';
+import {Box, Typography, Chip, Card, CardContent} from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 
 import {Hike} from '../../models/models';
 
-const useStyles = makeStyles()((theme) => ({
+const useStyles = makeStyles()(() => ({
     mainContainer: {
+        borderRadius: '6px',
         display: 'flex'
+    },
+
+    card: {
+        display: 'flex',
+
+        '&:last-child': {
+            paddingBottom: '16px'
+        }
     },
 
     thumbnail: {
@@ -45,7 +54,7 @@ interface SearchResultProps {
 
 const SearchResult: FC<SearchResultProps> = ({ hike }) => {
     const { classes, cx } = useStyles();
-    const thumbnailSource = hike.filePath ? `${process.env.REACT_APP_API_URL}/images/` + hike.filePath : 'images/no_hike_images_2.png';
+    const thumbnailSource = hike.filePath ? `${process.env.REACT_APP_API_URL}/images/` + hike.filePath : 'images/no_hike_images.png';
     const hikers = hike.fullNames?.split(',');
 
     const formatDateOfHike = () => {
@@ -54,31 +63,33 @@ const SearchResult: FC<SearchResultProps> = ({ hike }) => {
     };
 
     return (
-        <Box className={cx(classes.mainContainer)}>
-            <Box>
-                <img className={cx(classes.thumbnail)} alt='Hike pic' src={thumbnailSource} aria-label='Hike photo' />
-            </Box>
+        <Card className={cx(classes.mainContainer)} raised={true} elevation={4}>
+            <CardContent className={cx(classes.card)}>
+                <Box>
+                    <img className={cx(classes.thumbnail)} alt='Hike pic' src={thumbnailSource} aria-label='Hike photo' />
+                </Box>
 
-            <Box className={cx(classes.content)}>
-                <Typography variant='body2'>{hike.trail}</Typography>
-                <Typography variant='body2'>{formatDateOfHike()}</Typography>
+                <Box className={cx(classes.content)}>
+                    <Typography variant='body2'>{hike.trail}</Typography>
+                    <Typography variant='body2'>{formatDateOfHike()}</Typography>
 
-                {
-                    hikers &&
-                    <Box className={cx(classes.hikers)}>
-                        {
-                            hikers.map((hiker: string, index: number) => {
-                                return (
-                                    <Chip key={index} label={hiker.trim()} variant='outlined' color='primary' />
-                                );
-                            })
-                        }
-                    </Box>
-                }
+                    {
+                        hikers &&
+                        <Box className={cx(classes.hikers)}>
+                            {
+                                hikers.map((hiker: string, index: number) => {
+                                    return (
+                                        <Chip key={index} label={hiker.trim()} variant='outlined' color='primary' />
+                                    );
+                                })
+                            }
+                        </Box>
+                    }
 
-                <Box className={cx(classes.description)}>{hike.description}</Box>
-            </Box>
-        </Box>
+                    <Box className={cx(classes.description)}>{hike.description}</Box>
+                </Box>
+            </CardContent>
+        </Card>
     )
 };
 

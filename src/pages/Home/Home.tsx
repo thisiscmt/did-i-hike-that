@@ -1,13 +1,16 @@
 import React, {FC, useContext, useState} from 'react';
-import {TextField, Box, Typography, Button} from '@mui/material';
+import {TextField, Box, Typography, Button, InputAdornment, IconButton} from '@mui/material';
+import { CloseOutlined } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
 
 import SearchResult from '../../components/SearchResult/SearchResult';
 import * as DataService from '../../services/dataService';
 import {MainContext} from '../../contexts/MainContext';
 import {Hike, HikeSearchParams} from '../../models/models';
+import {useNavigate} from 'react-router-dom';
+import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
 
-const useStyles = makeStyles()((theme) => ({
+const useStyles = makeStyles()(() => ({
     content: {
         display: 'flex',
         flexDirection: 'column',
@@ -29,14 +32,14 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     searchInput: {
-        width: '400px'
+        width: '500px'
     },
 
     searchResultsContainer: {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        marginTop: '20px'
+        paddingTop: '20px'
     },
 
     searchResults: {
@@ -48,7 +51,7 @@ const useStyles = makeStyles()((theme) => ({
         marginBottom: '30px',
 
         ':last-child': {
-            marginBottom: 0
+            marginBottom: '20px'
         }
     }
 }));
@@ -56,10 +59,16 @@ const useStyles = makeStyles()((theme) => ({
 const Home: FC = () => {
     const { classes, cx } = useStyles();
     const { searchText, hikes, setSearchText, setHikes } = useContext(MainContext);
+    const [ loading, setLoading ] = useState<boolean>(false);
     const [ showResults, setShowResults ] = useState<boolean>(false);
+    const navigate = useNavigate()
 
     const handleSearchTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchText(event.target.value);
+    };
+
+    const handleClearSearchText = () => {
+        setSearchText('');
     };
 
     const handleSearch = async () => {
@@ -81,12 +90,18 @@ const Home: FC = () => {
             }
         }
 
-        console.log('searchParams: %o', searchParams);
+        try {
+            setLoading(true);
 
-        const hikes = await DataService.getHikes(searchParams);
-        setSearchText(searchText);
-        setHikes(hikes.rows);
-        setShowResults(true);
+            const hikes = await DataService.getHikes(searchParams);
+            setSearchText(searchText);
+            setHikes(hikes.rows);
+            setShowResults(true);
+        } catch (error){
+            // TODO: Log this somewhere
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -101,7 +116,23 @@ const Home: FC = () => {
                 </Typography>
 
                 <Box className={cx(classes.searchInputContainer)}>
-                    <TextField onChange={handleSearchTextChange} value={searchText} className={cx(classes.searchInput)} />
+                    <TextField
+                        onChange={handleSearchTextChange}
+                        value={searchText}
+                        className={cx(classes.searchInput)}
+                        InputProps={{
+                            endAdornment:
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        aria-label="clear search input"
+                                        onClick={handleClearSearchText}
+                                        title='Clear search text'
+                                    >
+                                        <CloseOutlined />
+                                    </IconButton>
+                            </InputAdornment>
+                        }}
+                    />
                 </Box>
 
                 <Box>
@@ -109,7 +140,7 @@ const Home: FC = () => {
                 </Box>
             </Box>
 
-            <Box className={cx(classes.searchResultsContainer)}>
+            <Box className={`${cx(classes.searchResultsContainer)} loadable-container`}>
                 {
                     showResults ?
                         hikes.length > 0
@@ -118,7 +149,7 @@ const Home: FC = () => {
                                     {
                                         hikes.map((hike: Hike) => {
                                             return (
-                                                <Box key={hike.id} className={cx(classes.searchResult)}>
+                                                <Box key={hike.id} className={cx(classes.searchResult)} onClick={() => navigate(`/hike/${hike.id}`)}>
                                                     <SearchResult hike={hike} />
                                                 </Box>
                                             )
@@ -127,6 +158,8 @@ const Home: FC = () => {
                                 </Box> : 'No hikes found'
                             : ''
                 }
+
+                <LoadingOverlay open={loading} />
             </Box>
         </>
     )

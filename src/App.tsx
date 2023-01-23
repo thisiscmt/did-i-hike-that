@@ -11,7 +11,7 @@ import ErrorPage from './pages/ErrorPage/ErrorPage';
 import Header from './components/Header/Header';
 import './App.scss';
 
-const useStyles = makeStyles()((theme) => ({
+const useStyles = makeStyles()(() => ({
     mainContainer: {
         display: 'flex',
         flexDirection: 'row',
@@ -22,7 +22,7 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     contentColumn: {
-        marginBottom: '20px',
+        marginBottom: '40px',
         marginTop: '20px',
         width: '70%'
     },
