@@ -1,14 +1,14 @@
 import React, {FC, useContext, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import {TextField, Box, Typography, Button, InputAdornment, IconButton} from '@mui/material';
 import { CloseOutlined } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
 
 import SearchResult from '../../components/SearchResult/SearchResult';
+import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
 import * as DataService from '../../services/dataService';
 import {MainContext} from '../../contexts/MainContext';
 import {Hike, HikeSearchParams} from '../../models/models';
-import {useNavigate} from 'react-router-dom';
-import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
 
 const useStyles = makeStyles()(() => ({
     content: {
@@ -48,11 +48,16 @@ const useStyles = makeStyles()(() => ({
     },
 
     searchResult: {
+        cursor: 'pointer',
         marginBottom: '30px',
 
         ':last-child': {
             marginBottom: '20px'
         }
+    },
+
+    noResults: {
+        textAlign: 'center'
     }
 }));
 
@@ -155,7 +160,7 @@ const Home: FC = () => {
                                             )
                                         })
                                     }
-                                </Box> : 'No hikes found'
+                                </Box> : <Box className={cx(classes.noResults)}>No hikes found</Box>
                             : ''
                 }
 
