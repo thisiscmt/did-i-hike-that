@@ -4,26 +4,31 @@ import { makeStyles } from 'tss-react/mui';
 
 import {Hike} from '../../models/models';
 
-const useStyles = makeStyles()(() => ({
+const useStyles = makeStyles()((theme) => ({
     mainContainer: {
         borderRadius: '6px',
         display: 'flex'
     },
 
-    card: {
+    content: {
         display: 'flex',
 
         '&:last-child': {
             paddingBottom: '16px'
-        }
+        },
+
+        [theme.breakpoints.down(500)]: {
+            flexDirection: 'column',
+            width: 'unset'
+        },
     },
 
     thumbnail: {
         width: '150px'
     },
 
-    content: {
-        marginLeft: '50px',
+    details: {
+        marginLeft: '40px',
 
         '& .MuiChip-root': {
             marginRight: '8px'
@@ -31,7 +36,15 @@ const useStyles = makeStyles()(() => ({
 
         '& .MuiChip-root:last-child': {
             marginRight: 0
-        }
+        },
+
+        [theme.breakpoints.down(700)]: {
+            marginLeft: '20px'
+        },
+
+        [theme.breakpoints.down(500)]: {
+            marginLeft: 0
+        },
     },
 
     hikers: {
@@ -42,8 +55,8 @@ const useStyles = makeStyles()(() => ({
         fontSize: '14px',
         marginTop: '10px',
         display: '-webkit-box',
-        webkitLineClamp: '4',
-        webkitBoxOrient: 'vertical',
+        '-webkitLineClamp': '4',
+        '-webkitBoxOrient': 'vertical',
         overflow: 'hidden'
     }
 }));
@@ -64,12 +77,12 @@ const SearchResult: FC<SearchResultProps> = ({ hike }) => {
 
     return (
         <Card className={cx(classes.mainContainer)} raised={true} elevation={4}>
-            <CardContent className={cx(classes.card)}>
+            <CardContent className={cx(classes.content)}>
                 <Box>
                     <img className={cx(classes.thumbnail)} alt='Hike pic' src={thumbnailSource} aria-label='Hike photo' />
                 </Box>
 
-                <Box className={cx(classes.content)}>
+                <Box className={cx(classes.details)}>
                     <Typography variant='body2'>{hike.trail}</Typography>
                     <Typography variant='body2'>{formatDateOfHike()}</Typography>
 

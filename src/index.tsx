@@ -8,8 +8,8 @@ import '@fontsource/roboto/700.css';
 
 import reportWebVitals from './reportWebVitals';
 import App from './App';
-import SharedService from './services/sharedService';
 import {MainProvider} from './contexts/MainContext';
+import * as SharedService from './services/sharedService';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 

@@ -36,7 +36,7 @@ function App() {
     const { classes, cx } = useStyles();
 
     return (
-        <main>
+        <main style={{ width: '100%'}}>
             <BrowserRouter>
                 <Header />
 

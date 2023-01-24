@@ -1,4 +1,4 @@
-import React, {FC, useContext, useState} from 'react';
+import React, {FC, useContext, useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {TextField, Box, Typography, Button, InputAdornment, IconButton} from '@mui/material';
 import { CloseOutlined } from '@mui/icons-material';
@@ -10,7 +10,7 @@ import * as DataService from '../../services/dataService';
 import {MainContext} from '../../contexts/MainContext';
 import {Hike, HikeSearchParams} from '../../models/models';
 
-const useStyles = makeStyles()(() => ({
+const useStyles = makeStyles()((theme) => ({
     content: {
         display: 'flex',
         flexDirection: 'column',
@@ -28,11 +28,15 @@ const useStyles = makeStyles()(() => ({
 
     searchInputContainer: {
         marginBottom: '10px',
-        marginTop: '10px'
+        marginTop: '10px',
     },
 
     searchInput: {
-        width: '500px'
+        width: '500px',
+
+        [theme.breakpoints.down(700)]: {
+            width: 'unset'
+        },
     },
 
     searchResultsContainer: {
@@ -44,7 +48,11 @@ const useStyles = makeStyles()(() => ({
 
     searchResults: {
         margin: 'auto',
-        width: '700px'
+        width: '700px',
+
+        [theme.breakpoints.down(1024)]: {
+            width: 'unset'
+        },
     },
 
     searchResult: {
@@ -58,14 +66,15 @@ const useStyles = makeStyles()(() => ({
 
     noResults: {
         textAlign: 'center'
-    }
+    },
+
 }));
 
 const Home: FC = () => {
     const { classes, cx } = useStyles();
     const { searchText, hikes, setSearchText, setHikes } = useContext(MainContext);
     const [ loading, setLoading ] = useState<boolean>(false);
-    const [ showResults, setShowResults ] = useState<boolean>(false);
+    const [ showResults, setShowResults ] = useState<boolean>(hikes.length > 0);
     const navigate = useNavigate()
 
     const handleSearchTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -113,11 +122,11 @@ const Home: FC = () => {
         <>
             <Box className={cx(classes.content)}>
                 <Typography variant='h5'>
-                    Ever wonder if you hiked a particular trail? Well wonder no more!
+                    Ever ask yourself if you've hiked a particular trail before?<br />Well ask no more!
                 </Typography>
 
-                <Typography variant='body1'>
-                    <span className={cx(classes.quote)}>Not all those who wander are lost</span> - J.R.R. Tolkien
+                <Typography variant='body1' className={cx(classes.quote)}>
+                    Not all those who wander are lost
                 </Typography>
 
                 <Box className={cx(classes.searchInputContainer)}>
@@ -125,6 +134,7 @@ const Home: FC = () => {
                         onChange={handleSearchTextChange}
                         value={searchText}
                         className={cx(classes.searchInput)}
+                        fullWidth={true}
                         InputProps={{
                             endAdornment:
                                 <InputAdornment position="end">
