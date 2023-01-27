@@ -1,20 +1,35 @@
 import React, {FC} from 'react';
-import {Box, IconButton, List, ListItem} from '@mui/material';
-import {CloseOutlined} from '@mui/icons-material';
+import {Box, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText} from '@mui/material';
+import {CloseOutlined, HomeOutlined, SettingsOutlined} from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
 
 import {Colors} from '../../services/sharedService';
+import {Link} from 'react-router-dom';
 
 const useStyles = makeStyles()(() => ({
     mainContainer: {
-        backgroundColor: `${Colors.backgroundGray}`,
-        width: '150px'
+        height: '100%',
+        width: '180px'
     },
 
     closeButton: {
         float: 'right',
-        padding: 0,
-        margin: '12px 12px 0 0'
+        margin: '2px',
+        zIndex: 1000
+    },
+
+    menu: {
+        '& .MuiListItem-root': {
+            borderTop: `2px solid ${Colors.backgroundGray}`
+        },
+
+        '& .MuiListItem-root:last-child': {
+            borderBottom: `2px solid ${Colors.backgroundGray}`
+        },
+
+        '& .MuiListItemIcon-root': {
+            minWidth: '36px'
+        }
     }
 }));
 
@@ -32,16 +47,27 @@ const MobileMenu: FC<MobileMenuProps> = ({ onClose }) => {
     return (
         <Box className={cx(classes.mainContainer)}>
             <IconButton
-                aria-label="clear search input"
+                aria-label='close the menu'
                 className={cx(classes.closeButton)}
                 onClick={handleMenuClose}
+                size='medium'
             >
                 <CloseOutlined />
             </IconButton>
 
-            <List>
-                <ListItem>Home</ListItem>
-                <ListItem>Preferences</ListItem>
+            <List className={cx(classes.menu)}>
+                <ListItem disablePadding={true}>
+                    <ListItemButton to='/' component={Link} onClick={handleMenuClose}>
+                        <ListItemIcon><HomeOutlined /></ListItemIcon>
+                        <ListItemText primary='Home' />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding={true}>
+                    <ListItemButton to='/preferences' component={Link} onClick={handleMenuClose}>
+                        <ListItemIcon><SettingsOutlined /></ListItemIcon>
+                        <ListItemText primary='Preferences' />
+                    </ListItemButton>
+                </ListItem>
             </List>
         </Box>
     );

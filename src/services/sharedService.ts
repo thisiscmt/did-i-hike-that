@@ -1,11 +1,16 @@
 import { createTheme } from '@mui/material/styles';
 import {grey} from '@mui/material/colors';
 
+export const Colors = {
+    primaryText: grey[800],
+    backgroundGray: '#F3F3F3'
+};
+
 export const buildTheme = (overrides?: Record<string, string>) => {
     return createTheme({
         typography: {
             allVariants: {
-                color: grey[800],
+                color: Colors.primaryText,
                 fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans'"
             },
         },
@@ -71,8 +76,4 @@ export const buildTheme = (overrides?: Record<string, string>) => {
         //     }
         // }
     });
-};
-
-export const Colors = {
-    backgroundGray: '#F3F3F3'
 };

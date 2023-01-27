@@ -40,25 +40,12 @@ const useStyles = makeStyles()((theme) => ({
 
     addButton: {
         marginLeft: 'auto',
-
-        // [theme.breakpoints.down(300)]: {
-        //     display: 'none'
-        // }
     },
-
-    // addButtonMobile: {
-    //     display: 'none',
-    //     marginLeft: 'auto',
-    //
-    //     [theme.breakpoints.down(300)]: {
-    //         display: 'inline-flex'
-    //     }
-    // },
 
     mobileMenuButton: {
         display: 'none',
 
-        [theme.breakpoints.down(1024)]: {
+        [theme.breakpoints.down('md')]: {
             display: 'inline-flex',
             marginRight: '10px'
         }
@@ -97,7 +84,6 @@ const Header = () => {
             <Button variant='text' className={cx(classes.headerButton)} component={Link} to='/'>Home</Button>
             <Button variant='text' className={cx(classes.headerButton)} component={Link} to='preferences/'>Preferences</Button>
             <Button component={Link} variant='contained' to='/hike' color="primary" className={cx(classes.addButton)}>Add Hike</Button>
-            {/*<Button component={Link} variant='contained' size='small' to='/hike' color="primary" className={cx(classes.addButton, classes.addButtonMobile)}>Add</Button>*/}
         </header>
     )
 }

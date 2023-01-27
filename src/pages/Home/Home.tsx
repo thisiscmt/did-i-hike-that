@@ -1,4 +1,4 @@
-import React, {FC, useContext, useEffect, useState} from 'react';
+import React, {FC, useContext, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {TextField, Box, Typography, Button, InputAdornment, IconButton} from '@mui/material';
 import { CloseOutlined } from '@mui/icons-material';
@@ -126,7 +126,7 @@ const Home: FC = () => {
                 </Typography>
 
                 <Typography variant='body1' className={cx(classes.quote)}>
-                    Not all those who wander are lost
+                    "Not all those who wander are lost"
                 </Typography>
 
                 <Box className={cx(classes.searchInputContainer)}>

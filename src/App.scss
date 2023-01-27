@@ -11,3 +11,13 @@ body {
 .loadable-container {
     position: relative;
 }
+
+a.menu-item:link,
+a.menu-item:visited,
+a.menu-item:focus,
+a.menu-item:hover,
+a.menu-item:active
+{
+    color: #424242;
+    text-decoration: none;
+}
