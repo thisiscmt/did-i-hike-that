@@ -45,8 +45,8 @@ function App() {
                     <Box className={cx(classes.contentColumn)}>
                         <Routes>
                             <Route path="/" element={<Home />} />
-                            <Route path="/hike/:hikeId" element={<ViewHike />} />
                             <Route path="/hike" element={<EditHike />} />
+                            <Route path="/hike/:hikeId" element={<ViewHike />} />
                             <Route path="/hike/:hikeId/edit" element={<EditHike />} />
                             <Route path="/preferences" element={<Preferences />} />
                             <Route path="*" element={<ErrorPage />} />

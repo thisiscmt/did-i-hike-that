@@ -14,6 +14,11 @@ export interface Hike {
     photos?: File[];
 }
 
+export interface Photo {
+    fileName: string;
+    caption: string;
+}
+
 export interface HikeSearchParams {
     page?: number;
     pageSize?: number;

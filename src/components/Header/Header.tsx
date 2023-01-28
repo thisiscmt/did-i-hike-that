@@ -5,7 +5,7 @@ import {MenuOutlined} from '@mui/icons-material';
 import {makeStyles} from 'tss-react/mui';
 
 import MobileMenu from '../MobileMenu/MobileMenu';
-import {Colors} from '../../services/sharedService';
+import {Colors} from '../../services/themeService';
 
 const useStyles = makeStyles()((theme) => ({
     headerContainer: {

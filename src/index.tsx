@@ -9,13 +9,13 @@ import '@fontsource/roboto/700.css';
 import reportWebVitals from './reportWebVitals';
 import App from './App';
 import {MainProvider} from './contexts/MainContext';
-import * as SharedService from './services/sharedService';
+import * as ThemeService from './services/themeService';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
 root.render(
     <React.StrictMode>
-        <ThemeProvider theme={SharedService.buildTheme()}>
+        <ThemeProvider theme={ThemeService.buildTheme()}>
             <MainProvider>
                 <App />
             </MainProvider>

@@ -1,4 +1,4 @@
-$primaryFontFamily: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans';
+$primaryFontFamily: -apple-system, BlinkMacSystemFont, Roboto, 'Segoe UI', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans';
 
 body {
     margin: 0;
@@ -10,14 +10,4 @@ body {
 
 .loadable-container {
     position: relative;
-}
-
-a.menu-item:link,
-a.menu-item:visited,
-a.menu-item:focus,
-a.menu-item:hover,
-a.menu-item:active
-{
-    color: #424242;
-    text-decoration: none;
 }
