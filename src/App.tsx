@@ -43,6 +43,8 @@ function App() {
                 <Box className={cx(classes.mainContainer)}>
                     <Box className={cx(classes.leftColumn)} />
                     <Box className={cx(classes.contentColumn)}>
+
+
                         <Routes>
                             <Route path="/" element={<Home />} />
                             <Route path="/hike" element={<EditHike />} />

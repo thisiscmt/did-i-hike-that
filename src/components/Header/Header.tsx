@@ -1,11 +1,12 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import { Link } from 'react-router-dom';
-import {Button, IconButton, SwipeableDrawer, Typography} from '@mui/material';
+import {Alert, Button, Fade, IconButton, SwipeableDrawer, Typography} from '@mui/material';
 import {MenuOutlined} from '@mui/icons-material';
 import {makeStyles} from 'tss-react/mui';
 
 import MobileMenu from '../MobileMenu/MobileMenu';
 import {Colors} from '../../services/themeService';
+import {MainContext} from '../../contexts/MainContext';
 
 const useStyles = makeStyles()((theme) => ({
     headerContainer: {
@@ -55,6 +56,7 @@ const useStyles = makeStyles()((theme) => ({
 const Header = () => {
     const { classes, cx } = useStyles();
     const [ mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+    const { bannerMessage, bannerSeverity } = useContext(MainContext);
 
     const handleMobileMenuClick = (value: boolean) => {
         setMobileMenuOpen(value);
@@ -84,6 +86,15 @@ const Header = () => {
             <Button variant='text' className={cx(classes.headerButton)} component={Link} to='/'>Home</Button>
             <Button variant='text' className={cx(classes.headerButton)} component={Link} to='preferences/'>Preferences</Button>
             <Button component={Link} variant='contained' to='/hike' color="primary" className={cx(classes.addButton)}>Add Hike</Button>
+
+            {
+                bannerMessage &&
+                <>
+                    <Fade in={!!bannerMessage}>
+                        <Alert severity={bannerSeverity}>{bannerMessage}</Alert>
+                    </Fade>
+                </>
+            }
         </header>
     )
 }

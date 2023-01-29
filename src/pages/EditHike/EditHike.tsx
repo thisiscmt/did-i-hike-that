@@ -1,11 +1,12 @@
-import React, {useEffect, useState} from 'react';
-import {Autocomplete, Box, Button, FormControl, FormControlLabel, Grid, TextField} from '@mui/material';
+import React, {useContext, useEffect, useState} from 'react';
+import {Autocomplete, AutocompleteChangeDetails, Box, Button, FormControl, FormControlLabel, Grid, TextField} from '@mui/material';
 import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterLuxon} from '@mui/x-date-pickers/AdapterLuxon';
-import {MuiChipsInput} from 'mui-chips-input';
 import { makeStyles } from 'tss-react/mui';
 
-import {Photo} from '../../models/models';
+import * as DataService from '../../services/dataService';
+import {Hike, Photo} from '../../models/models';
+import {MainContext} from '../../contexts/MainContext';
 
 const useStyles = makeStyles()((theme) => ({
     content: {
@@ -18,18 +19,27 @@ const useStyles = makeStyles()((theme) => ({
     field: {
         width: '500px',
 
-        // Prevents a slight overflow of the input to the right
         '& .MuiFormControlLabel-root': {
+            marginLeft: 0,
             marginRight: 'initial'
         }
     },
 
     wideField: {
-        width: '700px'
+        width: '650px',
+
+        '& .MuiFormControlLabel-root': {
+            marginLeft: 0,
+            marginRight: 'initial'
+        }
     },
 
     datePickerField: {
         width: 'initial',
+
+        '& .MuiTextField-root': {
+            width: '150px'
+        },
 
         // Prevents the picker button from being too far to the right
         '& .MuiInputBase-root': {
@@ -55,22 +65,73 @@ const useStyles = makeStyles()((theme) => ({
 const EditHike = () => {
     const { classes, cx } = useStyles();
     const [ trail, setTrail ] = useState<string>('');
-    const [ dateOfHike, setDateOfHike ] = useState<string | null>(null);
+    const [ dateOfHike, setDateOfHike ] = useState<string>('');
     const [ conditions, setConditions ] = useState<string>('');
     const [ crowds, setCrowds ] = useState<string>('');
+    const [ knownHikers, setKnownHikers ] = useState<string[]>([]);
     const [ hikers, setHikers ] = useState<string[]>([]);
     const [ notes, setNotes ] = useState<string>('');
     const [ link, setLink ] = useState<string>('');
     const [ tags, setTags ] = useState<string[]>([]);
     const [ photos, setPhotos ] = useState<Photo[]>([]);
+    const [ retrievedKnownHikers, setRetrievedKnownHikers ] = useState<boolean>(false);
+    const { setBannerMessage, setBannerSeverity } = useContext(MainContext);
 
     useEffect(() => {
+        const getKnownHikers = async () => {
+            try {
+                const currentHikers = await DataService.getHikers();
+                setKnownHikers(currentHikers);
+                setRetrievedKnownHikers(true);
+            } catch(error) {
+                // TODO: Log this somewhere
+            }
+        }
+
         document.title = 'Edit Hike - Did I Hike That?';
+
+        if (!retrievedKnownHikers) {
+            getKnownHikers();
+        }
     });
 
+    const handleChangeHikers = (event: React.SyntheticEvent, value: string[], reason: string, details?: AutocompleteChangeDetails<string> | undefined) => {
+        if (reason === 'createOption') {
+           const knownHikerIndex = knownHikers.findIndex((item: string) => details?.option?.toLowerCase() === item.toLowerCase());
+
+            if (knownHikerIndex > -1) {
+                const hikerIndex = value.indexOf(details?.option || '');
+                value[hikerIndex] = knownHikers[knownHikerIndex];
+            }
+        }
+
+        setHikers(value);
+    };
+
+    const handleChangeTags = (event: React.SyntheticEvent, value: string[], reason: string, details?: AutocompleteChangeDetails<string> | undefined) => {
+        setTags(value);
+    };
+
     const handleSave = () => {
-        console.log('%o, %o, %o, %o, %o, %o, %o, %o', trail, dateOfHike, conditions, crowds, hikers, notes, link, tags);
-    }
+        try {
+            const hike: Hike = {
+                trail,
+                dateOfHike,
+                conditions,
+                crowds,
+                hikers,
+                notes,
+                link,
+                tags,
+                photos
+            };
+
+            DataService.createHike(hike);
+        } catch (error) {
+            setBannerSeverity('error');
+            setBannerMessage('Error retrieving known hikers')
+        }
+    };
 
     return (
         <Box className={cx(classes.content)}>
@@ -89,6 +150,7 @@ const EditHike = () => {
                                 size='small'
                                 fullWidth={true}
                                 autoCorrect='off'
+                                required={true}
                                 inputProps={{ maxLength: 255 }}
                                 onChange={(event) => setTrail(event.target.value)}
                             />
@@ -107,7 +169,7 @@ const EditHike = () => {
                             <LocalizationProvider dateAdapter={AdapterLuxon}>
                                 <DatePicker
                                     value={dateOfHike}
-                                    onChange={(newValue) => setDateOfHike(newValue) }
+                                    onChange={(newValue) => setDateOfHike(newValue || '') }
                                     renderInput={(params) => <TextField {...params} size='small' />}
                                 />
                             </LocalizationProvider>
@@ -172,11 +234,12 @@ const EditHike = () => {
                             <Autocomplete
                                 multiple={true}
                                 freeSolo={true}
-                                options={hikers}
+                                options={knownHikers || []}
                                 getOptionLabel={(option) => option}
                                 defaultValue={[]}
                                 fullWidth={true}
                                 size='small'
+                                onChange={handleChangeHikers}
                                 filterSelectedOptions
                                 renderInput={(params) => (
                                     <TextField
@@ -243,12 +306,21 @@ const EditHike = () => {
                         label='Tags:'
                         classes={{ label: classes.textFieldLabel }}
                         control={
-                            <MuiChipsInput
-                                value={tags}
-                                size='small'
+                            <Autocomplete
+                                multiple={true}
+                                freeSolo={true}
+                                options={[]}
+                                getOptionLabel={(option) => option}
+                                defaultValue={[]}
                                 fullWidth={true}
-                                placeholder=''
-                                onChange={(newTags) => setTags(newTags)}
+                                size='small'
+                                onChange={handleChangeTags}
+                                filterSelectedOptions
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                    />
+                                )}
                             />
                         }
                     />

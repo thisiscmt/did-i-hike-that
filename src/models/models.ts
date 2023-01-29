@@ -2,19 +2,20 @@ export interface Hike {
     id?: string;
     trail: string;
     dateOfHike: string;
-    description?: string;
+    notes?: string;
     link?: string;
     conditions?: string;
     crowds?: string;
-    tags?: string;
+    tags?: string[];
     fullNames?: string;
     filePath?: string;
     caption?: string;
     hikers?: string[];
-    photos?: File[];
+    photos?: Photo[];
 }
 
 export interface Photo {
+    file: File;
     fileName: string;
     caption: string;
 }

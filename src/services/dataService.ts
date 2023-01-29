@@ -18,7 +18,7 @@ export const getHikes = async (searchParams?: HikeSearchParams): Promise<{ rows:
     return response.data;
 };
 
-export const getHike = (hikeId: string) => {
+export const getHike = async (hikeId: string) => {
     const config = {
         headers: {
             'Content-Type': 'application/json',
@@ -29,7 +29,9 @@ export const getHike = (hikeId: string) => {
         }
     };
 
-    return Axios.get(process.env.REACT_APP_API_URL + '/hike:id', config)
+
+    const response = await Axios.get(process.env.REACT_APP_API_URL + '/hike:id', config)
+    return response.data;
 };
 
 export const createHike = (hike: Hike, onUploadProgress?: (axiosProgressEvent: AxiosProgressEvent) => void) => {
@@ -108,4 +110,16 @@ export const deleteHike = (hikeId: string) => {
     };
 
     return Axios.delete(process.env.REACT_APP_API_URL + '/hike:id', config)
+};
+
+export const getHikers = async (): Promise<string[]> => {
+    const config: AxiosRequestConfig = {
+        headers: {
+            'Content-Type': 'application/json',
+            'x-diht-agent': process.env.REACT_APP_USER_AGENT
+        }
+    };
+
+    const response = await Axios.get(process.env.REACT_APP_API_URL + '/hiker', config)
+    return response.data;
 };
