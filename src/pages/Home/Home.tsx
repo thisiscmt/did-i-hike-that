@@ -14,7 +14,6 @@ const useStyles = makeStyles()((theme) => ({
     content: {
         display: 'flex',
         flexDirection: 'column',
-        marginTop: '20px',
         textAlign: 'center',
 
         '& .MuiTypography-root': {
@@ -135,18 +134,20 @@ const Home: FC = () => {
                         value={searchText}
                         className={cx(classes.searchInput)}
                         fullWidth={true}
-                        InputProps={{
-                            endAdornment:
-                                <InputAdornment position="end">
-                                    <IconButton
-                                        aria-label="clear search input"
-                                        onClick={handleClearSearchText}
-                                        title='Clear search text'
-                                    >
-                                        <CloseOutlined />
-                                    </IconButton>
-                            </InputAdornment>
-                        }}
+                        InputProps={ searchText ?
+                            {
+                                endAdornment:
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            aria-label="clear search input"
+                                            onClick={handleClearSearchText}
+                                            title='Clear search text'
+                                        >
+                                            <CloseOutlined />
+                                        </IconButton>
+                                    </InputAdornment>
+                            } : undefined
+                        }
                     />
                 </Box>
 

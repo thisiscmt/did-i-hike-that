@@ -5,7 +5,7 @@ import { makeStyles } from 'tss-react/mui';
 import {Hike} from '../../models/models';
 
 const useStyles = makeStyles()((theme) => ({
-    mainContainer: {
+    card: {
         borderRadius: '6px',
         display: 'flex'
     },
@@ -76,7 +76,7 @@ const SearchResult: FC<SearchResultProps> = ({ hike }) => {
     };
 
     return (
-        <Card className={cx(classes.mainContainer)} raised={true} elevation={4}>
+        <Card className={cx(classes.card)} raised={true} elevation={4}>
             <CardContent className={cx(classes.content)}>
                 <Box>
                     <img className={cx(classes.thumbnail)} alt='Hike pic' src={thumbnailSource} aria-label='Hike photo' />

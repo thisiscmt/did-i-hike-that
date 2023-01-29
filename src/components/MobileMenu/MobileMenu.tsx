@@ -1,10 +1,10 @@
 import React, {FC} from 'react';
+import {Link} from 'react-router-dom';
 import {Box, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText} from '@mui/material';
 import {CloseOutlined, HomeOutlined, SettingsOutlined} from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
 
 import {Colors} from '../../services/themeService';
-import {Link} from 'react-router-dom';
 
 const useStyles = makeStyles()(() => ({
     mainContainer: {

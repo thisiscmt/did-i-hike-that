@@ -23,7 +23,7 @@ const useStyles = makeStyles()(() => ({
 
     contentColumn: {
         marginBottom: '40px',
-        marginTop: '20px',
+        marginTop: '40px',
         width: '70%'
     },
 
