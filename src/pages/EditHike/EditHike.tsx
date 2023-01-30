@@ -1,11 +1,13 @@
-import React, {FC, forwardRef, RefObject, useContext, useEffect, useState} from 'react';
-import {Autocomplete, AutocompleteChangeDetails, Box, Button, FormControl, FormControlLabel, Grid, TextField} from '@mui/material';
+import React, {FC, RefObject, useContext, useEffect, useState} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
+import {Autocomplete, AutocompleteChangeDetails, Box, Button, Chip, FormControl, FormControlLabel, Grid, TextField} from '@mui/material';
 import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterLuxon} from '@mui/x-date-pickers/AdapterLuxon';
 import { makeStyles } from 'tss-react/mui';
 
 import * as DataService from '../../services/dataService';
-import {Hike, Photo} from '../../models/models';
+import * as SharedService from '../../services/sharedService';
+import {Hike, Hiker, Photo} from '../../models/models';
 import {MainContext} from '../../contexts/MainContext';
 
 const useStyles = makeStyles()((theme) => ({
@@ -68,7 +70,10 @@ interface EditHikeProps {
 
 const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const { classes, cx } = useStyles();
-    const { setBannerMessage, setBannerSeverity } = useContext(MainContext);
+    const { setBanner } = useContext(MainContext);
+    const { hikeId } = useParams();
+    const navigate = useNavigate();
+
     const [ trail, setTrail ] = useState<string>('');
     const [ dateOfHike, setDateOfHike ] = useState<string | null>(null);
     const [ conditions, setConditions ] = useState<string>('');
@@ -80,6 +85,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const [ tags, setTags ] = useState<string[]>([]);
     const [ photos, setPhotos ] = useState<Photo[]>([]);
     const [ retrievedKnownHikers, setRetrievedKnownHikers ] = useState<boolean>(false);
+    const [ retrievedHike, setRetrievedHike ] = useState<boolean>(false);
     const [ trailInputError, setTrailInputError ] = useState<boolean>(false);
     const [ dateOfHikeInputError, setDateOfHikeInputError ] = useState<boolean>(false);
 
@@ -94,15 +100,42 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             }
         }
 
+        const getHike = async () => {
+            try {
+                const hike = await DataService.getHike(hikeId || '');
+
+                if (hike) {
+                    setTrail(hike.trail);
+                    setDateOfHike(hike.dateOfHike);
+                    setConditions(hike.conditions || '');
+                    setCrowds(hike.crowds || '');
+                    setHikers(hike.hikers?.map((hiker: Hiker) => hiker.fullName));
+                    setLink(hike.link || '');
+                    setNotes(hike.description || '');
+                    setTags(hike.tags ? hike.tags.split(',').map((tag: string) => tag.trim()) : []);
+
+                    setRetrievedHike(true);
+                }
+            } catch(error) {
+
+                // TODO: Log this somewhere
+            }
+        }
+
         document.title = 'Edit Hike - Did I Hike That?';
 
         if (!retrievedKnownHikers) {
             getKnownHikers();
         }
+
+        if (hikeId && !retrievedHike) {
+            getHike();
+        }
     });
 
     const handleChangeHikers = (event: React.SyntheticEvent, value: string[], reason: string, details?: AutocompleteChangeDetails<string> | undefined) => {
         if (reason === 'createOption') {
+            // We make sure if the user specified an existing hiker, we use that exact name rather than create a duplicate in the database
            const knownHikerIndex = knownHikers.findIndex((item: string) => details?.option?.toLowerCase() === item.toLowerCase());
 
             if (knownHikerIndex > -1) {
@@ -137,12 +170,12 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             }
 
             if (hasError) {
-                setBannerSeverity('error');
-                setBannerMessage('Some required fields are empty');
+                setBanner('Some required fields are empty', 'error');
+                SharedService.scrollToTop(topOfPageRef);
+
                 return;
             } else {
-                setBannerSeverity('info');
-                setBannerMessage('');
+                setBanner('');
             }
 
             const hike: Hike = {
@@ -157,14 +190,16 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 photos
             };
 
-            await DataService.createHike(hike);
-        } catch (error) {
-            setBannerSeverity('error');
-            setBannerMessage('Error saving hike')
-
-            if (topOfPageRef && topOfPageRef.current) {
-                topOfPageRef.current.scrollIntoView();
+            if (hikeId) {
+                await DataService.updateHike(hike);
+            } else {
+                await DataService.createHike(hike);
             }
+
+            navigate(`/hike/${hike.id}`);
+        } catch (error) {
+            setBanner('Error saving hike', 'error');
+            SharedService.scrollToTop(topOfPageRef);
         }
     };
 
@@ -272,7 +307,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                                 freeSolo={true}
                                 options={knownHikers || []}
                                 getOptionLabel={(option) => option}
-                                defaultValue={[]}
+                                value={hikers}
                                 fullWidth={true}
                                 size='small'
                                 onChange={handleChangeHikers}
@@ -327,7 +362,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                                 fullWidth={true}
                                 autoCorrect='off'
                                 multiline={true}
-                                rows={4}
+                                rows={6}
                                 onChange={(event) => setNotes(event.target.value)}
                             />
                         }
@@ -347,7 +382,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                                 freeSolo={true}
                                 options={[]}
                                 getOptionLabel={(option) => option}
-                                defaultValue={[]}
+                                value={tags}
                                 fullWidth={true}
                                 size='small'
                                 onChange={handleChangeTags}

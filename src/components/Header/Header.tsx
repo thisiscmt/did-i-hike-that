@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useLayoutEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {Link, useLocation} from 'react-router-dom';
 import {Alert, Button, Fade, IconButton, SwipeableDrawer, Typography} from '@mui/material';
 import {MenuOutlined} from '@mui/icons-material';
@@ -56,12 +56,11 @@ const useStyles = makeStyles()((theme) => ({
 const Header = () => {
     const { classes, cx } = useStyles();
     const [ mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
-    const { bannerMessage, setBannerMessage, bannerSeverity, setBannerSeverity } = useContext(MainContext);
+    const { bannerMessage, bannerSeverity, setBanner } = useContext(MainContext);
     const location = useLocation();
 
     useEffect(() => {
-        setBannerMessage('');
-        setBannerSeverity('info');
+        setBanner('');
     }, [location]);
 
     const handleMobileMenuClick = (value: boolean) => {

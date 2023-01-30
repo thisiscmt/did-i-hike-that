@@ -1,6 +1,6 @@
-import React, {FC, useContext, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
-import {TextField, Box, Typography, Button, InputAdornment, IconButton} from '@mui/material';
+import React, { FC, useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { TextField, Box, Typography, Button, InputAdornment, IconButton} from '@mui/material';
 import { CloseOutlined } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
 
@@ -8,7 +8,7 @@ import SearchResult from '../../components/SearchResult/SearchResult';
 import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
 import * as DataService from '../../services/dataService';
 import {MainContext} from '../../contexts/MainContext';
-import {Hike, HikeSearchParams} from '../../models/models';
+import { Hike, HikeSearchParams } from '../../models/models';
 
 const useStyles = makeStyles()((theme) => ({
     content: {
@@ -74,7 +74,7 @@ const Home: FC = () => {
     const { searchText, hikes, setSearchText, setHikes } = useContext(MainContext);
     const [ loading, setLoading ] = useState<boolean>(false);
     const [ showResults, setShowResults ] = useState<boolean>(hikes.length > 0);
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
     const handleSearchTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchText(event.target.value);

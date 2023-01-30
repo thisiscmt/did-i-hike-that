@@ -3,9 +3,8 @@ import {Hike} from '../models/models';
 
 interface MainContextProps {
     bannerMessage: string;
-    setBannerMessage: React.Dispatch<React.SetStateAction<string>>;
     bannerSeverity: 'error' | 'info' | 'success' | 'warning';
-    setBannerSeverity: React.Dispatch<React.SetStateAction<'error' | 'info' | 'success' | 'warning'>>;
+    setBanner: (message: string, severity?: AlertSeverity) => void;
     searchText: string;
     hikes: Hike[];
     setSearchText: React.Dispatch<React.SetStateAction<string>>;
@@ -18,27 +17,32 @@ interface MainProviderProps{
 
 export const MainContext = React.createContext<MainContextProps>({
     bannerMessage: '',
-    setBannerMessage: () => {},
     bannerSeverity: 'info',
-    setBannerSeverity: () => {},
+    setBanner: (message, severity) => {},
     searchText: '',
     hikes: [],
     setSearchText: () => {},
     setHikes: () => {}
 });
 
+export type AlertSeverity = 'error' | 'info' | 'success' | 'warning';
+
 export const MainProvider = ({ children }: MainProviderProps) => {
     const [ bannerMessage, setBannerMessage ] = useState<string>('');
-    const [ bannerSeverity, setBannerSeverity ] = useState<'error' | 'info' | 'success' | 'warning'>('info');
+    const [ bannerSeverity, setBannerSeverity ] = useState<AlertSeverity>('info');
     const [ searchText, setSearchText ] = useState<string>('');
     const [ hikes, setHikes ] = useState<Hike[]>([]);
+
+    const setBanner = (message: string, severity?: AlertSeverity) => {
+        setBannerMessage(message);
+        setBannerSeverity(severity || 'info');
+    };
 
     return (
         <MainContext.Provider value={{
             bannerMessage,
-            setBannerMessage,
             bannerSeverity,
-            setBannerSeverity,
+            setBanner,
             searchText,
             hikes,
             setSearchText,

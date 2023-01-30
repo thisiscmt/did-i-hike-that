@@ -30,7 +30,7 @@ export const getHike = async (hikeId: string) => {
     };
 
 
-    const response = await Axios.get(process.env.REACT_APP_API_URL + '/hike:id', config)
+    const response = await Axios.get(process.env.REACT_APP_API_URL + `/hike/${hikeId}`, config)
     return response.data;
 };
 
