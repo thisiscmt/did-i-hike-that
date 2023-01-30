@@ -1,5 +1,5 @@
-import React from 'react';
-import {BrowserRouter, Route, Routes} from 'react-router-dom';
+import React, {useContext, useLayoutEffect, useRef} from 'react';
+import {BrowserRouter, Route, Routes, useLocation} from 'react-router-dom';
 import {Box} from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 
@@ -9,6 +9,7 @@ import EditHike from './pages/EditHike/EditHike';
 import Preferences from './pages/Preferences/Preferences';
 import ErrorPage from './pages/ErrorPage/ErrorPage';
 import Header from './components/Header/Header';
+import {MainContext} from './contexts/MainContext';
 import './App.scss';
 
 const useStyles = makeStyles()(() => ({
@@ -23,7 +24,7 @@ const useStyles = makeStyles()(() => ({
 
     contentColumn: {
         marginBottom: '40px',
-        marginTop: '40px',
+        marginTop: '30px',
         width: '70%'
     },
 
@@ -34,9 +35,13 @@ const useStyles = makeStyles()(() => ({
 
 function App() {
     const { classes, cx } = useStyles();
+    const { setBannerMessage, setBannerSeverity } = useContext(MainContext);
+
+    // This ref is used by child components to scroll to the top of the page, if needed
+    const topOfPageRef = useRef<HTMLElement>(null);
 
     return (
-        <main style={{ width: '100%'}}>
+        <main ref={topOfPageRef}>
             <BrowserRouter>
                 <Header />
 
@@ -47,9 +52,9 @@ function App() {
 
                         <Routes>
                             <Route path="/" element={<Home />} />
-                            <Route path="/hike" element={<EditHike />} />
+                            <Route path="/hike" element={<EditHike topOfPageRef={topOfPageRef} />} />
                             <Route path="/hike/:hikeId" element={<ViewHike />} />
-                            <Route path="/hike/:hikeId/edit" element={<EditHike />} />
+                            <Route path="/hike/:hikeId/edit" element={<EditHike topOfPageRef={topOfPageRef} />} />
                             <Route path="/preferences" element={<Preferences />} />
                             <Route path="*" element={<ErrorPage />} />
                         </Routes>

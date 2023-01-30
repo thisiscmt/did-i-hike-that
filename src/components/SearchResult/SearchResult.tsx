@@ -51,7 +51,7 @@ const useStyles = makeStyles()((theme) => ({
         marginTop: '10px'
     },
 
-    description: {
+    notes: {
         fontSize: '14px',
         marginTop: '10px',
         display: '-webkit-box',
@@ -99,7 +99,7 @@ const SearchResult: FC<SearchResultProps> = ({ hike }) => {
                         </Box>
                     }
 
-                    <Box className={cx(classes.description)}>{hike.description}</Box>
+                    <Box className={cx(classes.notes)}>{hike.notes}</Box>
                 </Box>
             </CardContent>
         </Card>

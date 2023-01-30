@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, {FC, forwardRef, RefObject, useContext, useEffect, useState} from 'react';
 import {Autocomplete, AutocompleteChangeDetails, Box, Button, FormControl, FormControlLabel, Grid, TextField} from '@mui/material';
 import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterLuxon} from '@mui/x-date-pickers/AdapterLuxon';
@@ -62,10 +62,15 @@ const useStyles = makeStyles()((theme) => ({
     }
 }));
 
-const EditHike = () => {
+interface EditHikeProps {
+    topOfPageRef: RefObject<HTMLElement>;
+}
+
+const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const { classes, cx } = useStyles();
+    const { setBannerMessage, setBannerSeverity } = useContext(MainContext);
     const [ trail, setTrail ] = useState<string>('');
-    const [ dateOfHike, setDateOfHike ] = useState<string>('');
+    const [ dateOfHike, setDateOfHike ] = useState<string | null>(null);
     const [ conditions, setConditions ] = useState<string>('');
     const [ crowds, setCrowds ] = useState<string>('');
     const [ knownHikers, setKnownHikers ] = useState<string[]>([]);
@@ -75,7 +80,8 @@ const EditHike = () => {
     const [ tags, setTags ] = useState<string[]>([]);
     const [ photos, setPhotos ] = useState<Photo[]>([]);
     const [ retrievedKnownHikers, setRetrievedKnownHikers ] = useState<boolean>(false);
-    const { setBannerMessage, setBannerSeverity } = useContext(MainContext);
+    const [ trailInputError, setTrailInputError ] = useState<boolean>(false);
+    const [ dateOfHikeInputError, setDateOfHikeInputError ] = useState<boolean>(false);
 
     useEffect(() => {
         const getKnownHikers = async () => {
@@ -112,11 +118,36 @@ const EditHike = () => {
         setTags(value);
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         try {
+            let hasError = false;
+
+            if (trail === '') {
+                setTrailInputError(true);
+                hasError = true;
+            } else {
+                setTrailInputError(false);
+            }
+
+            if (dateOfHike === null) {
+                setDateOfHikeInputError(true);
+                hasError = true;
+            } else {
+                setDateOfHikeInputError(false);
+            }
+
+            if (hasError) {
+                setBannerSeverity('error');
+                setBannerMessage('Some required fields are empty');
+                return;
+            } else {
+                setBannerSeverity('info');
+                setBannerMessage('');
+            }
+
             const hike: Hike = {
                 trail,
-                dateOfHike,
+                dateOfHike: dateOfHike || '',
                 conditions,
                 crowds,
                 hikers,
@@ -126,10 +157,14 @@ const EditHike = () => {
                 photos
             };
 
-            DataService.createHike(hike);
+            await DataService.createHike(hike);
         } catch (error) {
             setBannerSeverity('error');
-            setBannerMessage('Error retrieving known hikers')
+            setBannerMessage('Error saving hike')
+
+            if (topOfPageRef && topOfPageRef.current) {
+                topOfPageRef.current.scrollIntoView();
+            }
         }
     };
 
@@ -139,7 +174,7 @@ const EditHike = () => {
                 <FormControl className={cx(classes.field)}>
                     <FormControlLabel
                         labelPlacement='start'
-                        label='Trail:'
+                        label='Trail*'
                         classes={{ label: classes.textFieldLabel }}
                         control={
                             <TextField
@@ -148,9 +183,9 @@ const EditHike = () => {
                                 variant='outlined'
                                 value={trail}
                                 size='small'
+                                error={trailInputError}
                                 fullWidth={true}
                                 autoCorrect='off'
-                                required={true}
                                 inputProps={{ maxLength: 255 }}
                                 onChange={(event) => setTrail(event.target.value)}
                             />
@@ -163,14 +198,15 @@ const EditHike = () => {
                 <FormControl className={cx(classes.field, classes.datePickerField)}>
                     <FormControlLabel
                         labelPlacement='start'
-                        label='Date of hike:'
+                        label='Date of hike*'
                         classes={{ label: classes.textFieldLabel }}
                         control={
                             <LocalizationProvider dateAdapter={AdapterLuxon}>
                                 <DatePicker
                                     value={dateOfHike}
-                                    onChange={(newValue) => setDateOfHike(newValue || '') }
-                                    renderInput={(params) => <TextField {...params} size='small' />}
+                                    onChange={(newValue) => setDateOfHike(newValue || null) }
+                                    renderInput={(params) => <TextField {...params} size='small' error={dateOfHikeInputError}
+                                    />}
                                 />
                             </LocalizationProvider>
                         }
@@ -182,7 +218,7 @@ const EditHike = () => {
                 <FormControl className={cx(classes.field)}>
                     <FormControlLabel
                         labelPlacement='start'
-                        label='Conditions:'
+                        label='Conditions'
                         classes={{ label: classes.textFieldLabel }}
                         control={
                             <TextField
@@ -205,7 +241,7 @@ const EditHike = () => {
                 <FormControl className={cx(classes.field)}>
                     <FormControlLabel
                         labelPlacement='start'
-                        label='Crowds:'
+                        label='Crowds'
                         classes={{ label: classes.textFieldLabel }}
                         control={
                             <TextField
@@ -228,7 +264,7 @@ const EditHike = () => {
                 <FormControl className={cx(classes.wideField)}>
                     <FormControlLabel
                         labelPlacement='start'
-                        label='Hikers:'
+                        label='Hikers'
                         classes={{ label: classes.textFieldLabel }}
                         control={
                             <Autocomplete
@@ -256,7 +292,7 @@ const EditHike = () => {
                 <FormControl className={cx(classes.wideField)}>
                     <FormControlLabel
                         labelPlacement='start'
-                        label='Link:'
+                        label='Link'
                         classes={{ label: classes.textFieldLabel }}
                         control={
                             <TextField
@@ -279,7 +315,7 @@ const EditHike = () => {
                 <FormControl className={cx(classes.wideField, classes.multilineTextField)}>
                     <FormControlLabel
                         labelPlacement='start'
-                        label='Notes:'
+                        label='Notes'
                         classes={{ label: classes.textFieldLabel }}
                         control={
                             <TextField
@@ -303,7 +339,7 @@ const EditHike = () => {
                 <FormControl className={cx(classes.wideField)}>
                     <FormControlLabel
                         labelPlacement='start'
-                        label='Tags:'
+                        label='Tags'
                         classes={{ label: classes.textFieldLabel }}
                         control={
                             <Autocomplete

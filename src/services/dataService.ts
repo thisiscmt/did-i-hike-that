@@ -1,6 +1,6 @@
 import Axios, {AxiosProgressEvent, AxiosRequestConfig} from 'axios';
 
-import {Hike, HikeSearchParams} from '../models/models';
+import {Hike, HikeSearchParams, Photo} from '../models/models';
 
 export const getHikes = async (searchParams?: HikeSearchParams): Promise<{ rows: Hike[]; count: number }> => {
     const config: AxiosRequestConfig = {
@@ -39,8 +39,8 @@ export const createHike = (hike: Hike, onUploadProgress?: (axiosProgressEvent: A
     formData.append('trail', hike.trail);
     formData.append('dateOfHike', hike.dateOfHike);
 
-    if (hike.description) {
-        formData.append('description', hike.description);
+    if (hike.notes) {
+        formData.append('description', hike.notes);
     }
 
     if (hike.link) {
@@ -52,26 +52,25 @@ export const createHike = (hike: Hike, onUploadProgress?: (axiosProgressEvent: A
     }
 
     if (hike.crowds) {
-        formData.append('description', hike.crowds);
+        formData.append('crowds', hike.crowds);
     }
 
     if (hike.tags) {
-        formData.append('description', hike.tags);
+        formData.append('tags', hike.tags.join(','));
     }
 
     if (hike.hikers) {
-        formData.append('description', hike.hikers.join(','));
+        formData.append('hikers', hike.hikers.join(','));
     }
 
     if (hike.photos) {
-        hike.photos.forEach((file: File) => {
-            formData.append('files', file);
+        hike.photos.forEach((photo: Photo) => {
+            formData.append('files', photo.file);
         });
     }
 
     const config: AxiosRequestConfig = {
         headers: {
-            'Content-Type': 'multipart/form-data',
             'x-diht-agent': process.env.REACT_APP_USER_AGENT
         }
     };
@@ -80,7 +79,7 @@ export const createHike = (hike: Hike, onUploadProgress?: (axiosProgressEvent: A
         config.onUploadProgress = onUploadProgress;
     }
 
-    return Axios.post(process.env.REACT_APP_API_URL + '/hike', hike, config)
+    return Axios.post(process.env.REACT_APP_API_URL + '/hike', formData, config)
 };
 
 export const updateHike = (hike: Hike, onUploadProgress?: (axiosProgressEvent: AxiosProgressEvent) => void) => {
