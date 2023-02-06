@@ -21,6 +21,7 @@ export interface Hiker {
 export interface Photo {
     file: File;
     fileName: string;
+    filePath: string;
     caption: string;
 }
 

@@ -1,6 +1,20 @@
 import React, {FC, RefObject, useContext, useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
-import {Autocomplete, AutocompleteChangeDetails, Box, Button, Chip, FormControl, FormControlLabel, Grid, TextField} from '@mui/material';
+import {
+    Autocomplete,
+    AutocompleteChangeDetails,
+    Box,
+    Button,
+    FormControl,
+    FormControlLabel,
+    Grid,
+    IconButton,
+    List,
+    ListItem,
+    TextField,
+    Typography
+} from '@mui/material';
+import {DeleteOutlineOutlined} from '@mui/icons-material';
 import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterLuxon} from '@mui/x-date-pickers/AdapterLuxon';
 import { makeStyles } from 'tss-react/mui';
@@ -18,12 +32,20 @@ const useStyles = makeStyles()((theme) => ({
         marginBottom: '24px'
     },
 
+    shortRow: {
+        marginBottom: '12px'
+    },
+
     field: {
         width: '500px',
 
         '& .MuiFormControlLabel-root': {
             marginLeft: 0,
             marginRight: 'initial'
+        },
+
+        '& .MuiInputBase-root': {
+            paddingRight: 0
         }
     },
 
@@ -33,6 +55,16 @@ const useStyles = makeStyles()((theme) => ({
         '& .MuiFormControlLabel-root': {
             marginLeft: 0,
             marginRight: 'initial'
+        },
+
+        '& .MuiInputBase-root': {
+            paddingRight: 0
+        }
+    },
+
+    multilineTextField: {
+        '& .MuiFormControlLabel-root': {
+            alignItems: 'flex-start'
         }
     },
 
@@ -47,16 +79,52 @@ const useStyles = makeStyles()((theme) => ({
         '& .MuiInputBase-root': {
             paddingRight: '14px'
         }
-   },
-
-    textFieldLabel: {
-        minWidth: '120px',
     },
 
-    multilineTextField: {
+    photosField: {
         '& .MuiFormControlLabel-root': {
-            alignItems: 'flex-start'
+            marginLeft: 0,
+            marginRight: 'initial'
         }
+    },
+
+    photoCaptionField: {
+        width: '350px'
+    },
+
+    fieldLabel: {
+        minWidth: '120px'
+    },
+
+    fileUploadInput: {
+        display: 'none'
+    },
+
+    photosList: {
+        marginLeft: '113px',
+        marginTop: '8px',
+
+        '& .MuiListItem-gutters': {
+            paddingBottom: 0,
+
+            ':first-child': {
+                paddingTop: 0
+            }
+        }
+    },
+
+    photoFileName: {
+        width: '250px'
+    },
+
+    photoCaptionLabel: {
+        '& .MuiFormControlLabel-label': {
+            marginRight: '10px',
+        }
+    },
+
+    deletePhotoButton: {
+        marginLeft: '4px'
     },
 
     actions: {
@@ -113,6 +181,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                     setLink(hike.link || '');
                     setNotes(hike.description || '');
                     setTags(hike.tags ? hike.tags.split(',').map((tag: string) => tag.trim()) : []);
+                    setPhotos(hike.photos);
 
                     setRetrievedHike(true);
                 }
@@ -151,7 +220,35 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
         setTags(value);
     };
 
+    const handleSelectFile = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event && event.target && event.target.files && event.target.files.length > 0) {
+            setPhotos([...photos, { file: event.target.files[0], fileName: event.target.files[0].name, filePath: '', caption: ''}])
+        }
+    };
+
+    const handleUpdatePhotoCaption = (fileName: string, caption: string) => {
+        const index = photos.findIndex((photo: Photo) => photo.fileName === fileName);
+
+        if (index > -1) {
+            const newPhotos = [...photos];
+            newPhotos[index].caption = caption;
+            setPhotos(newPhotos);
+        }
+    };
+
+    const handleDeletePhoto = (fileName: string) => {
+        const index = photos.findIndex((photo: Photo) => photo.fileName === fileName);
+
+        if (index > -1) {
+            const newPhotos = [...photos];
+            newPhotos.splice(index, 1);
+            setPhotos(newPhotos);
+        }
+    };
+
     const handleSave = async () => {
+        console.log('photos: %o', photos);
+
         try {
             let hasError = false;
 
@@ -178,17 +275,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 setBanner('');
             }
 
-            const hike: Hike = {
-                trail,
-                dateOfHike: dateOfHike || '',
-                conditions,
-                crowds,
-                hikers,
-                notes,
-                link,
-                tags,
-                photos
-            };
+            const hike: Hike = {trail, dateOfHike: dateOfHike || '', conditions, crowds, hikers, notes, link, tags, photos};
 
             if (hikeId) {
                 await DataService.updateHike(hike);
@@ -210,7 +297,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                     <FormControlLabel
                         labelPlacement='start'
                         label='Trail*'
-                        classes={{ label: classes.textFieldLabel }}
+                        classes={{ label: classes.fieldLabel }}
                         control={
                             <TextField
                                 name='Trail'
@@ -234,7 +321,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                     <FormControlLabel
                         labelPlacement='start'
                         label='Date of hike*'
-                        classes={{ label: classes.textFieldLabel }}
+                        classes={{ label: classes.fieldLabel }}
                         control={
                             <LocalizationProvider dateAdapter={AdapterLuxon}>
                                 <DatePicker
@@ -254,7 +341,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                     <FormControlLabel
                         labelPlacement='start'
                         label='Conditions'
-                        classes={{ label: classes.textFieldLabel }}
+                        classes={{ label: classes.fieldLabel }}
                         control={
                             <TextField
                                 name='Conditions'
@@ -277,7 +364,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                     <FormControlLabel
                         labelPlacement='start'
                         label='Crowds'
-                        classes={{ label: classes.textFieldLabel }}
+                        classes={{ label: classes.fieldLabel }}
                         control={
                             <TextField
                                 name='Crowds'
@@ -300,7 +387,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                     <FormControlLabel
                         labelPlacement='start'
                         label='Hikers'
-                        classes={{ label: classes.textFieldLabel }}
+                        classes={{ label: classes.fieldLabel }}
                         control={
                             <Autocomplete
                                 multiple={true}
@@ -313,9 +400,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                                 onChange={handleChangeHikers}
                                 filterSelectedOptions
                                 renderInput={(params) => (
-                                    <TextField
-                                        {...params}
-                                    />
+                                    <TextField {...params} />
                                 )}
                             />
                         }
@@ -328,7 +413,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                     <FormControlLabel
                         labelPlacement='start'
                         label='Link'
-                        classes={{ label: classes.textFieldLabel }}
+                        classes={{ label: classes.fieldLabel }}
                         control={
                             <TextField
                                 name='Link'
@@ -351,7 +436,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                     <FormControlLabel
                         labelPlacement='start'
                         label='Notes'
-                        classes={{ label: classes.textFieldLabel }}
+                        classes={{ label: classes.fieldLabel }}
                         control={
                             <TextField
                                 name='Notes'
@@ -375,7 +460,8 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                     <FormControlLabel
                         labelPlacement='start'
                         label='Tags'
-                        classes={{ label: classes.textFieldLabel }}
+                        classes={{ label: classes.fieldLabel }}
+                        slotProps={{ typography: {variant: 'body2'} }}
                         control={
                             <Autocomplete
                                 multiple={true}
@@ -388,14 +474,78 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                                 onChange={handleChangeTags}
                                 filterSelectedOptions
                                 renderInput={(params) => (
-                                    <TextField
-                                        {...params}
-                                    />
+                                    <TextField {...params} />
                                 )}
                             />
                         }
                     />
                 </FormControl>
+            </Grid>
+
+            <Grid item xs={12}>
+                <FormControl className={cx(classes.photosField)}>
+                    <FormControlLabel
+                        labelPlacement='start'
+                        label='Photos'
+                        classes={{ label: classes.fieldLabel }}
+                        slotProps={{ typography: {variant: 'body2'} }}
+                        control={
+                            <>
+                                <input
+                                    type='file'
+                                    id='FileUpload'
+                                    name='file'
+                                    className={classes.fileUploadInput}
+                                    onChange={handleSelectFile}
+                                    accept='image/*'
+                                />
+                                <label htmlFor='FileUpload'>
+                                    <Button component='span'>Browse</Button>
+                                </label>
+                            </>
+                        }
+                    />
+                </FormControl>
+            </Grid>
+
+            <Grid item xs={12}>
+                <List className={cx(classes.photosList)} disablePadding={true}>
+                    {
+                        photos.map((photo: Photo) => (
+                            <ListItem key={photo.fileName}>
+                                <Typography variant='body2' className={cx(classes.photoFileName)}>{SharedService.getFileNameForPhoto(photo)}</Typography>
+
+                                <FormControl className={cx(classes.photoCaptionField)}>
+                                    <FormControlLabel
+                                        label='Caption'
+                                        labelPlacement='start'
+                                        className={cx(classes.photoCaptionLabel)}
+                                        slotProps={{ typography: {variant: 'body2'} }}
+                                        control={
+                                            <>
+                                                <IconButton
+                                                    aria-label='delete photo'
+                                                    className={cx(classes.deletePhotoButton)}
+                                                    onClick={() => handleDeletePhoto(photo.fileName)}
+                                                    title='Remove photo'
+                                                    size='small'
+                                                    color='error'
+                                                >
+                                                    <DeleteOutlineOutlined />
+                                                </IconButton>
+                                                <TextField
+                                                    value={photo.caption}
+                                                    size='small'
+                                                    onChange={(event) => handleUpdatePhotoCaption(photo.fileName, event.target.value)}
+                                                />
+                                            </>
+                                        }
+                                    />
+                                </FormControl>
+                            </ListItem>
+                        ))
+                    }
+                </List>
             </Grid>
 
             <Grid item xs={12} className={cx(classes.actions)}>
