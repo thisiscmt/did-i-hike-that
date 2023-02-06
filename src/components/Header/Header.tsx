@@ -61,6 +61,7 @@ const Header = () => {
 
     useEffect(() => {
         setBanner('');
+    // eslint-disable-next-line
     }, [location]);
 
     const handleMobileMenuClick = (value: boolean) => {

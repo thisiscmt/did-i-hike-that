@@ -34,7 +34,7 @@ export const getHike = async (hikeId: string) => {
     return response.data;
 };
 
-export const createHike = (hike: Hike, onUploadProgress?: (axiosProgressEvent: AxiosProgressEvent) => void) => {
+export const createHike = async (hike: Hike, onUploadProgress?: (axiosProgressEvent: AxiosProgressEvent) => void) => {
     const formData = new FormData();
     formData.append('trail', hike.trail);
     formData.append('dateOfHike', hike.dateOfHike);
@@ -55,11 +55,11 @@ export const createHike = (hike: Hike, onUploadProgress?: (axiosProgressEvent: A
         formData.append('crowds', hike.crowds);
     }
 
-    if (hike.tags) {
+    if (hike.tags && hike.tags.length > 0) {
         formData.append('tags', hike.tags.join(','));
     }
 
-    if (hike.hikers) {
+    if (hike.hikers && hike.hikers.length > 0) {
         formData.append('hikers', hike.hikers.join(','));
     }
 
@@ -79,7 +79,8 @@ export const createHike = (hike: Hike, onUploadProgress?: (axiosProgressEvent: A
         config.onUploadProgress = onUploadProgress;
     }
 
-    return Axios.post(process.env.REACT_APP_API_URL + '/hike', formData, config)
+    const response = await Axios.post(process.env.REACT_APP_API_URL + '/hike', formData, config);
+    return response.data;
 };
 
 export const updateHike = (hike: Hike, onUploadProgress?: (axiosProgressEvent: AxiosProgressEvent) => void) => {

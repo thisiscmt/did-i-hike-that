@@ -6,17 +6,17 @@ import {
     Box,
     Button,
     FormControl,
-    FormControlLabel,
+    FormControlLabel, FormLabel,
     Grid,
     IconButton,
     List,
     ListItem,
-    TextField,
-    Typography
+    TextField
 } from '@mui/material';
 import {DeleteOutlineOutlined} from '@mui/icons-material';
 import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers';
 import {AdapterLuxon} from '@mui/x-date-pickers/AdapterLuxon';
+import { DateTime } from 'luxon';
 import { makeStyles } from 'tss-react/mui';
 
 import * as DataService from '../../services/dataService';
@@ -25,9 +25,6 @@ import {Hike, Hiker, Photo} from '../../models/models';
 import {MainContext} from '../../contexts/MainContext';
 
 const useStyles = makeStyles()((theme) => ({
-    content: {
-    },
-
     row: {
         marginBottom: '24px'
     },
@@ -81,19 +78,14 @@ const useStyles = makeStyles()((theme) => ({
         }
     },
 
-    photosField: {
-        '& .MuiFormControlLabel-root': {
-            marginLeft: 0,
-            marginRight: 'initial'
-        }
-    },
-
-    photoCaptionField: {
-        width: '350px'
-    },
-
     fieldLabel: {
+        fontSize: '14px',
         minWidth: '120px'
+    },
+
+    photoFileInput: {
+        display: 'flex',
+        alignItems: 'center'
     },
 
     fileUploadInput: {
@@ -101,26 +93,26 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     photosList: {
-        marginLeft: '113px',
-        marginTop: '8px',
+        marginLeft: '128px',
+        marginTop: '10px',
 
-        '& .MuiListItem-gutters': {
+        '& .MuiListItem-padding': {
             paddingBottom: 0,
 
             ':first-child': {
                 paddingTop: 0
             }
+        },
+
+        '& .MuiInputBase-root': {
+            paddingRight: 0
         }
     },
 
     photoFileName: {
+        fontSize: '14px',
+        marginRight: '10px',
         width: '250px'
-    },
-
-    photoCaptionLabel: {
-        '& .MuiFormControlLabel-label': {
-            marginRight: '10px',
-        }
     },
 
     deletePhotoButton: {
@@ -131,6 +123,8 @@ const useStyles = makeStyles()((theme) => ({
         marginTop: '24px'
     }
 }));
+
+const MAX_PHOTOS_FOR_UPLOAD = 10;
 
 interface EditHikeProps {
     topOfPageRef: RefObject<HTMLElement>;
@@ -143,7 +137,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const navigate = useNavigate();
 
     const [ trail, setTrail ] = useState<string>('');
-    const [ dateOfHike, setDateOfHike ] = useState<string | null>(null);
+    const [ dateOfHike, setDateOfHike ] = useState<DateTime | null>(null);
     const [ conditions, setConditions ] = useState<string>('');
     const [ crowds, setCrowds ] = useState<string>('');
     const [ knownHikers, setKnownHikers ] = useState<string[]>([]);
@@ -186,7 +180,6 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                     setRetrievedHike(true);
                 }
             } catch(error) {
-
                 // TODO: Log this somewhere
             }
         }
@@ -204,7 +197,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
 
     const handleChangeHikers = (event: React.SyntheticEvent, value: string[], reason: string, details?: AutocompleteChangeDetails<string> | undefined) => {
         if (reason === 'createOption') {
-            // We make sure if the user specified an existing hiker, we use that exact name rather than create a duplicate in the database
+            // We make sure if the user specified an existing hiker, we use that exact name rather than create a duplicate record
            const knownHikerIndex = knownHikers.findIndex((item: string) => details?.option?.toLowerCase() === item.toLowerCase());
 
             if (knownHikerIndex > -1) {
@@ -220,13 +213,23 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
         setTags(value);
     };
 
-    const handleSelectFile = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event && event.target && event.target.files && event.target.files.length > 0) {
-            setPhotos([...photos, { file: event.target.files[0], fileName: event.target.files[0].name, filePath: '', caption: ''}])
+    const handleSelectPhoto = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files.length > 0) {
+            if (photos.length === MAX_PHOTOS_FOR_UPLOAD) {
+                return;
+            }
+
+            const fileName = event.target.files[0].name;
+
+            if (photos.find((photo: Photo) => photo.fileName.toLowerCase() === fileName.toLowerCase())) {
+                return;
+            }
+
+            setPhotos([...photos, { file: event.target.files[0], fileName, filePath: '', caption: '' }])
         }
     };
 
-    const handleUpdatePhotoCaption = (fileName: string, caption: string) => {
+    const handleChangePhotoCaption = (fileName: string, caption: string) => {
         const index = photos.findIndex((photo: Photo) => photo.fileName === fileName);
 
         if (index > -1) {
@@ -247,51 +250,64 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     };
 
     const handleSave = async () => {
-        console.log('photos: %o', photos);
-
         try {
-            let hasError = false;
+            if (validInput()) {
+                const hike: Hike = {trail, dateOfHike: dateOfHike ? dateOfHike.toString() : '', conditions, crowds, hikers, notes, link, tags, photos};
+                let hikeIdForNav: string;
 
-            if (trail === '') {
-                setTrailInputError(true);
-                hasError = true;
-            } else {
-                setTrailInputError(false);
+                if (hikeId) {
+                    await DataService.updateHike(hike);
+                    hikeIdForNav = hikeId;
+                } else {
+                    hikeIdForNav = await DataService.createHike(hike);
+                }
+
+                navigate(`/hike/${hikeIdForNav}`);
             }
-
-            if (dateOfHike === null) {
-                setDateOfHikeInputError(true);
-                hasError = true;
-            } else {
-                setDateOfHikeInputError(false);
-            }
-
-            if (hasError) {
-                setBanner('Some required fields are empty', 'error');
-                SharedService.scrollToTop(topOfPageRef);
-
-                return;
-            } else {
-                setBanner('');
-            }
-
-            const hike: Hike = {trail, dateOfHike: dateOfHike || '', conditions, crowds, hikers, notes, link, tags, photos};
-
-            if (hikeId) {
-                await DataService.updateHike(hike);
-            } else {
-                await DataService.createHike(hike);
-            }
-
-            navigate(`/hike/${hike.id}`);
         } catch (error) {
             setBanner('Error saving hike', 'error');
             SharedService.scrollToTop(topOfPageRef);
         }
     };
 
+    const validInput = () => {
+        let invalid = false;
+        let errorMsg = '';
+
+        if (trail === '') {
+            setTrailInputError(true);
+            errorMsg = 'A required field is empty';
+            invalid = true;
+        } else {
+            setTrailInputError(false);
+        }
+
+        if (dateOfHike === null) {
+            setDateOfHikeInputError(true);
+            errorMsg = 'A required field is empty';
+            invalid = true;
+        } else {
+            if (!dateOfHike.isValid) {
+                setDateOfHikeInputError(true);
+                invalid = true;
+                errorMsg = 'Invalid date value';
+            } else {
+                setDateOfHikeInputError(false);
+            }
+        }
+
+        if (invalid) {
+            setBanner(errorMsg, 'error');
+            SharedService.scrollToTop(topOfPageRef);
+        } else {
+            setBanner('');
+        }
+
+        return !invalid;
+    };
+
     return (
-        <Box className={cx(classes.content)}>
+        <>
             <Grid item xs={12} className={cx(classes.row)}>
                 <FormControl className={cx(classes.field)}>
                     <FormControlLabel
@@ -327,8 +343,9 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                                 <DatePicker
                                     value={dateOfHike}
                                     onChange={(newValue) => setDateOfHike(newValue || null) }
-                                    renderInput={(params) => <TextField {...params} size='small' error={dateOfHikeInputError}
-                                    />}
+                                    renderInput={(params) => (
+                                        <TextField {...params} size='small' error={dateOfHikeInputError} inputProps={{ ...params.inputProps, maxLength: 10 }} />
+                                    )}
                                 />
                             </LocalizationProvider>
                         }
@@ -461,7 +478,6 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                         labelPlacement='start'
                         label='Tags'
                         classes={{ label: classes.fieldLabel }}
-                        slotProps={{ typography: {variant: 'body2'} }}
                         control={
                             <Autocomplete
                                 multiple={true}
@@ -483,65 +499,48 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             </Grid>
 
             <Grid item xs={12}>
-                <FormControl className={cx(classes.photosField)}>
-                    <FormControlLabel
-                        labelPlacement='start'
-                        label='Photos'
-                        classes={{ label: classes.fieldLabel }}
-                        slotProps={{ typography: {variant: 'body2'} }}
-                        control={
-                            <>
-                                <input
-                                    type='file'
-                                    id='FileUpload'
-                                    name='file'
-                                    className={classes.fileUploadInput}
-                                    onChange={handleSelectFile}
-                                    accept='image/*'
-                                />
-                                <label htmlFor='FileUpload'>
-                                    <Button component='span'>Browse</Button>
-                                </label>
-                            </>
-                        }
-                    />
-                </FormControl>
+                <Box className={cx(classes.photoFileInput)}>
+                    <FormLabel className={cx(classes.fieldLabel)}>Photos</FormLabel>
+
+                        <input
+                            type='file'
+                            id='FileUpload'
+                            name='file'
+                            className={classes.fileUploadInput}
+                            onChange={handleSelectPhoto}
+                            accept='image/*'
+                        />
+                        <label htmlFor='FileUpload'>
+                            <Button component='span'>Browse</Button>
+                        </label>
+                </Box>
             </Grid>
 
             <Grid item xs={12}>
                 <List className={cx(classes.photosList)} disablePadding={true}>
                     {
                         photos.map((photo: Photo) => (
-                            <ListItem key={photo.fileName}>
-                                <Typography variant='body2' className={cx(classes.photoFileName)}>{SharedService.getFileNameForPhoto(photo)}</Typography>
+                            <ListItem key={photo.fileName} disableGutters={true}>
+                                <FormLabel htmlFor={`hike-photo-${photo.fileName}`} className={cx(classes.photoFileName)}>{SharedService.getFileNameForPhoto(photo)}</FormLabel>
 
-                                <FormControl className={cx(classes.photoCaptionField)}>
-                                    <FormControlLabel
-                                        label='Caption'
-                                        labelPlacement='start'
-                                        className={cx(classes.photoCaptionLabel)}
-                                        slotProps={{ typography: {variant: 'body2'} }}
-                                        control={
-                                            <>
-                                                <IconButton
-                                                    aria-label='delete photo'
-                                                    className={cx(classes.deletePhotoButton)}
-                                                    onClick={() => handleDeletePhoto(photo.fileName)}
-                                                    title='Remove photo'
-                                                    size='small'
-                                                    color='error'
-                                                >
-                                                    <DeleteOutlineOutlined />
-                                                </IconButton>
-                                                <TextField
-                                                    value={photo.caption}
-                                                    size='small'
-                                                    onChange={(event) => handleUpdatePhotoCaption(photo.fileName, event.target.value)}
-                                                />
-                                            </>
-                                        }
-                                    />
-                                </FormControl>
+                                <TextField
+                                    id={`hike-photo-${photo.fileName}`}
+                                    value={photo.caption}
+                                    size='small'
+                                    placeholder='Type a caption'
+                                    onChange={(event) => handleChangePhotoCaption(photo.fileName, event.target.value)}
+                                />
+
+                                <IconButton
+                                    aria-label='delete photo'
+                                    className={cx(classes.deletePhotoButton)}
+                                    onClick={() => handleDeletePhoto(photo.fileName)}
+                                    title='Remove photo'
+                                    size='small'
+                                    color='error'
+                                >
+                                    <DeleteOutlineOutlined />
+                                </IconButton>
                             </ListItem>
                         ))
                     }
@@ -551,7 +550,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             <Grid item xs={12} className={cx(classes.actions)}>
                 <Button onClick={handleSave} variant='contained' color='primary'>Save</Button>
             </Grid>
-        </Box>
+        </>
     )
 };
 
