@@ -40,7 +40,7 @@
     },
     "devDependencies": {
         "@types/luxon": "^3.2.0"
-    }
+    },
     "eslintConfig": {
         "extends": [
             "react-app",
