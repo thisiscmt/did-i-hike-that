@@ -8,7 +8,6 @@ const Preferences = () => {
 
     return (
         <Box>
-            Preferences
         </Box>
     )
 };

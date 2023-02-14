@@ -76,7 +76,7 @@ const SearchResult: FC<SearchResultProps> = ({ hike }) => {
     };
 
     return (
-        <Card className={cx(classes.card)} raised={true} elevation={4}>
+        <Card className={cx(classes.card)} raised={true} elevation={2}>
             <CardContent className={cx(classes.content)}>
                 <Box>
                     <img className={cx(classes.thumbnail)} alt='Hike pic' src={thumbnailSource} aria-label='Hike photo' />
@@ -99,7 +99,7 @@ const SearchResult: FC<SearchResultProps> = ({ hike }) => {
                         </Box>
                     }
 
-                    <Box className={cx(classes.notes)}>{hike.notes}</Box>
+                    <Box className={cx(classes.notes)}>{hike.description}</Box>
                 </Box>
             </CardContent>
         </Card>

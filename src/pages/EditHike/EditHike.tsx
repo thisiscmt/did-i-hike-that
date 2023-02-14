@@ -142,7 +142,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const [ crowds, setCrowds ] = useState<string>('');
     const [ knownHikers, setKnownHikers ] = useState<string[]>([]);
     const [ hikers, setHikers ] = useState<string[]>([]);
-    const [ notes, setNotes ] = useState<string>('');
+    const [ description, setDescription ] = useState<string>('');
     const [ link, setLink ] = useState<string>('');
     const [ tags, setTags ] = useState<string[]>([]);
     const [ photos, setPhotos ] = useState<Photo[]>([]);
@@ -173,7 +173,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                     setCrowds(hike.crowds || '');
                     setHikers(hike.hikers?.map((hiker: Hiker) => hiker.fullName));
                     setLink(hike.link || '');
-                    setNotes(hike.description || '');
+                    setDescription(hike.description || '');
                     setTags(hike.tags ? hike.tags.split(',').map((tag: string) => tag.trim()) : []);
                     setPhotos(hike.photos);
 
@@ -252,7 +252,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const handleSave = async () => {
         try {
             if (validInput()) {
-                const hike: Hike = {trail, dateOfHike: dateOfHike ? dateOfHike.toString() : '', conditions, crowds, hikers, notes, link, tags, photos};
+                const hike: Hike = {trail, dateOfHike: dateOfHike ? dateOfHike.toString() : '', conditions, crowds, hikers, description, link, tags, photos};
                 let hikeIdForNav: string;
 
                 if (hikeId) {
@@ -459,13 +459,13 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                                 name='Notes'
                                 margin='none'
                                 variant='outlined'
-                                value={notes}
+                                value={description}
                                 size='small'
                                 fullWidth={true}
                                 autoCorrect='off'
                                 multiline={true}
                                 rows={6}
-                                onChange={(event) => setNotes(event.target.value)}
+                                onChange={(event) => setDescription(event.target.value)}
                             />
                         }
                     />

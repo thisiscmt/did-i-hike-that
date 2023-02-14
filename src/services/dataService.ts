@@ -39,8 +39,8 @@ export const createHike = async (hike: Hike, onUploadProgress?: (axiosProgressEv
     formData.append('trail', hike.trail);
     formData.append('dateOfHike', hike.dateOfHike);
 
-    if (hike.notes) {
-        formData.append('description', hike.notes);
+    if (hike.description) {
+        formData.append('description', hike.description);
     }
 
     if (hike.link) {
