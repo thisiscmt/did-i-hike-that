@@ -26,7 +26,13 @@ import {MainContext} from '../../contexts/MainContext';
 
 const useStyles = makeStyles()((theme) => ({
     row: {
-        marginBottom: '24px'
+        marginBottom: '24px',
+
+        [theme.breakpoints.down(470)]: {
+            '& .MuiFormControlLabel-root': {
+                flexDirection: 'column-reverse'
+            }
+        }
     },
 
     shortRow: {
@@ -43,6 +49,10 @@ const useStyles = makeStyles()((theme) => ({
 
         '& .MuiInputBase-root': {
             paddingRight: 0
+        },
+
+        [theme.breakpoints.down(700)]: {
+            width: 'unset'
         }
     },
 
@@ -56,6 +66,14 @@ const useStyles = makeStyles()((theme) => ({
 
         '& .MuiInputBase-root': {
             paddingRight: 0
+        },
+
+        [theme.breakpoints.down(1024)]: {
+            width: '500px'
+        },
+
+        [theme.breakpoints.down(700)]: {
+            width: '100%'
         }
     },
 
@@ -80,12 +98,25 @@ const useStyles = makeStyles()((theme) => ({
 
     fieldLabel: {
         fontSize: '14px',
-        minWidth: '120px'
+        minWidth: '120px',
+
+        [theme.breakpoints.down(470)]: {
+            marginBottom: '4px',
+            width: '100%'
+        }
     },
 
     photoFileInput: {
         display: 'flex',
-        alignItems: 'center'
+        alignItems: 'center',
+
+        [theme.breakpoints.down(470)]: {
+            '& .MuiFormLabel-root': {
+                marginBottom: '1px',
+                minWidth: '60px',
+                width: 'unset'
+            }
+        }
     },
 
     fileUploadInput: {
@@ -106,13 +137,31 @@ const useStyles = makeStyles()((theme) => ({
 
         '& .MuiInputBase-root': {
             paddingRight: 0
+        },
+
+        [theme.breakpoints.down(700)]: {
+            marginLeft: 0,
+
+            '& .MuiFormLabel-root': {
+                width: '100%'
+            },
+
+            '& .MuiListItem-root': {
+                flexWrap: 'wrap',
+                paddingTop: '16px'
+            }
         }
     },
 
     photoFileName: {
         fontSize: '14px',
         marginRight: '10px',
-        width: '250px'
+        width: '250px',
+
+        [theme.breakpoints.down(700)]: {
+            marginBottom: '4px',
+            marginRight: 0
+        }
     },
 
     deletePhotoButton: {
@@ -271,13 +320,13 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     };
 
     const validInput = () => {
-        let invalid = false;
+        let valid = true;
         let errorMsg = '';
 
         if (trail === '') {
             setTrailInputError(true);
             errorMsg = 'A required field is empty';
-            invalid = true;
+            valid = false;
         } else {
             setTrailInputError(false);
         }
@@ -285,25 +334,25 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
         if (dateOfHike === null) {
             setDateOfHikeInputError(true);
             errorMsg = 'A required field is empty';
-            invalid = true;
+            valid = false;
         } else {
             if (!dateOfHike.isValid) {
                 setDateOfHikeInputError(true);
-                invalid = true;
+                valid = false;
                 errorMsg = 'Invalid date value';
             } else {
                 setDateOfHikeInputError(false);
             }
         }
 
-        if (invalid) {
+        if (valid) {
+            setBanner('');
+        } else {
             setBanner(errorMsg, 'error');
             SharedService.scrollToTop(topOfPageRef);
-        } else {
-            setBanner('');
         }
 
-        return !invalid;
+        return valid;
     };
 
     return (
