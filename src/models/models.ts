@@ -4,10 +4,10 @@ export interface Hike {
     dateOfHike: string;
     conditions?: string;
     crowds?: string;
-    hikers?: string[];
+    hikers?: Hiker[];
     link?: string;
     description?: string;
-    tags?: string[];
+    tags?: string;
     photos?: Photo[];
     fullNames?: string;
     filePath?: string;

@@ -1,6 +1,6 @@
 import Axios, {AxiosProgressEvent, AxiosRequestConfig} from 'axios';
 
-import {Hike, HikeSearchParams, Photo} from '../models/models';
+import {Hike, Hiker, HikeSearchParams, Photo} from '../models/models';
 
 export const getHikes = async (searchParams?: HikeSearchParams): Promise<{ rows: Hike[]; count: number }> => {
     const config: AxiosRequestConfig = {
@@ -18,7 +18,7 @@ export const getHikes = async (searchParams?: HikeSearchParams): Promise<{ rows:
     return response.data;
 };
 
-export const getHike = async (hikeId: string) => {
+export const getHike = async (hikeId: string): Promise<Hike> => {
     const config = {
         headers: {
             'Content-Type': 'application/json',
@@ -31,6 +31,10 @@ export const getHike = async (hikeId: string) => {
 
 
     const response = await Axios.get(process.env.REACT_APP_API_URL + `/hike/${hikeId}`, config)
+    const hike = {
+
+    }
+
     return response.data;
 };
 
@@ -55,12 +59,12 @@ export const createHike = async (hike: Hike, onUploadProgress?: (axiosProgressEv
         formData.append('crowds', hike.crowds);
     }
 
-    if (hike.tags && hike.tags.length > 0) {
-        formData.append('tags', hike.tags.join(','));
+    if (hike.tags) {
+        formData.append('tags', hike.tags);
     }
 
     if (hike.hikers && hike.hikers.length > 0) {
-        formData.append('hikers', hike.hikers.join(','));
+        formData.append('hikers', hike.hikers.map((hiker: Hiker) => hiker.fullName).join(','));
     }
 
     if (hike.photos) {

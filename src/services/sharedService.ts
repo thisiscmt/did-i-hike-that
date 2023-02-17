@@ -1,10 +1,6 @@
 import {RefObject} from 'react';
 import {Photo} from '../models/models';
 
-export const isMobile = () => {
-    return "ontouchstart" in document.documentElement;
-};
-
 export const getFileNameForPhoto = (photo: Photo) => {
     let fileName = '';
 

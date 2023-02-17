@@ -213,21 +213,26 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
 
         const getHike = async () => {
             try {
-                const hike = await DataService.getHike(hikeId || '');
+                if (hikeId) {
+                    const hike = await DataService.getHike(hikeId);
 
-                if (hike) {
-                    setTrail(hike.trail);
-                    setDateOfHike(hike.dateOfHike);
-                    setConditions(hike.conditions || '');
-                    setCrowds(hike.crowds || '');
-                    setHikers(hike.hikers?.map((hiker: Hiker) => hiker.fullName));
-                    setLink(hike.link || '');
-                    setDescription(hike.description || '');
-                    setTags(hike.tags ? hike.tags.split(',').map((tag: string) => tag.trim()) : []);
-                    setPhotos(hike.photos);
+                    if (hike) {
+                        setTrail(hike.trail);
+                        setDateOfHike(DateTime.fromFormat(hike.dateOfHike, 'yyyy-MM-dd'));
+                        setConditions(hike.conditions || '');
+                        setCrowds(hike.crowds || '');
+                        setHikers(hike.hikers?.map((hiker: Hiker) => hiker.fullName) || []);
+                        setLink(hike.link || '');
+                        setDescription(hike.description || '');
+                        setTags(hike.tags ? hike.tags.split(',').map((tag: string) => tag.trim()) : []);
+                        setPhotos(hike.photos || []);
 
-                    setRetrievedHike(true);
+                        setRetrievedHike(true);
+                    }
+                } else {
+                    // TODO: Show a message saying the given hike wasn't found
                 }
+
             } catch(error) {
                 // TODO: Log this somewhere
             }
@@ -301,7 +306,11 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const handleSave = async () => {
         try {
             if (validInput()) {
-                const hike: Hike = {trail, dateOfHike: dateOfHike ? dateOfHike.toString() : '', conditions, crowds, hikers, description, link, tags, photos};
+                const hikersToSave = hikers.map((hiker: string) => ({ fullName: hiker }))
+                const hike: Hike = {
+                    trail, dateOfHike: dateOfHike ? dateOfHike.toString() : '', conditions, crowds, hikers: hikersToSave, description, link,
+                    tags: tags.join(','), photos
+                };
                 let hikeIdForNav: string;
 
                 if (hikeId) {
