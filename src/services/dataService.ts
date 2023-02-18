@@ -31,10 +31,6 @@ export const getHike = async (hikeId: string): Promise<Hike> => {
 
 
     const response = await Axios.get(process.env.REACT_APP_API_URL + `/hike/${hikeId}`, config)
-    const hike = {
-
-    }
-
     return response.data;
 };
 
@@ -42,14 +38,6 @@ export const createHike = async (hike: Hike, onUploadProgress?: (axiosProgressEv
     const formData = new FormData();
     formData.append('trail', hike.trail);
     formData.append('dateOfHike', hike.dateOfHike);
-
-    if (hike.description) {
-        formData.append('description', hike.description);
-    }
-
-    if (hike.link) {
-        formData.append('link', hike.link);
-    }
 
     if (hike.conditions) {
         formData.append('conditions', hike.conditions);
@@ -59,12 +47,24 @@ export const createHike = async (hike: Hike, onUploadProgress?: (axiosProgressEv
         formData.append('crowds', hike.crowds);
     }
 
-    if (hike.tags) {
-        formData.append('tags', hike.tags);
+    if (hike.description) {
+        formData.append('description', hike.description);
     }
 
     if (hike.hikers && hike.hikers.length > 0) {
         formData.append('hikers', hike.hikers.map((hiker: Hiker) => hiker.fullName).join(','));
+    }
+
+    if (hike.tags) {
+        formData.append('tags', hike.tags);
+    }
+
+    if (hike.link) {
+        formData.append('link', hike.link);
+    }
+
+    if (hike.linkLabel) {
+        formData.append('linkLabel', hike.linkLabel);
     }
 
     if (hike.photos) {
@@ -75,7 +75,9 @@ export const createHike = async (hike: Hike, onUploadProgress?: (axiosProgressEv
 
     const config: AxiosRequestConfig = {
         headers: {
-            'x-diht-agent': process.env.REACT_APP_USER_AGENT
+            'x-diht-agent': process.env.REACT_APP_USER_AGENT,
+            'x-diht-trail': hike.trail,
+            'x-diht-date-of-hike': hike.dateOfHike
         }
     };
 
@@ -90,8 +92,9 @@ export const createHike = async (hike: Hike, onUploadProgress?: (axiosProgressEv
 export const updateHike = (hike: Hike, onUploadProgress?: (axiosProgressEvent: AxiosProgressEvent) => void) => {
     const config: AxiosRequestConfig = {
         headers: {
-            'Content-Type': 'multipart/form-data',
-            'x-diht-agent': process.env.REACT_APP_USER_AGENT
+            'x-diht-agent': process.env.REACT_APP_USER_AGENT,
+            'x-diht-trail': hike.trail,
+            'x-diht-date-of-hike': hike.dateOfHike
         }
     };
 

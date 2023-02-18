@@ -31,6 +31,10 @@ const useStyles = makeStyles()((theme) => ({
         [theme.breakpoints.down(470)]: {
             '& .MuiFormControlLabel-root': {
                 flexDirection: 'column-reverse'
+            },
+
+            '&.linkLabelField': {
+                marginBottom: '8px'
             }
         }
     },
@@ -53,8 +57,17 @@ const useStyles = makeStyles()((theme) => ({
 
         [theme.breakpoints.down(700)]: {
             width: 'unset'
+        },
+
+        '&.shortField': {
+            width: '350px',
+
+            [theme.breakpoints.down(500)]: {
+                width: 'unset'
+            }
         }
     },
+
 
     wideField: {
         width: '650px',
@@ -189,10 +202,11 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const [ dateOfHike, setDateOfHike ] = useState<DateTime | null>(null);
     const [ conditions, setConditions ] = useState<string>('');
     const [ crowds, setCrowds ] = useState<string>('');
+    const [ description, setDescription ] = useState<string>('');
     const [ knownHikers, setKnownHikers ] = useState<string[]>([]);
     const [ hikers, setHikers ] = useState<string[]>([]);
-    const [ description, setDescription ] = useState<string>('');
     const [ link, setLink ] = useState<string>('');
+    const [ linkLabel, setLinkLabel ] = useState<string>('');
     const [ tags, setTags ] = useState<string[]>([]);
     const [ photos, setPhotos ] = useState<Photo[]>([]);
     const [ retrievedKnownHikers, setRetrievedKnownHikers ] = useState<boolean>(false);
@@ -308,7 +322,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             if (validInput()) {
                 const hikersToSave = hikers.map((hiker: string) => ({ fullName: hiker }))
                 const hike: Hike = {
-                    trail, dateOfHike: dateOfHike ? dateOfHike.toString() : '', conditions, crowds, hikers: hikersToSave, description, link,
+                    trail, dateOfHike: dateOfHike ? dateOfHike.toString() : '', conditions, crowds, hikers: hikersToSave, description, link, linkLabel,
                     tags: tags.join(','), photos
                 };
                 let hikeIdForNav: string;
@@ -533,11 +547,35 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 </FormControl>
             </Grid>
 
+            <Grid item xs={12} className={`${cx(classes.row)} linkLabelField`}>
+                <FormControl className={`${cx(classes.field)} shortField`}>
+                    <FormControlLabel
+                        labelPlacement='start'
+                        label='Link'
+                        classes={{ label: classes.fieldLabel }}
+                        control={
+                            <TextField
+                                name='LinkLabel'
+                                margin='none'
+                                variant='outlined'
+                                value={linkLabel}
+                                size='small'
+                                placeholder='Add label for link'
+                                fullWidth={true}
+                                autoCorrect='off'
+                                inputProps={{ maxLength: 255 }}
+                                onChange={(event) => setLinkLabel(event.target.value)}
+                            />
+                        }
+                    />
+                </FormControl>
+            </Grid>
+
             <Grid item xs={12} className={cx(classes.row)}>
                 <FormControl className={cx(classes.wideField)}>
                     <FormControlLabel
                         labelPlacement='start'
-                        label='Link'
+                        label=''
                         classes={{ label: classes.fieldLabel }}
                         control={
                             <TextField
@@ -546,6 +584,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                                 variant='outlined'
                                 value={link}
                                 size='small'
+                                placeholder='Add web address'
                                 fullWidth={true}
                                 autoCorrect='off'
                                 inputProps={{ maxLength: 255 }}

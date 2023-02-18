@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
-import {Box, Card, CardContent, Chip, Typography} from '@mui/material';
+import {Box, Card, CardContent, Chip, Link, Typography} from '@mui/material';
 import {makeStyles} from 'tss-react/mui';
 
 import {Hike, Hiker} from '../../models/models';
@@ -55,9 +55,6 @@ const ViewHike = () => {
             try {
                 if (hikeId) {
                     const currentHike = await DataService.getHike(hikeId);
-
-                    console.log('currentHike: %o', currentHike);
-
                     setHike(currentHike);
                 } else {
                     // TODO: Show a message saying the given hike wasn't found
@@ -70,6 +67,26 @@ const ViewHike = () => {
         document.title = 'View Hike - Did I Hike That?';
         getHike();
     }, [hikeId]);
+
+    const getValidUrl = () => {
+        let valueToCheck = hike.link;
+        let url = '';
+
+        if (valueToCheck) {
+            if (!valueToCheck.startsWith('http://') && !valueToCheck.startsWith('https://')) {
+                valueToCheck = 'http://' + valueToCheck;
+            }
+
+            // eslint-disable-next-line
+            if (valueToCheck.match(/\b(https?):\/\/[-A-Za-z0-9+&@#\/%?=~_|!:,.;]*[-A-Za-z0-9+&@#\/%=~_|]/)) {
+                url = valueToCheck;
+            }
+        }
+
+        return url;
+    }
+
+    const linkUrl = getValidUrl();
 
     return (
         <Box>
@@ -138,9 +155,22 @@ const ViewHike = () => {
                 </Box>
             }
 
+            {
+                hike.link && linkUrl &&
+                <Box className={cx(classes.field)}>
+                    <Typography variant='body2'>
+                        <Link href={linkUrl}>{hike.linkLabel || hike.link}</Link>
+                    </Typography>
+                </Box>
+            }
+
+            {
+                hike.photos && hike.photos.length > 0 &&
+                <Box>
 
 
-
+                </Box>
+            }
         </Box>
     )
 };

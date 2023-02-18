@@ -6,6 +6,7 @@ export interface Hike {
     crowds?: string;
     hikers?: Hiker[];
     link?: string;
+    linkLabel?: string;
     description?: string;
     tags?: string;
     photos?: Photo[];
