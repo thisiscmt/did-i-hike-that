@@ -560,7 +560,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                                 variant='outlined'
                                 value={linkLabel}
                                 size='small'
-                                placeholder='Add label for link'
+                                placeholder='Add label'
                                 fullWidth={true}
                                 autoCorrect='off'
                                 inputProps={{ maxLength: 255 }}

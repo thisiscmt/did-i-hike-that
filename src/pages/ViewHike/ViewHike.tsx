@@ -1,14 +1,15 @@
 import React, {useEffect, useState} from 'react';
-import {useParams} from 'react-router-dom';
-import {Box, Card, CardContent, Chip, Link, Typography} from '@mui/material';
+import {Link as RouteLink, useNavigate, useParams} from 'react-router-dom';
+import {Box, Button, Card, CardContent, Chip, IconButton, Link, Typography} from '@mui/material';
+import {EditOutlined} from '@mui/icons-material';
 import {makeStyles} from 'tss-react/mui';
 
-import {Hike, Hiker} from '../../models/models';
+import {Hike, Hiker, Photo} from '../../models/models';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
 
 const useStyles = makeStyles()((theme) => ({
-    card: {
+    section: {
         marginBottom: '24px'
     },
 
@@ -24,16 +25,21 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     fieldLabel: {
-        width: '100px'
+        minWidth: '100px'
+    },
+
+    shortFieldLabel: {
+        minWidth: '60px'
     },
 
     trail: {
+        alignItems: 'baseline',
+        display: 'flex',
         marginBottom: '18px'
     },
 
-    chipContainer: {
-        marginBottom: '16px',
-        marginTop: '16px'
+    editHikeButton: {
+        marginLeft: '4px'
     },
 
     chip: {
@@ -42,6 +48,22 @@ const useStyles = makeStyles()((theme) => ({
         ':last-child': {
             marginRight: 0
         }
+    },
+
+    photoContainer: {
+        marginBottom: '24px',
+
+        ':last-child': {
+            marginBottom: 0
+        }
+    },
+
+    photo: {
+        maxWidth: '100%'
+    },
+
+    photoCaption: {
+        marginTop: '4px'
     }
 }));
 
@@ -49,6 +71,7 @@ const ViewHike = () => {
     const { classes, cx } = useStyles();
     const [ hike, setHike ] = useState<Hike>({ trail: '', dateOfHike: '' });
     const { hikeId } = useParams();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const getHike = async () => {
@@ -80,6 +103,10 @@ const ViewHike = () => {
             // eslint-disable-next-line
             if (valueToCheck.match(/\b(https?):\/\/[-A-Za-z0-9+&@#\/%?=~_|!:,.;]*[-A-Za-z0-9+&@#\/%=~_|]/)) {
                 url = valueToCheck;
+
+                if (url.endsWith('/')) {
+                    url = url.slice(0, -1);
+                }
             }
         }
 
@@ -90,9 +117,22 @@ const ViewHike = () => {
 
     return (
         <Box>
-            <Typography variant='h4' className={cx(classes.trail)}>{hike.trail}</Typography>
+            <Box className={cx(classes.trail)}>
+                <Typography variant='h4'>{hike.trail}</Typography>
+                <IconButton
+                    aria-label='edit hike'
+                    className={cx(classes.editHikeButton)}
+                    title='Edit hike'
+                    component={RouteLink}
+                    to={`/hike/${hike.id}/edit`}
+                    size='small'
+                    color='primary'
+                >
+                    <EditOutlined />
+                </IconButton>
+            </Box>
 
-            <Card className={cx(classes.card)}>
+            <Card className={cx(classes.section)}>
                 <CardContent>
                     <Box>
                         <Box className={cx(classes.field)}>
@@ -121,7 +161,7 @@ const ViewHike = () => {
 
             {
                 hike.description &&
-                <Card className={cx(classes.card)}>
+                <Card className={cx(classes.section)}>
                     <CardContent>
                         <Typography variant='body2'>{hike.description}</Typography>
                     </CardContent>
@@ -131,8 +171,8 @@ const ViewHike = () => {
 
             {
                 hike.hikers && hike.hikers.length > 0 &&
-                <Box className={`${cx(classes.field)} ${cx(classes.chipContainer)}`}>
-                    <Typography variant='body2' className={cx(classes.fieldLabel)}>Hikers</Typography>
+                <Box className={`${cx(classes.field)} ${cx(classes.section)}`}>
+                    <Typography variant='body2' className={cx(classes.shortFieldLabel)}>Hikers</Typography>
 
                     {
                         hike.hikers.map((hiker: Hiker) => (
@@ -144,33 +184,48 @@ const ViewHike = () => {
 
             {
                 hike.tags &&
-                <Box className={`${cx(classes.field)} ${cx(classes.chipContainer)}`}>
-                    <Typography variant='body2' className={cx(classes.fieldLabel)}>Tags</Typography>
+                <Box className={`${cx(classes.field)} ${cx(classes.section)}`}>
+                    <Typography variant='body2' className={cx(classes.shortFieldLabel)}>Tags</Typography>
 
-                    {
-                        hike.tags.split(',').map((tag: string) => (
-                            <Chip key={tag} label={tag} className={cx(classes.chip)}></Chip>
-                        ))
-                    }
+                    <Box>
+                        {
+                            hike.tags.split(',').map((tag: string) => (
+                                <Chip key={tag} label={tag} className={cx(classes.chip)}></Chip>
+                            ))
+                        }
+                    </Box>
                 </Box>
             }
 
             {
                 hike.link && linkUrl &&
-                <Box className={cx(classes.field)}>
+                <Box className={cx(classes.section)}>
                     <Typography variant='body2'>
-                        <Link href={linkUrl}>{hike.linkLabel || hike.link}</Link>
+                        <Link href={linkUrl}>{hike.linkLabel || linkUrl}</Link>
                     </Typography>
                 </Box>
             }
 
             {
                 hike.photos && hike.photos.length > 0 &&
-                <Box>
+                <Box className={cx(classes.section)}>
+                    {
+                        hike.photos.map((photo: Photo, index: number) => (
+                            <Box key={index} className={cx(classes.photoContainer)}>
+                                <img src={process.env.REACT_APP_API_URL + '/images/' + photo.filePath} className={cx(classes.photo)} alt='Hike pic' />
 
+                                {
+                                    photo.caption &&
+                                    <Typography variant='body2' className={cx(classes.photoCaption)}>{photo.caption}</Typography>
+                                }
+                            </Box>
+                        ))
 
+                    }
                 </Box>
             }
+
+            <Button variant='contained' color='primary' onClick={() => navigate(-1)}>Back</Button>
         </Box>
     )
 };

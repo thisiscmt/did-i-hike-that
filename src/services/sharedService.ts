@@ -10,7 +10,7 @@ export const getFileNameForPhoto = (photo: Photo) => {
         const index = photo.filePath.indexOf('/');
 
         if (index > -1) {
-            fileName = photo.filePath.slice(index);
+            fileName = photo.filePath.slice(index + 1);
         }
     }
 
