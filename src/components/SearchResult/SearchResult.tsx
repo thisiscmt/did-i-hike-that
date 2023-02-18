@@ -3,19 +3,11 @@ import {Box, Typography, Chip, Card, CardContent} from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 
 import {Hike} from '../../models/models';
+import * as SharedService from '../../services/sharedService';
 
 const useStyles = makeStyles()((theme) => ({
-    card: {
-        borderRadius: '6px',
-        display: 'flex'
-    },
-
-    content: {
+    cardContent: {
         display: 'flex',
-
-        '&:last-child': {
-            paddingBottom: '16px'
-        },
 
         [theme.breakpoints.down(500)]: {
             flexDirection: 'column',
@@ -70,21 +62,16 @@ const SearchResult: FC<SearchResultProps> = ({ hike }) => {
     const thumbnailSource = hike.filePath ? `${process.env.REACT_APP_API_URL}/images/` + hike.filePath : 'images/no_hike_images.png';
     const hikers = hike.fullNames?.split(',');
 
-    const formatDateOfHike = () => {
-        const dateParts = hike.dateOfHike.split('-');
-        return `${Number(dateParts[1])}/${Number(dateParts[2])}/${dateParts[0]}`;
-    };
-
     return (
-        <Card className={cx(classes.card)} raised={true} elevation={2}>
-            <CardContent className={cx(classes.content)}>
+        <Card>
+            <CardContent className={cx(classes.cardContent)}>
                 <Box>
                     <img className={cx(classes.thumbnail)} alt='Hike pic' src={thumbnailSource} aria-label='Hike photo' />
                 </Box>
 
                 <Box className={cx(classes.details)}>
                     <Typography variant='body2'>{hike.trail}</Typography>
-                    <Typography variant='body2'>{formatDateOfHike()}</Typography>
+                    <Typography variant='body2'>{SharedService.formatDateOfHike(hike.dateOfHike)}</Typography>
 
                     {
                         hikers &&

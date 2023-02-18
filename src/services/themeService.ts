@@ -12,7 +12,7 @@ export const buildTheme = (overrides?: Record<string, string>) => {
             allVariants: {
                 color: Colors.primaryText,
                 fontFamily: "-apple-system, BlinkMacSystemFont, Roboto, 'Segoe UI', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans'"
-            },
+            }
         },
         components: {
             MuiOutlinedInput: {
@@ -23,57 +23,30 @@ export const buildTheme = (overrides?: Record<string, string>) => {
                     }
                 }
             },
+            MuiCard: {
+                styleOverrides: {
+                    root: {
+                        borderRadius: '6px'
+                    }
+                },
+                defaultProps: {
+                    elevation: 2
+                }
+            },
+            MuiCardContent: {
+                styleOverrides: {
+                    root: {
+                        '&:last-child': {
+                            paddingBottom: '16px'
+                        }
+                    }
+                }
+            }
         },
         palette: {
             text: {
                 primary: Colors.primaryText
             }
         },
-        // overrides: {
-        //     MuiContainer: {
-        //         root: {
-        //             backgroundColor: overrides.backgroundColor,
-        //             paddingTop: '5px',
-        //             paddingBottom: '6px'
-        //         }
-        //     },
-        //     MuiButton: {
-        //         root: {
-        //             color: overrides.textColor
-        //         }
-        //     },
-        //     MuiCard: {
-        //         root: {
-        //             backgroundColor: overrides.backgroundColor,
-        //             border: 'none',
-        //             boxShadow: 'none',
-        //             color: overrides.textColor
-        //         }
-        //     },
-        //     MuiCardContent: {
-        //         root: {
-        //             padding: '4px 0 4px 0',
-        //             '&:last-child': {
-        //                 paddingBottom: '4px'
-        //             }
-        //         }
-        //     },
-        //     MuiList: {
-        //         root: {
-        //             color: overrides.textColor
-        //         }
-        //     },
-        //     MuiInputBase: {
-        //         root: {
-        //             color: overrides.textColor
-        //         }
-        //     },
-        //     MuiDivider: {
-        //         root: {
-        //             marginTop: '10px',
-        //             marginBottom: '10px'
-        //         }
-        //     }
-        // }
     });
 };

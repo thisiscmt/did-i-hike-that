@@ -17,6 +17,11 @@ export const getFileNameForPhoto = (photo: Photo) => {
     return fileName;
 };
 
+export const formatDateOfHike = (dateOfHike: string) => {
+    const dateParts = dateOfHike.split('-');
+    return `${Number(dateParts[1])}/${Number(dateParts[2])}/${dateParts[0]}`;
+};
+
 export const scrollToTop = (ref: RefObject<HTMLElement>) => {
     if (ref && ref.current) {
         ref.current.scrollIntoView();

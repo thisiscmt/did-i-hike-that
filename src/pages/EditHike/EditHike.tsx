@@ -458,6 +458,30 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             </Grid>
 
             <Grid item xs={12} className={cx(classes.row)}>
+                <FormControl className={cx(classes.wideField, classes.multilineTextField)}>
+                    <FormControlLabel
+                        labelPlacement='start'
+                        label='Notes'
+                        classes={{ label: classes.fieldLabel }}
+                        control={
+                            <TextField
+                                name='Notes'
+                                margin='none'
+                                variant='outlined'
+                                value={description}
+                                size='small'
+                                fullWidth={true}
+                                autoCorrect='off'
+                                multiline={true}
+                                rows={6}
+                                onChange={(event) => setDescription(event.target.value)}
+                            />
+                        }
+                    />
+                </FormControl>
+            </Grid>
+
+            <Grid item xs={12} className={cx(classes.row)}>
                 <FormControl className={cx(classes.wideField)}>
                     <FormControlLabel
                         labelPlacement='start'
@@ -487,53 +511,6 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 <FormControl className={cx(classes.wideField)}>
                     <FormControlLabel
                         labelPlacement='start'
-                        label='Link'
-                        classes={{ label: classes.fieldLabel }}
-                        control={
-                            <TextField
-                                name='Link'
-                                margin='none'
-                                variant='outlined'
-                                value={link}
-                                size='small'
-                                fullWidth={true}
-                                autoCorrect='off'
-                                inputProps={{ maxLength: 255 }}
-                                onChange={(event) => setLink(event.target.value)}
-                            />
-                        }
-                    />
-                </FormControl>
-            </Grid>
-
-            <Grid item xs={12} className={cx(classes.row)}>
-                <FormControl className={cx(classes.wideField, classes.multilineTextField)}>
-                    <FormControlLabel
-                        labelPlacement='start'
-                        label='Notes'
-                        classes={{ label: classes.fieldLabel }}
-                        control={
-                            <TextField
-                                name='Notes'
-                                margin='none'
-                                variant='outlined'
-                                value={description}
-                                size='small'
-                                fullWidth={true}
-                                autoCorrect='off'
-                                multiline={true}
-                                rows={6}
-                                onChange={(event) => setDescription(event.target.value)}
-                            />
-                        }
-                    />
-                </FormControl>
-            </Grid>
-
-            <Grid item xs={12} className={cx(classes.row)}>
-                <FormControl className={cx(classes.wideField)}>
-                    <FormControlLabel
-                        labelPlacement='start'
                         label='Tags'
                         classes={{ label: classes.fieldLabel }}
                         control={
@@ -550,6 +527,29 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                                 renderInput={(params) => (
                                     <TextField {...params} />
                                 )}
+                            />
+                        }
+                    />
+                </FormControl>
+            </Grid>
+
+            <Grid item xs={12} className={cx(classes.row)}>
+                <FormControl className={cx(classes.wideField)}>
+                    <FormControlLabel
+                        labelPlacement='start'
+                        label='Link'
+                        classes={{ label: classes.fieldLabel }}
+                        control={
+                            <TextField
+                                name='Link'
+                                margin='none'
+                                variant='outlined'
+                                value={link}
+                                size='small'
+                                fullWidth={true}
+                                autoCorrect='off'
+                                inputProps={{ maxLength: 255 }}
+                                onChange={(event) => setLink(event.target.value)}
                             />
                         }
                     />
