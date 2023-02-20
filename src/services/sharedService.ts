@@ -1,5 +1,26 @@
 import {RefObject} from 'react';
-import {Photo} from '../models/models';
+import {HikeSearchParams, Photo} from '../models/models';
+
+export const getSearchParams = (searchText: string) => {
+    const searchParams: HikeSearchParams = {};
+
+    if (searchText) {
+        if (searchText.toLowerCase().startsWith('date:')) {
+            const index = searchText.indexOf('-');
+
+            if (index > -1) {
+                searchParams.startDate = searchText.slice(5, index).trim();
+                searchParams.endDate = searchText.slice(index + 1).trim();
+            } else {
+                searchParams.startDate = searchText.slice(5).trim();
+            }
+        } else {
+            searchParams.searchText = searchText
+        }
+    }
+
+    return searchParams;
+};
 
 export const getFileNameForPhoto = (photo: Photo) => {
     let fileName = '';

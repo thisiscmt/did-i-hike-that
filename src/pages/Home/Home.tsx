@@ -7,8 +7,9 @@ import { makeStyles } from 'tss-react/mui';
 import SearchResult from '../../components/SearchResult/SearchResult';
 import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
 import * as DataService from '../../services/dataService';
+import * as SharedService from '../../services/sharedService';
 import {MainContext} from '../../contexts/MainContext';
-import { Hike, HikeSearchParams } from '../../models/models';
+import { Hike } from '../../models/models';
 
 const useStyles = makeStyles()((theme) => ({
     content: {
@@ -89,28 +90,12 @@ const Home: FC = () => {
     };
 
     const handleSearch = async () => {
-        const searchParams: HikeSearchParams = {};
-        let index: number;
-
-        if (searchText) {
-            if (searchText.toLowerCase().startsWith('date:')) {
-                index = searchText.indexOf('-');
-
-                if (index > -1) {
-                    searchParams.startDate = searchText.slice(5, index).trim();
-                    searchParams.endDate = searchText.slice(index + 1).trim();
-                } else {
-                    searchParams.startDate = searchText.slice(5).trim();
-                }
-            } else {
-                searchParams.searchText = searchText
-            }
-        }
-
         try {
             setLoading(true);
 
+            const searchParams = SharedService.getSearchParams(searchText);
             const hikes = await DataService.getHikes(searchParams);
+
             setSearchText(searchText);
             setHikes(hikes.rows);
             setShowResults(true);

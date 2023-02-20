@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {Link as RouteLink, useNavigate, useParams} from 'react-router-dom';
 import {Box, Button, Card, CardContent, Chip, IconButton, Link, Typography} from '@mui/material';
 import {DeleteOutlineOutlined, EditOutlined} from '@mui/icons-material';
@@ -7,6 +7,7 @@ import {makeStyles} from 'tss-react/mui';
 import {Hike, Hiker, Photo} from '../../models/models';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
+import {MainContext} from '../../contexts/MainContext';
 
 const useStyles = makeStyles()((theme) => ({
     section: {
@@ -93,6 +94,7 @@ const useStyles = makeStyles()((theme) => ({
 const ViewHike = () => {
     const { classes, cx } = useStyles();
     const [ hike, setHike ] = useState<Hike>({ trail: '', dateOfHike: '' });
+    const { searchText, setHikes } = useContext(MainContext);
     const { hikeId } = useParams();
     const navigate = useNavigate();
 
@@ -136,8 +138,16 @@ const ViewHike = () => {
         return url;
     }
 
-    const handleDeleteHike = () => {
+    const handleDeleteHike = async () => {
+        if (hikeId) {
+            await DataService.deleteHike(hikeId);
+        }
 
+        const searchParams = SharedService.getSearchParams(searchText);
+        const hikes = await DataService.getHikes(searchParams);
+        setHikes(hikes.rows);
+
+        navigate(-1);
     };
 
     const linkUrl = getValidUrl();

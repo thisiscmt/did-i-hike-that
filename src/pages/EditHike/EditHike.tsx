@@ -198,7 +198,7 @@ interface EditHikeProps {
 
 const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const { classes, cx } = useStyles();
-    const { setBanner } = useContext(MainContext);
+    const { searchText, setHikes, setBanner } = useContext(MainContext);
     const { hikeId } = useParams();
     const navigate = useNavigate();
 
@@ -268,6 +268,10 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
 
     const handleChangeHikers = (event: React.SyntheticEvent, value: string[], reason: string, details?: AutocompleteChangeDetails<string> | undefined) => {
         if (reason === 'createOption') {
+            if (hikers.find((item: string) => details?.option?.toLowerCase().trim() === item.toLowerCase().trim())) {
+                return;
+            }
+
             // We make sure if the user specified an existing hiker, we use that exact name rather than create a duplicate record
            const knownHikerIndex = knownHikers.findIndex((item: string) => details?.option?.toLowerCase() === item.toLowerCase());
 
@@ -281,6 +285,12 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     };
 
     const handleChangeTags = (event: React.SyntheticEvent, value: string[], reason: string, details?: AutocompleteChangeDetails<string> | undefined) => {
+        if (reason === 'createOption') {
+            if (tags.find((item: string) => details?.option?.toLowerCase().trim() === item.toLowerCase().trim())) {
+                return;
+            }
+        }
+
         setTags(value);
     };
 
@@ -361,6 +371,10 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 } else {
                     hikeIdForNav = await DataService.createHike(hike);
                 }
+
+                const searchParams = SharedService.getSearchParams(searchText);
+                const hikes = await DataService.getHikes(searchParams);
+                setHikes(hikes.rows);
 
                 navigate(`/hike/${hikeIdForNav}`);
             }
