@@ -20,10 +20,12 @@ export interface Hiker {
 }
 
 export interface Photo {
+    id?: string;
     file: File;
     fileName: string;
     filePath: string;
-    caption: string;
+    caption?: string;
+    action: 'add' | 'update' | 'delete';
 }
 
 export interface HikeSearchParams {

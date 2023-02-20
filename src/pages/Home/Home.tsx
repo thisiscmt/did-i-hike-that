@@ -50,6 +50,10 @@ const useStyles = makeStyles()((theme) => ({
         width: '700px',
 
         [theme.breakpoints.down(1024)]: {
+            width: '500px'
+        },
+
+        [theme.breakpoints.down(700)]: {
             width: 'unset'
         },
     },

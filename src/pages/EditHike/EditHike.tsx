@@ -183,6 +183,10 @@ const useStyles = makeStyles()((theme) => ({
 
     actions: {
         marginTop: '24px'
+    },
+
+    backButton: {
+        marginLeft: '12px'
     }
 }));
 
@@ -240,7 +244,6 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                         setDescription(hike.description || '');
                         setTags(hike.tags ? hike.tags.split(',').map((tag: string) => tag.trim()) : []);
                         setPhotos(hike.photos || []);
-
                         setRetrievedHike(true);
                     }
                 } else {
@@ -282,18 +285,32 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     };
 
     const handleSelectPhoto = (event: React.ChangeEvent<HTMLInputElement>) => {
+        let index: number;
+        let photo: Photo;
+        let newPhotos = [...photos];
+
         if (event.target.files && event.target.files.length > 0) {
             if (photos.length === MAX_PHOTOS_FOR_UPLOAD) {
                 return;
             }
 
             const fileName = event.target.files[0].name;
+            index = newPhotos.findIndex((photo: Photo) => photo.fileName.toLowerCase() === fileName.toLowerCase());
 
-            if (photos.find((photo: Photo) => photo.fileName.toLowerCase() === fileName.toLowerCase())) {
-                return;
+            if (index > -1) {
+                if (hikeId && newPhotos[index].action !== 'add') {
+                    newPhotos[index].file = event.target.files[0];
+                    newPhotos[index].action = 'update';
+                }
+            } else {
+                photo = {
+                    file: event.target.files[0], fileName, filePath: '', caption: '', action: 'add'
+                };
+
+                newPhotos.push(photo);
             }
 
-            setPhotos([...photos, { file: event.target.files[0], fileName, filePath: '', caption: '' }])
+            setPhotos(newPhotos);
         }
     };
 
@@ -303,6 +320,11 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
         if (index > -1) {
             const newPhotos = [...photos];
             newPhotos[index].caption = caption;
+
+            if (newPhotos[index].action !== 'add') {
+                newPhotos[index].action = 'update';
+            }
+
             setPhotos(newPhotos);
         }
     };
@@ -312,7 +334,12 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
 
         if (index > -1) {
             const newPhotos = [...photos];
-            newPhotos.splice(index, 1);
+            newPhotos[index].action = 'delete';
+
+            if (hikeId && newPhotos[index].action === 'add') {
+                newPhotos.splice(index, 1);
+            }
+
             setPhotos(newPhotos);
         }
     };
@@ -328,6 +355,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 let hikeIdForNav: string;
 
                 if (hikeId) {
+                    hike.id = hikeId;
                     await DataService.updateHike(hike);
                     hikeIdForNav = hikeId;
                 } else {
@@ -617,28 +645,33 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 <List className={cx(classes.photosList)} disablePadding={true}>
                     {
                         photos.map((photo: Photo) => (
-                            <ListItem key={photo.fileName} disableGutters={true}>
-                                <FormLabel htmlFor={`hike-photo-${photo.fileName}`} className={cx(classes.photoFileName)}>{SharedService.getFileNameForPhoto(photo)}</FormLabel>
+                            <React.Fragment key={photo.fileName}>
+                                {
+                                    photo.action !== 'delete' &&
+                                    <ListItem disableGutters={true}>
+                                        <FormLabel htmlFor={`hike-photo-${photo.fileName}`} className={cx(classes.photoFileName)}>{SharedService.getFileNameForPhoto(photo)}</FormLabel>
 
-                                <TextField
-                                    id={`hike-photo-${photo.fileName}`}
-                                    value={photo.caption}
-                                    size='small'
-                                    placeholder='Type a caption'
-                                    onChange={(event) => handleChangePhotoCaption(photo.fileName, event.target.value)}
-                                />
+                                        <TextField
+                                            id={`hike-photo-${photo.fileName}`}
+                                            value={photo.caption || ''}
+                                            size='small'
+                                            placeholder='Type a caption'
+                                            onChange={(event) => handleChangePhotoCaption(photo.fileName, event.target.value)}
+                                        />
 
-                                <IconButton
-                                    aria-label='delete photo'
-                                    className={cx(classes.deletePhotoButton)}
-                                    onClick={() => handleDeletePhoto(photo.fileName)}
-                                    title='Remove photo'
-                                    size='small'
-                                    color='error'
-                                >
-                                    <DeleteOutlineOutlined />
-                                </IconButton>
-                            </ListItem>
+                                        <IconButton
+                                            aria-label='delete photo'
+                                            className={cx(classes.deletePhotoButton)}
+                                            onClick={() => handleDeletePhoto(photo.fileName)}
+                                            title='Remove photo'
+                                            size='small'
+                                            color='error'
+                                        >
+                                            <DeleteOutlineOutlined />
+                                        </IconButton>
+                                    </ListItem>
+                                }
+                            </React.Fragment>
                         ))
                     }
                 </List>
@@ -646,6 +679,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
 
             <Grid item xs={12} className={cx(classes.actions)}>
                 <Button onClick={handleSave} variant='contained' color='primary'>Save</Button>
+                <Button onClick={() => navigate(-1)} variant='outlined' color='secondary' className={cx(classes.backButton)}>Back</Button>
             </Grid>
         </>
     )

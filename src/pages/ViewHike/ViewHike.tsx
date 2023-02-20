@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Link as RouteLink, useNavigate, useParams} from 'react-router-dom';
 import {Box, Button, Card, CardContent, Chip, IconButton, Link, Typography} from '@mui/material';
-import {EditOutlined} from '@mui/icons-material';
+import {DeleteOutlineOutlined, EditOutlined} from '@mui/icons-material';
 import {makeStyles} from 'tss-react/mui';
 
 import {Hike, Hiker, Photo} from '../../models/models';
@@ -10,11 +10,15 @@ import * as SharedService from '../../services/sharedService';
 
 const useStyles = makeStyles()((theme) => ({
     section: {
-        marginBottom: '24px'
+        marginBottom: '24px',
+
+        '&.chips': {
+            marginBottom: '16px'
+        }
     },
 
     field: {
-        alignItems: 'center',
+        alignItems: 'baseline',
         display: 'flex',
         flexDirection: 'row',
         marginBottom: '8px',
@@ -33,16 +37,35 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     trail: {
-        alignItems: 'baseline',
+        alignItems: 'flex-start',
         display: 'flex',
-        marginBottom: '18px'
+        marginBottom: '18px',
+
+        [theme.breakpoints.down(1024)]: {
+            '& h4': {
+                fontSize: '1.5rem'
+            }
+        },
+
+        [theme.breakpoints.down(700)]: {
+            flexWrap: 'wrap',
+
+            '& a': {
+                marginLeft: 0
+            },
+
+            '& h4': {
+                marginBottom: '12px'
+            }
+        }
     },
 
-    editHikeButton: {
-        marginLeft: '4px'
+    actionButton: {
+        marginLeft: '8px'
     },
 
     chip: {
+        marginBottom: '8px',
         marginRight: '8px',
 
         ':last-child': {
@@ -113,15 +136,20 @@ const ViewHike = () => {
         return url;
     }
 
+    const handleDeleteHike = () => {
+
+    };
+
     const linkUrl = getValidUrl();
 
     return (
         <Box>
             <Box className={cx(classes.trail)}>
                 <Typography variant='h4'>{hike.trail}</Typography>
+
                 <IconButton
                     aria-label='edit hike'
-                    className={cx(classes.editHikeButton)}
+                    className={cx(classes.actionButton)}
                     title='Edit hike'
                     component={RouteLink}
                     to={`/hike/${hike.id}/edit`}
@@ -129,6 +157,17 @@ const ViewHike = () => {
                     color='primary'
                 >
                     <EditOutlined />
+                </IconButton>
+
+                <IconButton
+                    aria-label='delete hike'
+                    className={cx(classes.actionButton)}
+                    title='Delete hike'
+                    onClick={handleDeleteHike}
+                    size='small'
+                    color='error'
+                >
+                    <DeleteOutlineOutlined />
                 </IconButton>
             </Box>
 
@@ -171,7 +210,7 @@ const ViewHike = () => {
 
             {
                 hike.hikers && hike.hikers.length > 0 &&
-                <Box className={`${cx(classes.field)} ${cx(classes.section)}`}>
+                <Box className={`${cx(classes.field)} ${cx(classes.section)} chips`}>
                     <Typography variant='body2' className={cx(classes.shortFieldLabel)}>Hikers</Typography>
 
                     {
@@ -184,7 +223,7 @@ const ViewHike = () => {
 
             {
                 hike.tags &&
-                <Box className={`${cx(classes.field)} ${cx(classes.section)}`}>
+                <Box className={`${cx(classes.field)} ${cx(classes.section)} chips`}>
                     <Typography variant='body2' className={cx(classes.shortFieldLabel)}>Tags</Typography>
 
                     <Box>
@@ -201,7 +240,7 @@ const ViewHike = () => {
                 hike.link && linkUrl &&
                 <Box className={cx(classes.section)}>
                     <Typography variant='body2'>
-                        <Link href={linkUrl}>{hike.linkLabel || linkUrl}</Link>
+                        <Link href={linkUrl} target='_blank'>{hike.linkLabel || linkUrl}</Link>
                     </Typography>
                 </Box>
             }

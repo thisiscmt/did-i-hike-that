@@ -10,8 +10,7 @@ const useStyles = makeStyles()((theme) => ({
         display: 'flex',
 
         [theme.breakpoints.down(500)]: {
-            flexDirection: 'column',
-            width: 'unset'
+            flexDirection: 'column'
         },
     },
 

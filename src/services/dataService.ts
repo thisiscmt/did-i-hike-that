@@ -23,19 +23,74 @@ export const getHike = async (hikeId: string): Promise<Hike> => {
         headers: {
             'Content-Type': 'application/json',
             'x-diht-agent': process.env.REACT_APP_USER_AGENT
-        },
-        params: {
-            id: hikeId
         }
     };
-
 
     const response = await Axios.get(process.env.REACT_APP_API_URL + `/hike/${hikeId}`, config)
     return response.data;
 };
 
 export const createHike = async (hike: Hike, onUploadProgress?: (axiosProgressEvent: AxiosProgressEvent) => void) => {
+    const formData = getFormData(hike);
+    const config: AxiosRequestConfig = {
+        headers: {
+            'x-diht-agent': process.env.REACT_APP_USER_AGENT,
+            'x-diht-trail': hike.trail,
+            'x-diht-date-of-hike': hike.dateOfHike
+        }
+    };
+
+    if (onUploadProgress) {
+        config.onUploadProgress = onUploadProgress;
+    }
+
+    const response = await Axios.post(process.env.REACT_APP_API_URL + '/hike', formData, config);
+    return response.data;
+};
+
+export const updateHike = (hike: Hike, onUploadProgress?: (axiosProgressEvent: AxiosProgressEvent) => void) => {
+    const formData = getFormData(hike);
+    const config: AxiosRequestConfig = {
+        headers: {
+            'x-diht-agent': process.env.REACT_APP_USER_AGENT,
+            'x-diht-trail': hike.trail,
+            'x-diht-date-of-hike': hike.dateOfHike
+        }
+    };
+
+    if (onUploadProgress) {
+        config.onUploadProgress = onUploadProgress;
+    }
+
+    return Axios.put(process.env.REACT_APP_API_URL + `/hike/${hike.id}`, formData, config)
+};
+
+export const deleteHike = (hikeId: string) => {
+    const config = {
+        headers: {
+            'Content-Type': 'application/json',
+            'x-diht-agent': process.env.REACT_APP_USER_AGENT
+        }
+    };
+
+    return Axios.delete(process.env.REACT_APP_API_URL + `/hike/${hikeId}`, config)
+};
+
+export const getHikers = async (): Promise<string[]> => {
+    const config: AxiosRequestConfig = {
+        headers: {
+            'Content-Type': 'application/json',
+            'x-diht-agent': process.env.REACT_APP_USER_AGENT
+        }
+    };
+
+    const response = await Axios.get(process.env.REACT_APP_API_URL + '/hiker', config)
+    return response.data;
+};
+
+const getFormData = (hike: Hike) => {
     const formData = new FormData();
+
     formData.append('trail', hike.trail);
     formData.append('dateOfHike', hike.dateOfHike);
 
@@ -69,64 +124,28 @@ export const createHike = async (hike: Hike, onUploadProgress?: (axiosProgressEv
 
     if (hike.photos) {
         hike.photos.forEach((photo: Photo) => {
-            formData.append('files', photo.file);
+            if (photo.file) {
+                formData.append('files', photo.file);
+            }
         });
+
+        const photoMetadata = hike.photos.map((photo: Photo) => {
+            if (photo.action) {
+                return {
+                    id: photo.id,
+                    fileName: photo.fileName,
+                    caption: photo.caption,
+                    action: photo.action
+                };
+            } else {
+                return undefined;
+            }
+        }).filter((metadata: any) => metadata);
+
+        if (photoMetadata.length > 0) {
+            formData.append('photos', JSON.stringify(photoMetadata));
+        }
     }
 
-    const config: AxiosRequestConfig = {
-        headers: {
-            'x-diht-agent': process.env.REACT_APP_USER_AGENT,
-            'x-diht-trail': hike.trail,
-            'x-diht-date-of-hike': hike.dateOfHike
-        }
-    };
-
-    if (onUploadProgress) {
-        config.onUploadProgress = onUploadProgress;
-    }
-
-    const response = await Axios.post(process.env.REACT_APP_API_URL + '/hike', formData, config);
-    return response.data;
-};
-
-export const updateHike = (hike: Hike, onUploadProgress?: (axiosProgressEvent: AxiosProgressEvent) => void) => {
-    const config: AxiosRequestConfig = {
-        headers: {
-            'x-diht-agent': process.env.REACT_APP_USER_AGENT,
-            'x-diht-trail': hike.trail,
-            'x-diht-date-of-hike': hike.dateOfHike
-        }
-    };
-
-    if (onUploadProgress) {
-        config.onUploadProgress = onUploadProgress;
-    }
-
-    return Axios.put(process.env.REACT_APP_API_URL + '/hike:id', hike, config)
-};
-
-export const deleteHike = (hikeId: string) => {
-    const config = {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-diht-agent': process.env.REACT_APP_USER_AGENT
-        },
-        params: {
-            id: hikeId
-        }
-    };
-
-    return Axios.delete(process.env.REACT_APP_API_URL + '/hike:id', config)
-};
-
-export const getHikers = async (): Promise<string[]> => {
-    const config: AxiosRequestConfig = {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-diht-agent': process.env.REACT_APP_USER_AGENT
-        }
-    };
-
-    const response = await Axios.get(process.env.REACT_APP_API_URL + '/hiker', config)
-    return response.data;
+    return formData;
 };
