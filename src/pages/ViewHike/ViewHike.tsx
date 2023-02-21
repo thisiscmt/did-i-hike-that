@@ -4,6 +4,7 @@ import {Box, Button, Card, CardContent, Chip, IconButton, Link, Typography} from
 import {DeleteOutlineOutlined, EditOutlined} from '@mui/icons-material';
 import {makeStyles} from 'tss-react/mui';
 
+import ConfirmationPrompt from '../../components/ConfirmationPrompt/ConfirmationPrompt';
 import {Hike, Hiker, Photo} from '../../models/models';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
@@ -94,6 +95,7 @@ const useStyles = makeStyles()((theme) => ({
 const ViewHike = () => {
     const { classes, cx } = useStyles();
     const [ hike, setHike ] = useState<Hike>({ trail: '', dateOfHike: '' });
+    const [ openDeleteConfirmation, setIsOpenDeleteConfirmation ] = useState<boolean>(false);
     const { searchText, setHikes } = useContext(MainContext);
     const { hikeId } = useParams();
     const navigate = useNavigate();
@@ -138,16 +140,23 @@ const ViewHike = () => {
         return url;
     }
 
+    const handleDeleteConfirmation = async (value: boolean) => {
+        setIsOpenDeleteConfirmation(false);
+
+        if (value) {
+            await handleDeleteHike();
+        }
+    }
+
     const handleDeleteHike = async () => {
         if (hikeId) {
             await DataService.deleteHike(hikeId);
+
+            const searchParams = SharedService.getSearchParams(searchText);
+            const hikes = await DataService.getHikes(searchParams);
+            setHikes(hikes.rows);
+            navigate(-1);
         }
-
-        const searchParams = SharedService.getSearchParams(searchText);
-        const hikes = await DataService.getHikes(searchParams);
-        setHikes(hikes.rows);
-
-        navigate(-1);
     };
 
     const linkUrl = getValidUrl();
@@ -173,7 +182,7 @@ const ViewHike = () => {
                     aria-label='delete hike'
                     className={cx(classes.actionButton)}
                     title='Delete hike'
-                    onClick={handleDeleteHike}
+                    onClick={() => setIsOpenDeleteConfirmation(true)}
                     size='small'
                     color='error'
                 >
@@ -275,6 +284,7 @@ const ViewHike = () => {
             }
 
             <Button variant='contained' color='primary' onClick={() => navigate(-1)}>Back</Button>
+            <ConfirmationPrompt title='Delete this hike?' open={openDeleteConfirmation} content='Are you sure you want to delete this hike?' onClose={handleDeleteConfirmation} />
         </Box>
     )
 };
