@@ -9,7 +9,7 @@ jobs:
     steps:
       - task: NodeTool@0
         inputs:
-          versionSpec: '16.x'
+          versionSpec: '18.x'
         displayName: 'Install Node.js'
       - script: |
           npm install
@@ -27,5 +27,5 @@ jobs:
       - task: PublishBuildArtifacts@1
         inputs:
           PathtoPublish: '$(Build.ArtifactStagingDirectory)/$(Build.Repository.Name)-$(Build.BuildId).zip'
-          ArtifactName: personal-site
+          ArtifactName: did-i-hike-that-ui
         displayName: 'Publish artifact: $(Build.Repository.Name)'
