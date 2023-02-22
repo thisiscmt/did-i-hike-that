@@ -42,13 +42,14 @@ const useStyles = makeStyles()((theme) => ({
         marginTop: '10px'
     },
 
-    notes: {
+    description: {
         fontSize: '14px',
         marginTop: '10px',
         display: '-webkit-box',
         '-webkitLineClamp': '4',
         '-webkitBoxOrient': 'vertical',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        whiteSpace: 'pre-wrap'
     }
 }));
 
@@ -85,7 +86,7 @@ const SearchResult: FC<SearchResultProps> = ({ hike }) => {
                         </Box>
                     }
 
-                    <Box className={cx(classes.notes)}>{hike.description}</Box>
+                    <Box className={cx(classes.description)}>{hike.description}</Box>
                 </Box>
             </CardContent>
         </Card>

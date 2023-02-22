@@ -62,6 +62,10 @@ const useStyles = makeStyles()((theme) => ({
         }
     },
 
+    description: {
+        whiteSpace: 'pre-wrap'
+    },
+
     actionButton: {
         marginLeft: '8px'
     },
@@ -221,7 +225,7 @@ const ViewHike = () => {
                 hike.description &&
                 <Card className={cx(classes.section)}>
                     <CardContent>
-                        <Typography variant='body2'>{hike.description}</Typography>
+                        <Typography variant='body2' className={cx(classes.description)}>{hike.description}</Typography>
                     </CardContent>
 
                 </Card>

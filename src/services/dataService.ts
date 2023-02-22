@@ -2,11 +2,13 @@ import Axios, {AxiosProgressEvent, AxiosRequestConfig} from 'axios';
 
 import {Hike, Hiker, HikeSearchParams, Photo} from '../models/models';
 
+const userAgent = process.env.REACT_APP_USER_AGENT;
+
 export const getHikes = async (searchParams?: HikeSearchParams): Promise<{ rows: Hike[]; count: number }> => {
     const config: AxiosRequestConfig = {
         headers: {
             'Content-Type': 'application/json',
-            'x-diht-agent': process.env.REACT_APP_USER_AGENT
+            'x-diht-agent': userAgent
         }
     };
 
@@ -22,7 +24,7 @@ export const getHike = async (hikeId: string): Promise<Hike> => {
     const config = {
         headers: {
             'Content-Type': 'application/json',
-            'x-diht-agent': process.env.REACT_APP_USER_AGENT
+            'x-diht-agent': userAgent
         }
     };
 
@@ -34,7 +36,7 @@ export const createHike = async (hike: Hike, onUploadProgress?: (axiosProgressEv
     const formData = getFormData(hike);
     const config: AxiosRequestConfig = {
         headers: {
-            'x-diht-agent': process.env.REACT_APP_USER_AGENT,
+            'x-diht-agent': userAgent,
             'x-diht-trail': hike.trail,
             'x-diht-date-of-hike': hike.dateOfHike
         }
@@ -52,7 +54,7 @@ export const updateHike = (hike: Hike, onUploadProgress?: (axiosProgressEvent: A
     const formData = getFormData(hike);
     const config: AxiosRequestConfig = {
         headers: {
-            'x-diht-agent': process.env.REACT_APP_USER_AGENT,
+            'x-diht-agent': userAgent,
             'x-diht-trail': hike.trail,
             'x-diht-date-of-hike': hike.dateOfHike
         }
@@ -69,7 +71,7 @@ export const deleteHike = (hikeId: string) => {
     const config = {
         headers: {
             'Content-Type': 'application/json',
-            'x-diht-agent': process.env.REACT_APP_USER_AGENT
+            'x-diht-agent': userAgent
         }
     };
 
@@ -80,7 +82,7 @@ export const getHikers = async (): Promise<string[]> => {
     const config: AxiosRequestConfig = {
         headers: {
             'Content-Type': 'application/json',
-            'x-diht-agent': process.env.REACT_APP_USER_AGENT
+            'x-diht-agent': userAgent
         }
     };
 

@@ -1,0 +1,31 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+jobs:
+  - job: Build
+    steps:
+      - task: NodeTool@0
+        inputs:
+          versionSpec: '16.x'
+        displayName: 'Install Node.js'
+      - script: |
+          npm install
+        displayName: 'Install project dependencies'
+      - script: |
+          npm run build
+        displayName: 'Build the project'
+      - task: ArchiveFiles@2
+        inputs:
+          rootFolderOrFile: build
+          includeRootFolder: false
+          archiveType: zip
+          archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.Repository.Name)-$(Build.BuildId).zip'
+        displayName: 'Create deployment archive'
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)/$(Build.Repository.Name)-$(Build.BuildId).zip'
+          ArtifactName: personal-site
+        displayName: 'Publish artifact: $(Build.Repository.Name)'
