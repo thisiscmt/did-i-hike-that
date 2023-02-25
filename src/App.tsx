@@ -18,17 +18,17 @@ const useStyles = makeStyles()(() => ({
     },
 
     leftColumn: {
-        width: '15%'
+        width: '20%'
     },
 
     contentColumn: {
         marginBottom: '40px',
         marginTop: '30px',
-        width: '70%'
+        width: '60%'
     },
 
     rightColumn: {
-        width: '15%'
+        width: '20%'
     }
 }));
 

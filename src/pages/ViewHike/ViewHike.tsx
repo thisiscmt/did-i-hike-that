@@ -66,8 +66,12 @@ const useStyles = makeStyles()((theme) => ({
         whiteSpace: 'pre-wrap'
     },
 
-    actionButton: {
-        marginLeft: '8px'
+    editButton: {
+        marginLeft: '12px'
+    },
+
+    deleteButton: {
+        marginLeft: '4px'
     },
 
     chip: {
@@ -172,7 +176,7 @@ const ViewHike = () => {
 
                 <IconButton
                     aria-label='edit hike'
-                    className={cx(classes.actionButton)}
+                    className={cx(classes.editButton)}
                     title='Edit hike'
                     component={RouteLink}
                     to={`/hike/${hike.id}/edit`}
@@ -184,7 +188,7 @@ const ViewHike = () => {
 
                 <IconButton
                     aria-label='delete hike'
-                    className={cx(classes.actionButton)}
+                    className={cx(classes.deleteButton)}
                     title='Delete hike'
                     onClick={() => setIsOpenDeleteConfirmation(true)}
                     size='small'

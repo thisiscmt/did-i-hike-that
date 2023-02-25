@@ -43,7 +43,7 @@ const useStyles = makeStyles()((theme) => ({
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        paddingTop: '20px'
+        marginTop: '16px'
     },
 
     searchResults: {
@@ -107,7 +107,7 @@ const Home: FC = () => {
     };
 
     return (
-        <>
+        <Box className='loadable-container'>
             <Box className={cx(classes.content)}>
                 <Typography variant='h5'>
                     Ever ask yourself if you've hiked a particular trail before?<br />Well ask no more!
@@ -145,7 +145,7 @@ const Home: FC = () => {
                 </Box>
             </Box>
 
-            <Box className={`${cx(classes.searchResultsContainer)} loadable-container`}>
+            <Box className={`${cx(classes.searchResultsContainer)}`}>
                 {
                     showResults ?
                         hikes.length > 0
@@ -163,10 +163,10 @@ const Home: FC = () => {
                                 </Box> : <Box className={cx(classes.noResults)}>No hikes found</Box>
                             : ''
                 }
-
-                <LoadingOverlay open={loading} />
             </Box>
-        </>
+
+            <LoadingOverlay open={loading} />
+        </Box>
     )
 };
 
