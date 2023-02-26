@@ -13,6 +13,7 @@ export interface Hike {
     fullNames?: string;
     filePath?: string;
     caption?: string;
+    updatedAt?: Date;
 }
 
 export interface Hiker {

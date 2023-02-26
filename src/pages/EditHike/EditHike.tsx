@@ -426,7 +426,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 <FormControl className={cx(classes.field)}>
                     <FormControlLabel
                         labelPlacement='start'
-                        label='Trail*'
+                        label='Trail *'
                         classes={{ label: classes.fieldLabel }}
                         control={
                             <TextField
@@ -450,7 +450,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 <FormControl className={cx(classes.field, classes.datePickerField)}>
                     <FormControlLabel
                         labelPlacement='start'
-                        label='Date of hike*'
+                        label='Date of hike *'
                         classes={{ label: classes.fieldLabel }}
                         control={
                             <LocalizationProvider dateAdapter={AdapterLuxon}>

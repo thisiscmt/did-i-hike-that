@@ -1,46 +1,29 @@
 import Axios, {AxiosProgressEvent, AxiosRequestConfig} from 'axios';
 
 import {Hike, Hiker, HikeSearchParams, Photo} from '../models/models';
-
-const userAgent = process.env.REACT_APP_USER_AGENT;
+import {STORAGE_EMAIL_KEY} from '../constants/constants';
 
 export const getHikes = async (searchParams?: HikeSearchParams): Promise<{ rows: Hike[]; count: number }> => {
-    const config: AxiosRequestConfig = {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-diht-agent': userAgent
-        }
-    };
+    const config = getRequestConfig();
 
     if (searchParams) {
         config.params = { ...searchParams };
     }
 
-    const response = await Axios.get(process.env.REACT_APP_API_URL + '/hike', config)
+    const response = await Axios.get(process.env.REACT_APP_API_URL + '/hike', config);
     return response.data;
 };
 
 export const getHike = async (hikeId: string): Promise<Hike> => {
-    const config = {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-diht-agent': userAgent
-        }
-    };
-
-    const response = await Axios.get(process.env.REACT_APP_API_URL + `/hike/${hikeId}`, config)
+    const response = await Axios.get(process.env.REACT_APP_API_URL + `/hike/${hikeId}`, getRequestConfig());
     return response.data;
 };
 
 export const createHike = async (hike: Hike, onUploadProgress?: (axiosProgressEvent: AxiosProgressEvent) => void) => {
     const formData = getFormData(hike);
-    const config: AxiosRequestConfig = {
-        headers: {
-            'x-diht-agent': userAgent,
-            'x-diht-trail': hike.trail,
-            'x-diht-date-of-hike': hike.dateOfHike
-        }
-    };
+    const config = getRequestConfig();
+    config.headers!['x-diht-trail'] = hike.trail;
+    config.headers!['x-diht-date-of-hikel'] = hike.dateOfHike;
 
     if (onUploadProgress) {
         config.onUploadProgress = onUploadProgress;
@@ -52,42 +35,43 @@ export const createHike = async (hike: Hike, onUploadProgress?: (axiosProgressEv
 
 export const updateHike = (hike: Hike, onUploadProgress?: (axiosProgressEvent: AxiosProgressEvent) => void) => {
     const formData = getFormData(hike);
-    const config: AxiosRequestConfig = {
-        headers: {
-            'x-diht-agent': userAgent,
-            'x-diht-trail': hike.trail,
-            'x-diht-date-of-hike': hike.dateOfHike
-        }
-    };
+    const config = getRequestConfig();
+    config.headers!['x-diht-trail'] = hike.trail;
+    config.headers!['x-diht-date-of-hikel'] = hike.dateOfHike;
 
     if (onUploadProgress) {
         config.onUploadProgress = onUploadProgress;
     }
 
-    return Axios.put(process.env.REACT_APP_API_URL + `/hike/${hike.id}`, formData, config)
+    return Axios.put(process.env.REACT_APP_API_URL + `/hike/${hike.id}`, formData, config);
 };
 
 export const deleteHike = (hikeId: string) => {
-    const config = {
-        headers: {
-            'Content-Type': 'application/json',
-            'x-diht-agent': userAgent
-        }
-    };
-
-    return Axios.delete(process.env.REACT_APP_API_URL + `/hike/${hikeId}`, config)
+    return Axios.delete(process.env.REACT_APP_API_URL + `/hike/${hikeId}`, getRequestConfig());
 };
 
 export const getHikers = async (): Promise<string[]> => {
+    const response = await Axios.get(process.env.REACT_APP_API_URL + '/hiker', getRequestConfig());
+    return response.data;
+};
+
+export const loginUser = async (email: string, password: string) => {
+    return await Axios.get(process.env.REACT_APP_API_URL + `/user/login?email=${email}&password=${password}`, getRequestConfig());
+};
+
+const getRequestConfig = (multipartRequest: boolean = false): AxiosRequestConfig => {
     const config: AxiosRequestConfig = {
         headers: {
-            'Content-Type': 'application/json',
-            'x-diht-agent': userAgent
-        }
+            'x-diht-user': localStorage.getItem(STORAGE_EMAIL_KEY)
+        },
+        withCredentials: true
     };
 
-    const response = await Axios.get(process.env.REACT_APP_API_URL + '/hiker', config)
-    return response.data;
+    if (!multipartRequest) {
+        config.headers!['Content-Type'] = 'application/json';
+    }
+
+    return config;
 };
 
 const getFormData = (hike: Hike) => {

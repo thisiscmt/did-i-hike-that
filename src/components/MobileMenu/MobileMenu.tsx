@@ -63,9 +63,9 @@ const MobileMenu: FC<MobileMenuProps> = ({ onClose }) => {
                     </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding={true}>
-                    <ListItemButton to='/preferences' component={Link} onClick={handleMenuClose}>
+                    <ListItemButton to='/settings' component={Link} onClick={handleMenuClose}>
                         <ListItemIcon><SettingsOutlined /></ListItemIcon>
-                        <ListItemText primary='Preferences' />
+                        <ListItemText primary='Settings' />
                     </ListItemButton>
                 </ListItem>
             </List>

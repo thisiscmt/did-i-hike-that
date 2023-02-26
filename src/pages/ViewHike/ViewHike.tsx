@@ -97,6 +97,11 @@ const useStyles = makeStyles()((theme) => ({
 
     photoCaption: {
         marginTop: '4px'
+    },
+
+    lastUpdated: {
+        fontSize: '12px',
+        textAlign: 'center'
     }
 }));
 
@@ -168,6 +173,12 @@ const ViewHike = () => {
     };
 
     const linkUrl = getValidUrl();
+    let formattedUpdatedAt = '';
+
+    if (hike.updatedAt) {
+        const parsedUpdatedAt = Date.parse(hike.updatedAt.toString());
+        formattedUpdatedAt = new Date(parsedUpdatedAt).toLocaleString();
+    }
 
     return (
         <Box>
@@ -290,6 +301,10 @@ const ViewHike = () => {
                     }
                 </Box>
             }
+
+            <Box className={cx(classes.section)}>
+                <Typography variant='body2' className={cx(classes.lastUpdated)}>{`Last updated on ${formattedUpdatedAt}`}</Typography>
+            </Box>
 
             <Button variant='contained' color='primary' onClick={() => navigate(-1)}>Back</Button>
             <ConfirmationPrompt title='Delete this hike?' open={openDeleteConfirmation} content='Are you sure you want to delete this hike?' onClose={handleDeleteConfirmation} />
