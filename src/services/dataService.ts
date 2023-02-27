@@ -23,7 +23,7 @@ export const createHike = async (hike: Hike, onUploadProgress?: (axiosProgressEv
     const formData = getFormData(hike);
     const config = getRequestConfig();
     config.headers!['x-diht-trail'] = hike.trail;
-    config.headers!['x-diht-date-of-hikel'] = hike.dateOfHike;
+    config.headers!['x-diht-date-of-hike'] = hike.dateOfHike;
 
     if (onUploadProgress) {
         config.onUploadProgress = onUploadProgress;
@@ -37,7 +37,7 @@ export const updateHike = (hike: Hike, onUploadProgress?: (axiosProgressEvent: A
     const formData = getFormData(hike);
     const config = getRequestConfig();
     config.headers!['x-diht-trail'] = hike.trail;
-    config.headers!['x-diht-date-of-hikel'] = hike.dateOfHike;
+    config.headers!['x-diht-date-of-hike'] = hike.dateOfHike;
 
     if (onUploadProgress) {
         config.onUploadProgress = onUploadProgress;

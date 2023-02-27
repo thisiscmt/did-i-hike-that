@@ -6,6 +6,7 @@ import { makeStyles } from 'tss-react/mui';
 import { DateTime } from 'luxon';
 
 import ConfirmationPrompt from '../../components/ConfirmationPrompt/ConfirmationPrompt';
+import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
 import {Hike, Hiker, Photo} from '../../models/models';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
@@ -108,6 +109,7 @@ const ViewHike = () => {
     const { classes, cx } = useStyles();
     const [ hike, setHike ] = useState<Hike>({ trail: '', dateOfHike: '' });
     const [ openDeleteConfirmation, setIsOpenDeleteConfirmation ] = useState<boolean>(false);
+    const [ loading, setLoading ] = useState<boolean>(false);
     const { searchText, setHikes, setBanner } = useContext(MainContext);
     const { hikeId } = useParams();
     const navigate = useNavigate();
@@ -117,6 +119,7 @@ const ViewHike = () => {
             try {
                 if (hikeId) {
                     setBanner('');
+                    setLoading(true);
                     const currentHike = await DataService.getHike(hikeId);
                     setHike(currentHike);
                 } else {
@@ -128,6 +131,8 @@ const ViewHike = () => {
                 } else {
                     setBanner('Error occurred retrieving the hike', 'error');
                 }
+            } finally {
+                setLoading(false);
             }
         }
 
@@ -185,7 +190,7 @@ const ViewHike = () => {
     }
 
     return (
-        <Box>
+        <Box className='loadable-container'>
             <Box className={cx(classes.trail)}>
                 <Typography variant='h4'>{hike.trail}</Typography>
 
@@ -215,25 +220,30 @@ const ViewHike = () => {
             <Card className={cx(classes.section)}>
                 <CardContent>
                     <Box>
-                        <Box className={cx(classes.field)}>
-                            <Typography variant='body2' className={cx(classes.fieldLabel)}>Date of hike</Typography>
-                            <Typography variant='body2'>{SharedService.formatDateOfHike(hike.dateOfHike)}</Typography>
-                        </Box>
-
                         {
-                            hike.conditions &&
-                            <Box className={cx(classes.field)}>
-                                <Typography variant='body2' className={cx(classes.fieldLabel)}>Conditions</Typography>
-                                <Typography variant='body2'>{hike.conditions}</Typography>
-                            </Box>
-                        }
+                            !loading &&
+                            <>
+                                <Box className={cx(classes.field)}>
+                                    <Typography variant='body2' className={cx(classes.fieldLabel)}>Date of hike</Typography>
+                                    <Typography variant='body2'>{SharedService.formatDateOfHike(hike.dateOfHike)}</Typography>
+                                </Box>
 
-                        {
-                            hike.crowds &&
-                            <Box className={cx(classes.field)}>
-                                <Typography variant='body2' className={cx(classes.fieldLabel)}>Crowds</Typography>
-                                <Typography variant='body2'>{hike.crowds}</Typography>
-                            </Box>
+                                {
+                                    hike.conditions &&
+                                    <Box className={cx(classes.field)}>
+                                        <Typography variant='body2' className={cx(classes.fieldLabel)}>Conditions</Typography>
+                                        <Typography variant='body2'>{hike.conditions}</Typography>
+                                    </Box>
+                                }
+
+                                {
+                                    hike.crowds &&
+                                    <Box className={cx(classes.field)}>
+                                        <Typography variant='body2' className={cx(classes.fieldLabel)}>Crowds</Typography>
+                                        <Typography variant='body2'>{hike.crowds}</Typography>
+                                    </Box>
+                                }
+                            </>
                         }
                     </Box>
                 </CardContent>
@@ -305,12 +315,17 @@ const ViewHike = () => {
                 </Box>
             }
 
-            <Box className={cx(classes.section)}>
-                <Typography variant='body2' className={cx(classes.lastUpdated)}>{`Last updated on ${formattedUpdatedAt}`}</Typography>
-            </Box>
+            {
+                !loading &&
+                <Box className={cx(classes.section)}>
+                    <Typography variant='body2' className={cx(classes.lastUpdated)}>{`Last updated on ${formattedUpdatedAt}`}</Typography>
+                </Box>
+            }
 
             <Button variant='contained' color='primary' onClick={() => navigate(-1)}>Back</Button>
             <ConfirmationPrompt title='Delete this hike?' open={openDeleteConfirmation} content='Are you sure you want to delete this hike?' onClose={handleDeleteConfirmation} />
+
+            <LoadingOverlay open={loading} />
         </Box>
     )
 };
