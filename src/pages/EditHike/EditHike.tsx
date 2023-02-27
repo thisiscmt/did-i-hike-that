@@ -23,6 +23,7 @@ import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
 import {Hike, Hiker, Photo} from '../../models/models';
 import {MainContext} from '../../contexts/MainContext';
+import Axios from 'axios';
 
 const useStyles = makeStyles()((theme) => ({
     row: {
@@ -225,13 +226,18 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 setKnownHikers(currentHikers);
                 setRetrievedKnownHikers(true);
             } catch(error) {
-                // TODO: Log this somewhere
+                if (Axios.isAxiosError(error) && error.response?.status === 401) {
+                    setBanner('You need to log in', 'warning');
+                } else {
+                    setBanner('Error occurred retrieving hikers', 'error');
+                }
             }
         }
 
         const getHike = async () => {
             try {
                 if (hikeId) {
+                    setBanner('');
                     const hike = await DataService.getHike(hikeId);
 
                     if (hike) {
@@ -247,11 +253,15 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                         setRetrievedHike(true);
                     }
                 } else {
-                    // TODO: Show a message saying the given hike wasn't found
+                    setBanner('Missing a hike ID', 'error');
                 }
 
             } catch(error) {
-                // TODO: Log this somewhere
+                if (Axios.isAxiosError(error) && error.response?.status === 401) {
+                    setBanner('You need to log in', 'warning');
+                } else {
+                    setBanner('Error occurred retrieving the hike', 'error');
+                }
             }
         }
 
@@ -379,7 +389,12 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 navigate(`/hike/${hikeIdForNav}`);
             }
         } catch (error) {
-            setBanner('Error saving hike', 'error');
+            if (Axios.isAxiosError(error) && error.response?.status === 401) {
+                setBanner('You need to log in', 'warning');
+            } else {
+                setBanner('Error saving hike', 'error');
+            }
+
             SharedService.scrollToTop(topOfPageRef);
         }
     };

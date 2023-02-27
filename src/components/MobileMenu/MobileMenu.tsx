@@ -1,7 +1,7 @@
-import React, {FC} from 'react';
-import {Link} from 'react-router-dom';
-import {Box, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText} from '@mui/material';
-import {CloseOutlined, HomeOutlined, SettingsOutlined} from '@mui/icons-material';
+import React, { FC } from 'react';
+import { Link } from 'react-router-dom';
+import { Box, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { CloseOutlined, HomeOutlined, SettingsOutlined, LoginOutlined } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
 
 import {Colors} from '../../services/themeService';
@@ -63,9 +63,15 @@ const MobileMenu: FC<MobileMenuProps> = ({ onClose }) => {
                     </ListItemButton>
                 </ListItem>
                 <ListItem disablePadding={true}>
-                    <ListItemButton to='/settings' component={Link} onClick={handleMenuClose}>
+                    <ListItemButton to='/preferences' component={Link} onClick={handleMenuClose}>
                         <ListItemIcon><SettingsOutlined /></ListItemIcon>
-                        <ListItemText primary='Settings' />
+                        <ListItemText primary='Preferences' />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem disablePadding={true}>
+                    <ListItemButton to='/login' component={Link} onClick={handleMenuClose}>
+                        <ListItemIcon><LoginOutlined /></ListItemIcon>
+                        <ListItemText primary='Login' />
                     </ListItemButton>
                 </ListItem>
             </List>

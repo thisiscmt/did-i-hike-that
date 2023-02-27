@@ -1,14 +1,16 @@
-import React, {useContext, useEffect, useState} from 'react';
-import {Link as RouteLink, useNavigate, useParams} from 'react-router-dom';
-import {Box, Button, Card, CardContent, Chip, IconButton, Link, Typography} from '@mui/material';
-import {DeleteOutlineOutlined, EditOutlined} from '@mui/icons-material';
-import {makeStyles} from 'tss-react/mui';
+import React, {useContext, useEffect, useState } from 'react';
+import { Link as RouteLink, useNavigate, useParams } from 'react-router-dom';
+import { Box, Button, Card, CardContent, Chip, IconButton, Link, Typography } from '@mui/material';
+import { DeleteOutlineOutlined, EditOutlined } from '@mui/icons-material';
+import { makeStyles } from 'tss-react/mui';
+import { DateTime } from 'luxon';
 
 import ConfirmationPrompt from '../../components/ConfirmationPrompt/ConfirmationPrompt';
 import {Hike, Hiker, Photo} from '../../models/models';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
 import {MainContext} from '../../contexts/MainContext';
+import Axios from 'axios';
 
 const useStyles = makeStyles()((theme) => ({
     section: {
@@ -39,9 +41,13 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     trail: {
-        alignItems: 'flex-start',
+        alignItems: 'center',
         display: 'flex',
         marginBottom: '18px',
+
+        '& h4': {
+            marginRight: '12px'
+        },
 
         [theme.breakpoints.down(1024)]: {
             '& h4': {
@@ -52,22 +58,15 @@ const useStyles = makeStyles()((theme) => ({
         [theme.breakpoints.down(700)]: {
             flexWrap: 'wrap',
 
-            '& a': {
-                marginLeft: 0
-            },
-
             '& h4': {
+                flexBasis: '100%',
                 marginBottom: '12px'
-            }
+            },
         }
     },
 
     description: {
         whiteSpace: 'pre-wrap'
-    },
-
-    editButton: {
-        marginLeft: '12px'
     },
 
     deleteButton: {
@@ -109,7 +108,7 @@ const ViewHike = () => {
     const { classes, cx } = useStyles();
     const [ hike, setHike ] = useState<Hike>({ trail: '', dateOfHike: '' });
     const [ openDeleteConfirmation, setIsOpenDeleteConfirmation ] = useState<boolean>(false);
-    const { searchText, setHikes } = useContext(MainContext);
+    const { searchText, setHikes, setBanner } = useContext(MainContext);
     const { hikeId } = useParams();
     const navigate = useNavigate();
 
@@ -117,19 +116,24 @@ const ViewHike = () => {
         const getHike = async () => {
             try {
                 if (hikeId) {
+                    setBanner('');
                     const currentHike = await DataService.getHike(hikeId);
                     setHike(currentHike);
                 } else {
-                    // TODO: Show a message saying the given hike wasn't found
+                    setBanner('Missing a hike ID', 'error');
                 }
             } catch(error) {
-                // TODO: Log this somewhere
+                if (Axios.isAxiosError(error) && error.response?.status === 401) {
+                    setBanner('You need to log in', 'warning');
+                } else {
+                    setBanner('Error occurred retrieving the hike', 'error');
+                }
             }
         }
 
         document.title = 'View Hike - Did I Hike That?';
         getHike();
-    }, [hikeId]);
+    }, [hikeId, setBanner]);
 
     const getValidUrl = () => {
         let valueToCheck = hike.link;
@@ -176,8 +180,8 @@ const ViewHike = () => {
     let formattedUpdatedAt = '';
 
     if (hike.updatedAt) {
-        const parsedUpdatedAt = Date.parse(hike.updatedAt.toString());
-        formattedUpdatedAt = new Date(parsedUpdatedAt).toLocaleString();
+        const parsedUpdatedAt = DateTime.fromISO(hike.updatedAt.toString());
+        formattedUpdatedAt = parsedUpdatedAt.toLocaleString(DateTime.DATETIME_FULL);
     }
 
     return (
@@ -187,7 +191,6 @@ const ViewHike = () => {
 
                 <IconButton
                     aria-label='edit hike'
-                    className={cx(classes.editButton)}
                     title='Edit hike'
                     component={RouteLink}
                     to={`/hike/${hike.id}/edit`}

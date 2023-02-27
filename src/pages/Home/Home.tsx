@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { TextField, Box, Typography, Button, InputAdornment, IconButton} from '@mui/material';
 import { CloseOutlined } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
+import Axios from 'axios';
 
 import SearchResult from '../../components/SearchResult/SearchResult';
 import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
@@ -76,7 +77,7 @@ const useStyles = makeStyles()((theme) => ({
 
 const Home: FC = () => {
     const { classes, cx } = useStyles();
-    const { searchText, hikes, setSearchText, setHikes } = useContext(MainContext);
+    const { searchText, hikes, setSearchText, setHikes, setBanner } = useContext(MainContext);
     const [ loading, setLoading ] = useState<boolean>(false);
     const [ showResults, setShowResults ] = useState<boolean>(hikes.length > 0);
     const navigate = useNavigate();
@@ -92,7 +93,7 @@ const Home: FC = () => {
     const handleSearch = async () => {
         try {
             setLoading(true);
-
+            setBanner('');
             const searchParams = SharedService.getSearchParams(searchText);
             const hikes = await DataService.getHikes(searchParams);
 
@@ -100,7 +101,11 @@ const Home: FC = () => {
             setHikes(hikes.rows);
             setShowResults(true);
         } catch (error){
-            // TODO: Log this somewhere
+            if (Axios.isAxiosError(error) && error.response?.status === 401) {
+                setBanner('You need to log in', 'warning');
+            } else {
+                setBanner('Error occurred retrieving hikes', 'error');
+            }
         } finally {
             setLoading(false);
         }

@@ -39,7 +39,7 @@ const useStyles = makeStyles()((theme) => ({
         }
     },
 
-    addButton: {
+    addHikeButton: {
         marginLeft: 'auto',
     },
 
@@ -91,8 +91,9 @@ const Header = () => {
                 <Typography variant='h5' className={cx(classes.headerText)}>Did I Hike That?</Typography>
 
                 <Button variant='text' className={cx(classes.headerButton)} component={Link} to='/'>Home</Button>
-                <Button variant='text' className={cx(classes.headerButton)} component={Link} to='settings/'>Settings</Button>
-                <Button component={Link} variant='contained' to='/hike' color="primary" className={cx(classes.addButton)}>Add Hike</Button>
+                <Button variant='text' className={cx(classes.headerButton)} component={Link} to='/preferences'>Preferences</Button>
+                <Button variant='text' className={cx(classes.headerButton)} component={Link} to='/login'>Login</Button>
+                <Button variant='contained' className={cx(classes.addHikeButton)} component={Link} to='/hike' color="primary">Add Hike</Button>
             </header>
             {
                 bannerMessage &&

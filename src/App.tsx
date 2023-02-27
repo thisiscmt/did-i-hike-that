@@ -6,7 +6,8 @@ import { makeStyles } from 'tss-react/mui';
 import Home from './pages/Home/Home';
 import ViewHike from './pages/ViewHike/ViewHike';
 import EditHike from './pages/EditHike/EditHike';
-import Settings from './pages/Settings/Settings';
+import Preferences from './pages/Preferences/Preferences';
+import Login from './pages/Login/Login';
 import ErrorPage from './pages/ErrorPage/ErrorPage';
 import Header from './components/Header/Header';
 import './App.scss';
@@ -53,7 +54,8 @@ function App() {
                             <Route path="/hike" element={<EditHike topOfPageRef={topOfPageRef} />} />
                             <Route path="/hike/:hikeId" element={<ViewHike />} />
                             <Route path="/hike/:hikeId/edit" element={<EditHike topOfPageRef={topOfPageRef} />} />
-                            <Route path="/settings" element={<Settings />} />
+                            <Route path="/preferences" element={<Preferences />} />
+                            <Route path="/login" element={<Login />} />
                             <Route path="*" element={<ErrorPage />} />
                         </Routes>
                     </Box>

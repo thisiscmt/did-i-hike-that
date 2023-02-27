@@ -1,6 +1,7 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {Box, Button, FormControl, FormControlLabel, Grid, TextField, Typography} from '@mui/material';
+import { Button, FormControl, FormControlLabel, Grid, TextField, Typography } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
+import { DateTime } from 'luxon';
 import Axios from 'axios';
 
 import * as DataService from '../../services/dataService';
@@ -59,7 +60,7 @@ const useStyles = makeStyles()((theme) => ({
     }
 }));
 
-const Settings = () => {
+const Login = () => {
     const { classes, cx } = useStyles();
     const { setBanner } = useContext(MainContext);
     const [ email, setEmail ] = useState<string>(localStorage.getItem(STORAGE_EMAIL_KEY) || '');
@@ -69,7 +70,7 @@ const Settings = () => {
     const [ passwordInputError, setPasswordInputError ] = useState<boolean>(false);
 
     useEffect(() => {
-        document.title = 'Settings - Did I Hike That?';
+        document.title = 'Login - Did I Hike That?';
     });
 
     const handleLogin = async () => {
@@ -98,15 +99,15 @@ const Settings = () => {
             localStorage.setItem(STORAGE_EMAIL_KEY, email);
             localStorage.setItem(STORAGE_LAST_LOGIN_KEY, lastLogin);
         } catch (error) {
-            if (Axios.isAxiosError(error)) {
-                setBanner('Email address or password was invalid', 'error');
+            if (Axios.isAxiosError(error) && error.response?.status === 401) {
+                setBanner('You need to log in', 'warning');
             } else {
                 setBanner('Error occurred during login', 'error');
             }
         }
     };
 
-    const formattedLastLogin = lastLogin ? 'Last login: ' + new Date(Number(lastLogin)).toLocaleString() : '';
+    const formattedLastLogin = lastLogin ? 'Last login on ' + DateTime.fromMillis(Number(lastLogin)).toLocaleString(DateTime.DATETIME_FULL) : '';
 
     return (
         <>
@@ -171,4 +172,4 @@ const Settings = () => {
     )
 };
 
-export default Settings;
+export default Login;
