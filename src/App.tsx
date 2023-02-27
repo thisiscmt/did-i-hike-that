@@ -12,24 +12,36 @@ import ErrorPage from './pages/ErrorPage/ErrorPage';
 import Header from './components/Header/Header';
 import './App.scss';
 
-const useStyles = makeStyles()(() => ({
+const useStyles = makeStyles()((theme) => ({
     mainContainer: {
         display: 'flex',
         flexDirection: 'row',
     },
 
     leftColumn: {
-        width: '20%'
+        width: '20%',
+
+        [theme.breakpoints.down(470)]: {
+            width: '8%'
+        }
     },
 
     contentColumn: {
-        marginBottom: '40px',
+        marginBottom: '30px',
         marginTop: '30px',
-        width: '60%'
+        width: '60%',
+
+        [theme.breakpoints.down(470)]: {
+            width: '84%'
+        }
     },
 
     rightColumn: {
-        width: '20%'
+        width: '20%',
+
+        [theme.breakpoints.down(470)]: {
+            width: '8%'
+        }
     }
 }));
 

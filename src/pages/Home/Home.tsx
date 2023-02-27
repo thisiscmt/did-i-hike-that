@@ -36,7 +36,11 @@ const useStyles = makeStyles()((theme) => ({
         width: '500px',
 
         [theme.breakpoints.down(700)]: {
-            width: 'unset'
+            width: '300px'
+        },
+
+        [theme.breakpoints.down(470)]: {
+            width: '80%'
         },
     },
 
@@ -56,7 +60,7 @@ const useStyles = makeStyles()((theme) => ({
         },
 
         [theme.breakpoints.down(700)]: {
-            width: 'unset'
+            width: '80%'
         },
     },
 
@@ -115,9 +119,11 @@ const Home: FC = () => {
         <Box className='loadable-container'>
             <Box className={cx(classes.content)}>
                 <Typography variant='h5'>
-                    Ever ask yourself if you've hiked a particular trail before?<br />Well ask no more!
+                    Ever ask yourself if you've hiked a particular trail before?
                 </Typography>
-
+                <Typography variant='h5'>
+                    Well ask no more!
+                </Typography>
                 <Typography variant='body1' className={cx(classes.quote)}>
                     "Not all those who wander are lost"
                 </Typography>
