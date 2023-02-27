@@ -21,7 +21,7 @@ const useStyles = makeStyles()((theme) => ({
     leftColumn: {
         width: '20%',
 
-        [theme.breakpoints.down(470)]: {
+        [theme.breakpoints.down(700)]: {
             width: '8%'
         }
     },
@@ -31,7 +31,7 @@ const useStyles = makeStyles()((theme) => ({
         marginTop: '30px',
         width: '60%',
 
-        [theme.breakpoints.down(470)]: {
+        [theme.breakpoints.down(700)]: {
             width: '84%'
         }
     },
@@ -39,7 +39,7 @@ const useStyles = makeStyles()((theme) => ({
     rightColumn: {
         width: '20%',
 
-        [theme.breakpoints.down(470)]: {
+        [theme.breakpoints.down(700)]: {
             width: '8%'
         }
     }

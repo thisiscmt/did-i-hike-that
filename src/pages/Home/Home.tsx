@@ -33,15 +33,11 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     searchInput: {
-        width: '500px',
+        width: '80%',
 
         [theme.breakpoints.down(700)]: {
-            width: '300px'
-        },
-
-        [theme.breakpoints.down(470)]: {
-            width: '80%'
-        },
+            width: '100%'
+        }
     },
 
     searchResultsContainer: {
@@ -53,15 +49,11 @@ const useStyles = makeStyles()((theme) => ({
 
     searchResults: {
         margin: 'auto',
-        width: '700px',
-
-        [theme.breakpoints.down(1024)]: {
-            width: '500px'
-        },
+        width: '80%',
 
         [theme.breakpoints.down(700)]: {
-            width: '80%'
-        },
+            width: '100%'
+        }
     },
 
     searchResult: {

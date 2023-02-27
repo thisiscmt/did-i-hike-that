@@ -18,7 +18,7 @@ const useStyles = makeStyles()((theme) => ({
         paddingLeft: '20px',
         paddingRight: '20px',
 
-        [theme.breakpoints.down(620)]: {
+        [theme.breakpoints.down(630)]: {
             paddingLeft: '10px',
             paddingRight: '15px',
         }
@@ -27,14 +27,14 @@ const useStyles = makeStyles()((theme) => ({
     headerText: {
         marginRight: '30px',
 
-        [theme.breakpoints.down(620)]: {
+        [theme.breakpoints.down(630)]: {
             fontSize: '1.0rem',
             marginRight: 0
         },
     },
 
     headerButton: {
-        [theme.breakpoints.down(620)]: {
+        [theme.breakpoints.down(630)]: {
             display: 'none'
         }
     },
