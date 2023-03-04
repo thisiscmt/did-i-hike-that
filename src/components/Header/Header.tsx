@@ -26,6 +26,7 @@ const useStyles = makeStyles()((theme) => ({
 
     headerText: {
         marginRight: '30px',
+        textDecoration: 'none',
 
         [theme.breakpoints.down(630)]: {
             fontSize: '1.0rem',
@@ -88,9 +89,8 @@ const Header = () => {
                     <MobileMenu onClose={() => handleMobileMenuClick(false)} />
                 </SwipeableDrawer>
 
-                <Typography variant='h5' className={cx(classes.headerText)}>Did I Hike That?</Typography>
+                <Typography variant='h5' component={Link} to='/' className={cx(classes.headerText)}>Did I Hike That?</Typography>
 
-                <Button variant='text' className={cx(classes.headerButton)} component={Link} to='/'>Home</Button>
                 <Button variant='text' className={cx(classes.headerButton)} component={Link} to='/preferences'>Preferences</Button>
                 <Button variant='text' className={cx(classes.headerButton)} component={Link} to='/login'>Login</Button>
                 <Button variant='contained' className={cx(classes.addHikeButton)} component={Link} to='/hike' color="primary">Add Hike</Button>

@@ -1,7 +1,6 @@
 import Axios, {AxiosProgressEvent, AxiosRequestConfig} from 'axios';
 
 import {Hike, Hiker, HikeSearchParams, Photo} from '../models/models';
-import {STORAGE_EMAIL_KEY} from '../constants/constants';
 
 export const getHikes = async (searchParams?: HikeSearchParams): Promise<{ rows: Hike[]; count: number }> => {
     const config = getRequestConfig();
@@ -56,19 +55,18 @@ export const getHikers = async (): Promise<string[]> => {
 };
 
 export const loginUser = async (email: string, password: string) => {
-    return await Axios.get(process.env.REACT_APP_API_URL + `/user/login?email=${email}&password=${password}`, getRequestConfig());
+    return await Axios.get(process.env.REACT_APP_API_URL + `/auth/login?email=${email}&password=${password}`, getRequestConfig());
 };
 
 const getRequestConfig = (multipartRequest: boolean = false): AxiosRequestConfig => {
     const config: AxiosRequestConfig = {
-        headers: {
-            'x-diht-user': localStorage.getItem(STORAGE_EMAIL_KEY)
-        },
         withCredentials: true
     };
 
     if (!multipartRequest) {
-        config.headers!['Content-Type'] = 'application/json';
+        config.headers = {
+            'Content-Type': 'application/json'
+        };
     }
 
     return config;

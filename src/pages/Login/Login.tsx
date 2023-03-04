@@ -100,7 +100,7 @@ const Login = () => {
             localStorage.setItem(STORAGE_LAST_LOGIN_KEY, lastLogin);
         } catch (error) {
             if (Axios.isAxiosError(error) && error.response?.status === 401) {
-                setBanner('You need to log in', 'warning');
+                setBanner('Email or password were invalid', 'warning');
             } else {
                 setBanner('Error occurred during login', 'error');
             }
