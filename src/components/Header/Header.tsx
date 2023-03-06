@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {Link, useLocation} from 'react-router-dom';
+import {Link, useLocation, useNavigate} from 'react-router-dom';
 import {Alert, Button, Fade, IconButton, SwipeableDrawer, Typography} from '@mui/material';
 import {MenuOutlined} from '@mui/icons-material';
 import {makeStyles} from 'tss-react/mui';
@@ -7,6 +7,8 @@ import {makeStyles} from 'tss-react/mui';
 import MobileMenu from '../MobileMenu/MobileMenu';
 import {Colors} from '../../services/themeService';
 import {MainContext} from '../../contexts/MainContext';
+import {STORAGE_LAST_LOGIN_KEY} from '../../constants/constants';
+import * as DataService from '../../services/dataService';
 
 const useStyles = makeStyles()((theme) => ({
     headerContainer: {
@@ -59,6 +61,7 @@ const Header = () => {
     const [ mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
     const { bannerMessage, bannerSeverity, setBanner } = useContext(MainContext);
     const location = useLocation();
+    const navigate = useNavigate();
 
     useEffect(() => {
         setBanner('');
@@ -68,6 +71,18 @@ const Header = () => {
     const handleMobileMenuClick = (value: boolean) => {
         setMobileMenuOpen(value);
     };
+
+    const handleLogout = async () => {
+        try {
+            await DataService.logout();
+            localStorage.removeItem(STORAGE_LAST_LOGIN_KEY);
+            navigate(0);
+        } catch(error) {
+            setBanner('Error occurred during logout', 'error');
+        }
+    }
+
+    const loggedIn = !!localStorage.getItem(STORAGE_LAST_LOGIN_KEY);
 
     return (
         <>
@@ -92,7 +107,15 @@ const Header = () => {
                 <Typography variant='h5' component={Link} to='/' className={cx(classes.headerText)}>Did I Hike That?</Typography>
 
                 <Button variant='text' className={cx(classes.headerButton)} component={Link} to='/preferences'>Preferences</Button>
-                <Button variant='text' className={cx(classes.headerButton)} component={Link} to='/login'>Login</Button>
+
+                {
+                    loggedIn
+                        ?
+                            <Button variant='text' className={cx(classes.headerButton)} onClick={handleLogout}>Logout</Button>
+                        :
+                            <Button variant='text' className={cx(classes.headerButton)} component={Link} to='/login'>Login</Button>
+                }
+
                 <Button variant='contained' className={cx(classes.addHikeButton)} component={Link} to='/hike' color="primary">Add Hike</Button>
             </header>
             {

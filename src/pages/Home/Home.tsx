@@ -73,9 +73,9 @@ const useStyles = makeStyles()((theme) => ({
 
 const Home: FC = () => {
     const { classes, cx } = useStyles();
-    const { searchText, hikes, setSearchText, setHikes, setBanner } = useContext(MainContext);
+    const { searchText, searchResults, setSearchText, setSearchResults, setBanner } = useContext(MainContext);
     const [ loading, setLoading ] = useState<boolean>(false);
-    const [ showResults, setShowResults ] = useState<boolean>(hikes.length > 0);
+    const [ showResults, setShowResults ] = useState<boolean>(searchResults.length > 0);
     const navigate = useNavigate();
 
     const handleSearchTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -94,7 +94,7 @@ const Home: FC = () => {
             const hikes = await DataService.getHikes(searchParams);
 
             setSearchText(searchText);
-            setHikes(hikes.rows);
+            setSearchResults(hikes.rows);
             setShowResults(true);
         } catch (error){
             if (Axios.isAxiosError(error) && error.response?.status === 401) {
@@ -151,11 +151,11 @@ const Home: FC = () => {
             <Box className={`${cx(classes.searchResultsContainer)}`}>
                 {
                     showResults ?
-                        hikes.length > 0
+                        searchResults.length > 0
                             ?
                                 <Box className={cx(classes.searchResults)}>
                                     {
-                                        hikes.map((hike: Hike) => {
+                                        searchResults.map((hike: Hike) => {
                                             return (
                                                 <Box key={hike.id} className={cx(classes.searchResult)} onClick={() => navigate(`/hike/${hike.id}`)}>
                                                     <SearchResult hike={hike} />

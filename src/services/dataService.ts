@@ -20,7 +20,7 @@ export const getHike = async (hikeId: string): Promise<Hike> => {
 
 export const createHike = async (hike: Hike, onUploadProgress?: (axiosProgressEvent: AxiosProgressEvent) => void) => {
     const formData = getFormData(hike);
-    const config = getRequestConfig();
+    const config = getRequestConfig(true);
     config.headers!['x-diht-trail'] = hike.trail;
     config.headers!['x-diht-date-of-hike'] = hike.dateOfHike;
 
@@ -34,7 +34,7 @@ export const createHike = async (hike: Hike, onUploadProgress?: (axiosProgressEv
 
 export const updateHike = (hike: Hike, onUploadProgress?: (axiosProgressEvent: AxiosProgressEvent) => void) => {
     const formData = getFormData(hike);
-    const config = getRequestConfig();
+    const config = getRequestConfig(true);
     config.headers!['x-diht-trail'] = hike.trail;
     config.headers!['x-diht-date-of-hike'] = hike.dateOfHike;
 
@@ -54,20 +54,27 @@ export const getHikers = async (): Promise<string[]> => {
     return response.data;
 };
 
-export const loginUser = async (email: string, password: string) => {
-    return await Axios.get(process.env.REACT_APP_API_URL + `/auth/login?email=${email}&password=${password}`, getRequestConfig());
+export const login = async (email: string, password: string) => {
+    return await Axios.get(process.env.REACT_APP_API_URL + `/auth?email=${email}&password=${password}`, getRequestConfig());
+};
+
+export const logout = async () => {
+    return await Axios.delete(process.env.REACT_APP_API_URL + `/auth`, getRequestConfig());
 };
 
 const getRequestConfig = (multipartRequest: boolean = false): AxiosRequestConfig => {
     const config: AxiosRequestConfig = {
         withCredentials: true
     };
+    let contentType = 'application/json';
 
-    if (!multipartRequest) {
-        config.headers = {
-            'Content-Type': 'application/json'
-        };
+    if (multipartRequest) {
+        contentType = 'multipart/form-data'
     }
+
+    config.headers = {
+        'Content-Type': contentType
+    };
 
     return config;
 };

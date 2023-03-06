@@ -34,7 +34,8 @@ const useStyles = makeStyles()((theme) => ({
         },
 
         [theme.breakpoints.down(500)]: {
-            marginLeft: 0
+            marginLeft: 0,
+            marginTop: '8px'
         },
     },
 
@@ -60,7 +61,7 @@ interface SearchResultProps {
 const SearchResult: FC<SearchResultProps> = ({ hike }) => {
     const { classes, cx } = useStyles();
     const thumbnailSource = hike.filePath ? `${process.env.REACT_APP_API_URL}/images/` + hike.filePath : 'images/no_hike_images.png';
-    const hikers = hike.fullNames?.split(',');
+    const hikers = hike.fullNames ? hike.fullNames.split(',') : [];
 
     return (
         <Card>
@@ -74,7 +75,7 @@ const SearchResult: FC<SearchResultProps> = ({ hike }) => {
                     <Typography variant='body2'>{SharedService.formatDateOfHike(hike.dateOfHike)}</Typography>
 
                     {
-                        hikers &&
+                        hikers && hikers.length > 0 &&
                         <Box className={cx(classes.hikers)}>
                             {
                                 hikers.map((hiker: string, index: number) => {

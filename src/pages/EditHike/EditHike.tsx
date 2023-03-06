@@ -1,5 +1,5 @@
-import React, {FC, RefObject, useContext, useEffect, useState} from 'react';
-import {useNavigate, useParams} from 'react-router-dom';
+import React, { FC, RefObject, useContext, useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
     Autocomplete,
     AutocompleteChangeDetails,
@@ -13,17 +13,17 @@ import {
     ListItem,
     TextField
 } from '@mui/material';
-import {DeleteOutlineOutlined} from '@mui/icons-material';
-import {DatePicker, LocalizationProvider} from '@mui/x-date-pickers';
-import {AdapterLuxon} from '@mui/x-date-pickers/AdapterLuxon';
-import { DateTime } from 'luxon';
+import { DeleteOutlineOutlined } from '@mui/icons-material';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { makeStyles } from 'tss-react/mui';
+import { AdapterLuxon} from '@mui/x-date-pickers/AdapterLuxon';
+import Axios, {AxiosResponse} from 'axios';
+import { DateTime } from 'luxon';
 
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
-import {Hike, Hiker, Photo} from '../../models/models';
-import {MainContext} from '../../contexts/MainContext';
-import Axios from 'axios';
+import { Hike, Hiker, Photo } from '../../models/models';
+import { MainContext } from '../../contexts/MainContext';
 
 const useStyles = makeStyles()((theme) => ({
     row: {
@@ -199,7 +199,7 @@ interface EditHikeProps {
 
 const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const { classes, cx } = useStyles();
-    const { searchText, setHikes, setBanner } = useContext(MainContext);
+    const { searchResults, setSearchResults, setUpdatedHike, setBanner } = useContext(MainContext);
     const { hikeId } = useParams();
     const navigate = useNavigate();
 
@@ -372,20 +372,23 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                     trail, dateOfHike: dateOfHike ? dateOfHike.toString() : '', conditions, crowds, hikers: hikersToSave, description, link, linkLabel,
                     tags: tags.join(','), photos
                 };
-                let hikeIdForNav: string;
+                let hikeIdForNav = hikeId;
+                let response: AxiosResponse;
 
                 if (hikeId) {
                     hike.id = hikeId;
-                    await DataService.updateHike(hike);
-                    hikeIdForNav = hikeId;
+                    response = await DataService.updateHike(hike);
+
+                    const updatedSearchResults = [...searchResults];
+                    const index = updatedSearchResults.findIndex((hike: Hike) => hike.id === hikeId);
+                    updatedSearchResults[index] = getHikeForSearchResults(response.data);
+                    setSearchResults(updatedSearchResults);
                 } else {
-                    hikeIdForNav = await DataService.createHike(hike);
+                    response = await DataService.createHike(hike);
+                    hikeIdForNav = response.data.id;
                 }
 
-                const searchParams = SharedService.getSearchParams(searchText);
-                const hikes = await DataService.getHikes(searchParams);
-                setHikes(hikes.rows);
-
+                setUpdatedHike(response.data);
                 navigate(`/hike/${hikeIdForNav}`);
             }
         } catch (error) {
@@ -433,6 +436,32 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
         }
 
         return valid;
+    };
+
+    const getHikeForSearchResults = (hike: Hike) => {
+        let fullNames = '';
+        let filePath = '';
+        let caption = '';
+
+        if (hike.hikers && hike.hikers.length > 0) {
+            fullNames = hike.hikers.map((hiker: Hiker) => hiker.fullName).join(',');
+        }
+
+        if (hike.photos && hike.photos.length > 0) {
+            filePath = hike.photos[0].filePath;
+            caption = hike.photos[0].caption || '';
+        }
+
+        return {
+            id: hike.id,
+            trail: hike.trail,
+            dateOfHike: hike.dateOfHike,
+            description: hike.description,
+            tags: hike.tags,
+            fullNames,
+            filePath,
+            caption
+        }
     };
 
     return (

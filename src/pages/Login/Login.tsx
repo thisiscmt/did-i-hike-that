@@ -92,7 +92,7 @@ const Login = () => {
             }
 
             setBanner('');
-            await DataService.loginUser(email, password);
+            await DataService.login(email, password);
 
             const lastLogin = Date.now().toString();
             setLastLogin(lastLogin);
@@ -166,7 +166,7 @@ const Login = () => {
             }
 
             <Grid item xs={12} className={cx(classes.actions)}>
-                <Button onClick={handleLogin} variant='contained' color='primary'>Login</Button>
+                <Button onClick={handleLogin} variant='contained' color='primary' type='submit'>Login</Button>
             </Grid>
         </>
     )

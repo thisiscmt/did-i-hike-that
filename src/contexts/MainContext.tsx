@@ -6,9 +6,11 @@ interface MainContextProps {
     bannerSeverity: 'error' | 'info' | 'success' | 'warning';
     setBanner: (message: string, severity?: AlertSeverity) => void;
     searchText: string;
-    hikes: Hike[];
+    searchResults: Hike[];
+    updatedHike: Hike | null;
     setSearchText: React.Dispatch<React.SetStateAction<string>>;
-    setHikes: React.Dispatch<React.SetStateAction<Hike[]>>;
+    setSearchResults: React.Dispatch<React.SetStateAction<Hike[]>>;
+    setUpdatedHike: React.Dispatch<React.SetStateAction<Hike | null>>;
 }
 
 interface MainProviderProps{
@@ -20,9 +22,11 @@ export const MainContext = React.createContext<MainContextProps>({
     bannerSeverity: 'info',
     setBanner: (message, severity) => {},
     searchText: '',
-    hikes: [],
+    searchResults: [],
+    updatedHike: null,
     setSearchText: () => {},
-    setHikes: () => {}
+    setSearchResults: () => {},
+    setUpdatedHike: () => {}
 });
 
 export type AlertSeverity = 'error' | 'info' | 'success' | 'warning';
@@ -31,7 +35,8 @@ export const MainProvider = ({ children }: MainProviderProps) => {
     const [ bannerMessage, setBannerMessage ] = useState<string>('');
     const [ bannerSeverity, setBannerSeverity ] = useState<AlertSeverity>('info');
     const [ searchText, setSearchText ] = useState<string>('');
-    const [ hikes, setHikes ] = useState<Hike[]>([]);
+    const [ searchResults, setSearchResults ] = useState<Hike[]>([]);
+    const [ updatedHike, setUpdatedHike ] = useState<Hike | null>(null);
 
     const setBanner = (message: string, severity?: AlertSeverity) => {
         setBannerMessage(message);
@@ -44,9 +49,12 @@ export const MainProvider = ({ children }: MainProviderProps) => {
             bannerSeverity,
             setBanner,
             searchText,
-            hikes,
+            searchResults,
+            updatedHike,
             setSearchText,
-            setHikes }}
+            setSearchResults,
+            setUpdatedHike
+        }}
         >
             {children}
         </MainContext.Provider>

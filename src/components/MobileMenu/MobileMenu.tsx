@@ -1,10 +1,13 @@
-import React, { FC } from 'react';
-import { Link } from 'react-router-dom';
+import React, { FC, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Box, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { CloseOutlined, HomeOutlined, SettingsOutlined, LoginOutlined } from '@mui/icons-material';
+import { CloseOutlined, HomeOutlined, SettingsOutlined, LoginOutlined, LogoutOutlined } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
 
-import {Colors} from '../../services/themeService';
+import { Colors } from '../../services/themeService';
+import { MainContext } from '../../contexts/MainContext';
+import * as DataService from '../../services/dataService';
+import { STORAGE_LAST_LOGIN_KEY } from '../../constants/constants';
 
 const useStyles = makeStyles()(() => ({
     mainContainer: {
@@ -39,10 +42,26 @@ interface MobileMenuProps {
 
 const MobileMenu: FC<MobileMenuProps> = ({ onClose }) => {
     const { classes, cx } = useStyles();
+    const { setBanner } = useContext(MainContext);
+    const navigate = useNavigate();
 
     const handleMenuClose = () => {
         onClose();
     };
+
+    const handleLogout = async () => {
+        try {
+            await DataService.logout();
+            localStorage.removeItem(STORAGE_LAST_LOGIN_KEY);
+            navigate(0);
+        } catch(error) {
+            setBanner('Error occurred during logout', 'error');
+        }
+
+        handleMenuClose();
+    };
+
+    const loggedIn = !!localStorage.getItem(STORAGE_LAST_LOGIN_KEY);
 
     return (
         <Box className={cx(classes.mainContainer)}>
@@ -68,12 +87,24 @@ const MobileMenu: FC<MobileMenuProps> = ({ onClose }) => {
                         <ListItemText primary='Preferences' />
                     </ListItemButton>
                 </ListItem>
-                <ListItem disablePadding={true}>
-                    <ListItemButton to='/login' component={Link} onClick={handleMenuClose}>
-                        <ListItemIcon><LoginOutlined /></ListItemIcon>
-                        <ListItemText primary='Login' />
-                    </ListItemButton>
-                </ListItem>
+
+                {
+                    loggedIn
+                        ?
+                            <ListItem disablePadding={true}>
+                                <ListItemButton onClick={handleLogout}>
+                                    <ListItemIcon><LogoutOutlined /></ListItemIcon>
+                                    <ListItemText primary='Logout' />
+                                </ListItemButton>
+                            </ListItem>
+                        :
+                            <ListItem disablePadding={true}>
+                                <ListItemButton to='/login' component={Link} onClick={handleMenuClose}>
+                                    <ListItemIcon><LoginOutlined /></ListItemIcon>
+                                    <ListItemText primary='Login' />
+                                </ListItemButton>
+                            </ListItem>
+                }
             </List>
         </Box>
     );

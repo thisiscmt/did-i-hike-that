@@ -3,15 +3,15 @@ import { Link as RouteLink, useNavigate, useParams } from 'react-router-dom';
 import { Box, Button, Card, CardContent, Chip, IconButton, Link, Typography } from '@mui/material';
 import { DeleteOutlineOutlined, EditOutlined } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
+import Axios from 'axios';
 import { DateTime } from 'luxon';
 
 import ConfirmationPrompt from '../../components/ConfirmationPrompt/ConfirmationPrompt';
 import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
-import {Hike, Hiker, Photo} from '../../models/models';
+import { Hike, Hiker, Photo } from '../../models/models';
+import { MainContext } from '../../contexts/MainContext';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
-import {MainContext} from '../../contexts/MainContext';
-import Axios from 'axios';
 
 const useStyles = makeStyles()((theme) => ({
     section: {
@@ -108,9 +108,10 @@ const useStyles = makeStyles()((theme) => ({
 const ViewHike = () => {
     const { classes, cx } = useStyles();
     const [ hike, setHike ] = useState<Hike>({ trail: '', dateOfHike: '' });
+    const [ retrievedHike, setRetrievedHike ] = useState<boolean>(false);
     const [ openDeleteConfirmation, setIsOpenDeleteConfirmation ] = useState<boolean>(false);
     const [ loading, setLoading ] = useState<boolean>(false);
-    const { searchText, setHikes, setBanner } = useContext(MainContext);
+    const { searchResults, updatedHike, setSearchResults, setUpdatedHike, setBanner } = useContext(MainContext);
     const { hikeId } = useParams();
     const navigate = useNavigate();
 
@@ -120,25 +121,39 @@ const ViewHike = () => {
                 if (hikeId) {
                     setBanner('');
                     setLoading(true);
+
                     const currentHike = await DataService.getHike(hikeId);
                     setHike(currentHike);
+                    setRetrievedHike(true);
                 } else {
                     setBanner('Missing a hike ID', 'error');
                 }
             } catch(error) {
                 if (Axios.isAxiosError(error) && error.response?.status === 401) {
                     setBanner('You need to log in', 'warning');
+                } else if (Axios.isAxiosError(error) && error.response?.status === 404) {
+                    setBanner('Could not find the hike', 'warning');
                 } else {
                     setBanner('Error occurred retrieving the hike', 'error');
                 }
             } finally {
+                setRetrievedHike(true);
                 setLoading(false);
             }
         }
 
         document.title = 'View Hike - Did I Hike That?';
-        getHike();
-    }, [hikeId, setBanner]);
+
+        if (!retrievedHike) {
+            if (updatedHike) {
+                setHike(updatedHike);
+                setUpdatedHike(null);
+                setRetrievedHike(true);
+            } else {
+                getHike();
+            }
+        }
+    }, [hikeId, retrievedHike, updatedHike, setUpdatedHike, setBanner]);
 
     const getValidUrl = () => {
         let valueToCheck = hike.link;
@@ -174,9 +189,10 @@ const ViewHike = () => {
         if (hikeId) {
             await DataService.deleteHike(hikeId);
 
-            const searchParams = SharedService.getSearchParams(searchText);
-            const hikes = await DataService.getHikes(searchParams);
-            setHikes(hikes.rows);
+            const updatedSearchResults = [...searchResults];
+            const index = updatedSearchResults.findIndex((hike: Hike) => hike.id === hikeId);
+            updatedSearchResults.splice(index, 1);
+            setSearchResults(updatedSearchResults);
             navigate(-1);
         }
     };
@@ -277,13 +293,11 @@ const ViewHike = () => {
                 <Box className={`${cx(classes.field)} ${cx(classes.section)} chips`}>
                     <Typography variant='body2' className={cx(classes.shortFieldLabel)}>Tags</Typography>
 
-                    <Box>
-                        {
-                            hike.tags.split(',').map((tag: string) => (
-                                <Chip key={tag} label={tag} className={cx(classes.chip)}></Chip>
-                            ))
-                        }
-                    </Box>
+                    {
+                        hike.tags.split(',').map((tag: string) => (
+                            <Chip key={tag} label={tag} className={cx(classes.chip)}></Chip>
+                        ))
+                    }
                 </Box>
             }
 
