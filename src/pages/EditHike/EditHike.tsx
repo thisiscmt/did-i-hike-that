@@ -17,7 +17,7 @@ import { DeleteOutlineOutlined } from '@mui/icons-material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { makeStyles } from 'tss-react/mui';
 import { AdapterLuxon} from '@mui/x-date-pickers/AdapterLuxon';
-import Axios, {AxiosResponse} from 'axios';
+import Axios from 'axios';
 import { DateTime } from 'luxon';
 
 import * as DataService from '../../services/dataService';
@@ -373,7 +373,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                     tags: tags.join(','), photos
                 };
                 let hikeIdForNav = hikeId;
-                let response: AxiosResponse;
+                let response: Hike;
 
                 if (hikeId) {
                     hike.id = hikeId;
@@ -381,14 +381,14 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
 
                     const updatedSearchResults = [...searchResults];
                     const index = updatedSearchResults.findIndex((hike: Hike) => hike.id === hikeId);
-                    updatedSearchResults[index] = getHikeForSearchResults(response.data);
+                    updatedSearchResults[index] = getHikeForSearchResults(response);
                     setSearchResults(updatedSearchResults);
                 } else {
                     response = await DataService.createHike(hike);
-                    hikeIdForNav = response.data.id;
+                    hikeIdForNav = response.id;
                 }
 
-                setUpdatedHike(response.data);
+                setUpdatedHike(response);
                 navigate(`/hike/${hikeIdForNav}`);
             }
         } catch (error) {

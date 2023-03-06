@@ -18,7 +18,7 @@ export const getHike = async (hikeId: string): Promise<Hike> => {
     return response.data;
 };
 
-export const createHike = async (hike: Hike, onUploadProgress?: (axiosProgressEvent: AxiosProgressEvent) => void) => {
+export const createHike = async (hike: Hike, onUploadProgress?: (axiosProgressEvent: AxiosProgressEvent) => void): Promise<Hike> => {
     const formData = getFormData(hike);
     const config = getRequestConfig(true);
     config.headers!['x-diht-trail'] = hike.trail;
@@ -32,7 +32,7 @@ export const createHike = async (hike: Hike, onUploadProgress?: (axiosProgressEv
     return response.data;
 };
 
-export const updateHike = (hike: Hike, onUploadProgress?: (axiosProgressEvent: AxiosProgressEvent) => void) => {
+export const updateHike = async (hike: Hike, onUploadProgress?: (axiosProgressEvent: AxiosProgressEvent) => void): Promise<Hike> => {
     const formData = getFormData(hike);
     const config = getRequestConfig(true);
     config.headers!['x-diht-trail'] = hike.trail;
@@ -42,7 +42,8 @@ export const updateHike = (hike: Hike, onUploadProgress?: (axiosProgressEvent: A
         config.onUploadProgress = onUploadProgress;
     }
 
-    return Axios.put(process.env.REACT_APP_API_URL + `/hike/${hike.id}`, formData, config);
+    const response = await Axios.put(process.env.REACT_APP_API_URL + `/hike/${hike.id}`, formData, config);
+    return response.data;
 };
 
 export const deleteHike = (hikeId: string) => {
