@@ -18,9 +18,10 @@ export const getHike = async (hikeId: string): Promise<Hike> => {
     return response.data;
 };
 
-export const createHike = async (hike: Hike, onUploadProgress?: (axiosProgressEvent: AxiosProgressEvent) => void): Promise<Hike> => {
+export const createHike = async (hike: Hike, signal: AbortSignal, onUploadProgress?: (axiosProgressEvent: AxiosProgressEvent) => void): Promise<Hike> => {
     const formData = getFormData(hike);
     const config = getRequestConfig(true);
+    config.signal = signal;
     config.headers!['x-diht-trail'] = hike.trail;
     config.headers!['x-diht-date-of-hike'] = hike.dateOfHike;
 
@@ -32,9 +33,10 @@ export const createHike = async (hike: Hike, onUploadProgress?: (axiosProgressEv
     return response.data;
 };
 
-export const updateHike = async (hike: Hike, onUploadProgress?: (axiosProgressEvent: AxiosProgressEvent) => void): Promise<Hike> => {
+export const updateHike = async (hike: Hike, signal: AbortSignal, onUploadProgress?: (progressEvent: AxiosProgressEvent) => void): Promise<Hike> => {
     const formData = getFormData(hike);
     const config = getRequestConfig(true);
+    config.signal = signal;
     config.headers!['x-diht-trail'] = hike.trail;
     config.headers!['x-diht-date-of-hike'] = hike.dateOfHike;
 

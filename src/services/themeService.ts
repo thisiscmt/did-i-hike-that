@@ -3,7 +3,8 @@ import {grey} from '@mui/material/colors';
 
 export const Colors = {
     primaryText: grey[800],
-    backgroundGray: '#F3F3F3'
+    backgroundGray: '#F3F3F3',
+    white: '#FFFFFF'
 };
 
 export const buildTheme = (overrides?: Record<string, string>) => {

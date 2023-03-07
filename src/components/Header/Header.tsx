@@ -1,13 +1,13 @@
-import React, {useContext, useEffect, useState} from 'react';
-import {Link, useLocation, useNavigate} from 'react-router-dom';
-import {Alert, Button, Fade, IconButton, SwipeableDrawer, Typography} from '@mui/material';
-import {MenuOutlined} from '@mui/icons-material';
-import {makeStyles} from 'tss-react/mui';
+import React, {useContext, useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Alert, Button, Fade, IconButton, SwipeableDrawer, Typography } from '@mui/material';
+import { MenuOutlined } from '@mui/icons-material';
+import { makeStyles } from 'tss-react/mui';
 
 import MobileMenu from '../MobileMenu/MobileMenu';
-import {Colors} from '../../services/themeService';
-import {MainContext} from '../../contexts/MainContext';
-import {STORAGE_LAST_LOGIN_KEY} from '../../constants/constants';
+import { Colors } from '../../services/themeService';
+import { MainContext } from '../../contexts/MainContext';
+import { STORAGE_LAST_LOGIN_KEY } from '../../constants/constants';
 import * as DataService from '../../services/dataService';
 
 const useStyles = makeStyles()((theme) => ({

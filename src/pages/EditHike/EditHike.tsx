@@ -1,14 +1,14 @@
-import React, { FC, RefObject, useContext, useEffect, useState } from 'react';
+import React, { FC, RefObject, useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
     Autocomplete,
     AutocompleteChangeDetails,
     Box,
-    Button,
+    Button, CircularProgress,
     FormControl,
     FormControlLabel, FormLabel,
     Grid,
-    IconButton,
+    IconButton, LinearProgress,
     List,
     ListItem,
     TextField
@@ -17,11 +17,12 @@ import { DeleteOutlineOutlined } from '@mui/icons-material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { makeStyles } from 'tss-react/mui';
 import { AdapterLuxon} from '@mui/x-date-pickers/AdapterLuxon';
-import Axios from 'axios';
+import Axios, { AxiosProgressEvent } from 'axios';
 import { DateTime } from 'luxon';
 
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
+import { Colors } from '../../services/themeService';
 import { Hike, Hiker, Photo } from '../../models/models';
 import { MainContext } from '../../contexts/MainContext';
 
@@ -186,8 +187,13 @@ const useStyles = makeStyles()((theme) => ({
         marginTop: '24px'
     },
 
-    backButton: {
+    cancelButton: {
         marginLeft: '12px'
+    },
+
+    saveIndicator: {
+        color: Colors.white,
+        position: 'absolute',
     }
 }));
 
@@ -202,6 +208,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const { searchResults, setSearchResults, setUpdatedHike, setBanner } = useContext(MainContext);
     const { hikeId } = useParams();
     const navigate = useNavigate();
+    const abortController = useRef<AbortController>(new AbortController());
 
     const [ trail, setTrail ] = useState<string>('');
     const [ dateOfHike, setDateOfHike ] = useState<DateTime | null>(null);
@@ -218,6 +225,8 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const [ retrievedHike, setRetrievedHike ] = useState<boolean>(false);
     const [ trailInputError, setTrailInputError ] = useState<boolean>(false);
     const [ dateOfHikeInputError, setDateOfHikeInputError ] = useState<boolean>(false);
+    const [ saving, setSaving ] = useState<boolean>(false);
+    const [ uploadProgress, setUploadProgress ] = useState<number>(0);
 
     useEffect(() => {
         const getKnownHikers = async () => {
@@ -247,6 +256,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                         setCrowds(hike.crowds || '');
                         setHikers(hike.hikers?.map((hiker: Hiker) => hiker.fullName) || []);
                         setLink(hike.link || '');
+                        setLinkLabel(hike.linkLabel || '');
                         setDescription(hike.description || '');
                         setTags(hike.tags ? hike.tags.split(',').map((tag: string) => tag.trim()) : []);
                         setPhotos(hike.photos || []);
@@ -275,6 +285,68 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             getHike();
         }
     });
+
+    const validInput = () => {
+        let valid = true;
+        let errorMsg = '';
+
+        if (trail === '') {
+            setTrailInputError(true);
+            errorMsg = 'A required field is empty';
+            valid = false;
+        } else {
+            setTrailInputError(false);
+        }
+
+        if (dateOfHike === null) {
+            setDateOfHikeInputError(true);
+            errorMsg = 'A required field is empty';
+            valid = false;
+        } else {
+            if (!dateOfHike.isValid) {
+                setDateOfHikeInputError(true);
+                valid = false;
+                errorMsg = 'Invalid date value';
+            } else {
+                setDateOfHikeInputError(false);
+            }
+        }
+
+        if (valid) {
+            setBanner('');
+        } else {
+            setBanner(errorMsg, 'error');
+            SharedService.scrollToTop(topOfPageRef);
+        }
+
+        return valid;
+    };
+
+    const getHikeForSearchResults = (hike: Hike) => {
+        let fullNames = '';
+        let filePath = '';
+        let caption = '';
+
+        if (hike.hikers && hike.hikers.length > 0) {
+            fullNames = hike.hikers.map((hiker: Hiker) => hiker.fullName).join(',');
+        }
+
+        if (hike.photos && hike.photos.length > 0) {
+            filePath = hike.photos[0].filePath;
+            caption = hike.photos[0].caption || '';
+        }
+
+        return {
+            id: hike.id,
+            trail: hike.trail,
+            dateOfHike: hike.dateOfHike,
+            description: hike.description,
+            tags: hike.tags,
+            fullNames,
+            filePath,
+            caption
+        }
+    };
 
     const handleChangeHikers = (event: React.SyntheticEvent, value: string[], reason: string, details?: AutocompleteChangeDetails<string> | undefined) => {
         if (reason === 'createOption') {
@@ -364,9 +436,14 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
         }
     };
 
+    const handleUploadProgress = (progressEvent: AxiosProgressEvent) => {
+        setUploadProgress((progressEvent.progress || 0) * 100);
+    };
+
     const handleSave = async () => {
         try {
             if (validInput()) {
+                setSaving(true);
                 const hikersToSave = hikers.map((hiker: string) => ({ fullName: hiker }))
                 const hike: Hike = {
                     trail, dateOfHike: dateOfHike ? dateOfHike.toString() : '', conditions, crowds, hikers: hikersToSave, description, link, linkLabel,
@@ -377,18 +454,19 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
 
                 if (hikeId) {
                     hike.id = hikeId;
-                    response = await DataService.updateHike(hike);
+                    response = await DataService.updateHike(hike, abortController.current.signal);
 
                     const updatedSearchResults = [...searchResults];
                     const index = updatedSearchResults.findIndex((hike: Hike) => hike.id === hikeId);
                     updatedSearchResults[index] = getHikeForSearchResults(response);
                     setSearchResults(updatedSearchResults);
                 } else {
-                    response = await DataService.createHike(hike);
+                    response = await DataService.createHike(hike, abortController.current.signal, handleUploadProgress);
                     hikeIdForNav = response.id;
                 }
 
                 setUpdatedHike(response);
+                setSaving(false);
                 navigate(`/hike/${hikeIdForNav}`);
             }
         } catch (error) {
@@ -399,69 +477,19 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             }
 
             SharedService.scrollToTop(topOfPageRef);
+        } finally {
+            setSaving(false);
         }
     };
 
-    const validInput = () => {
-        let valid = true;
-        let errorMsg = '';
+    const handleCancel = () => {
+        if (saving) {
+            abortController.current.abort();
 
-        if (trail === '') {
-            setTrailInputError(true);
-            errorMsg = 'A required field is empty';
-            valid = false;
-        } else {
-            setTrailInputError(false);
+            // TODO: Tell the user that they have aborted the request
         }
 
-        if (dateOfHike === null) {
-            setDateOfHikeInputError(true);
-            errorMsg = 'A required field is empty';
-            valid = false;
-        } else {
-            if (!dateOfHike.isValid) {
-                setDateOfHikeInputError(true);
-                valid = false;
-                errorMsg = 'Invalid date value';
-            } else {
-                setDateOfHikeInputError(false);
-            }
-        }
-
-        if (valid) {
-            setBanner('');
-        } else {
-            setBanner(errorMsg, 'error');
-            SharedService.scrollToTop(topOfPageRef);
-        }
-
-        return valid;
-    };
-
-    const getHikeForSearchResults = (hike: Hike) => {
-        let fullNames = '';
-        let filePath = '';
-        let caption = '';
-
-        if (hike.hikers && hike.hikers.length > 0) {
-            fullNames = hike.hikers.map((hiker: Hiker) => hiker.fullName).join(',');
-        }
-
-        if (hike.photos && hike.photos.length > 0) {
-            filePath = hike.photos[0].filePath;
-            caption = hike.photos[0].caption || '';
-        }
-
-        return {
-            id: hike.id,
-            trail: hike.trail,
-            dateOfHike: hike.dateOfHike,
-            description: hike.description,
-            tags: hike.tags,
-            fullNames,
-            filePath,
-            caption
-        }
+        navigate(-1);
     };
 
     return (
@@ -599,7 +627,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                                 onChange={handleChangeHikers}
                                 filterSelectedOptions
                                 renderInput={(params) => (
-                                    <TextField {...params} />
+                                    <TextField {...params} multiline={true} rows={1} />
                                 )}
                             />
                         }
@@ -625,7 +653,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                                 onChange={handleChangeTags}
                                 filterSelectedOptions
                                 renderInput={(params) => (
-                                    <TextField {...params} />
+                                    <TextField {...params} multiline={true} rows={1} />
                                 )}
                             />
                         }
@@ -733,11 +761,23 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                         ))
                     }
                 </List>
+
+                {
+                    saving &&
+                    <Box style={{ marginLeft: '128px', width: '522px', marginTop: '16px'}}>
+                        <LinearProgress variant="determinate" value={uploadProgress} />
+                    </Box>
+                }
             </Grid>
 
             <Grid item xs={12} className={cx(classes.actions)}>
-                <Button onClick={handleSave} variant='contained' color='primary'>Save</Button>
-                <Button onClick={() => navigate(-1)} variant='outlined' color='secondary' className={cx(classes.backButton)}>Back</Button>
+                <Button onClick={handleSave} variant='contained' color='primary' disabled={saving}>Save
+                    {saving && (
+                        <CircularProgress size={20} className={cx(classes.saveIndicator)} />
+                    )}
+                </Button>
+
+                <Button onClick={handleCancel} variant='outlined' color='secondary' className={cx(classes.cancelButton)}>Cancel</Button>
             </Grid>
         </>
     )
