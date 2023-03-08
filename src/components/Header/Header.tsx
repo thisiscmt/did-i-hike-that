@@ -76,7 +76,7 @@ const Header = () => {
         try {
             await DataService.logout();
             localStorage.removeItem(STORAGE_LAST_LOGIN_KEY);
-            navigate(0);
+            navigate('/');
         } catch(error) {
             setBanner('Error occurred during logout', 'error');
         }
