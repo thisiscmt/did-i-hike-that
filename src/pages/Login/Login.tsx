@@ -110,7 +110,7 @@ const Login = () => {
     const formattedLastLogin = lastLogin ? 'Last login on ' + DateTime.fromMillis(Number(lastLogin)).toLocaleString(DateTime.DATETIME_FULL) : '';
 
     return (
-        <>
+        <form name='EditHike'>
             <Grid item xs={12} className={cx(classes.row)}>
                 <FormControl className={cx(classes.field)}>
                     <FormControlLabel
@@ -168,7 +168,7 @@ const Login = () => {
             <Grid item xs={12} className={cx(classes.actions)}>
                 <Button onClick={handleLogin} variant='contained' color='primary' type='submit'>Login</Button>
             </Grid>
-        </>
+        </form>
     )
 };
 

@@ -191,6 +191,21 @@ const useStyles = makeStyles()((theme) => ({
         marginLeft: '12px'
     },
 
+    progressIndicator: {
+        marginLeft: '128px',
+        marginTop: '16px',
+        width: '522px',
+
+        [theme.breakpoints.down(1024)]: {
+            width: 'unset'
+        },
+
+        [theme.breakpoints.down(700)]: {
+            marginLeft: 0,
+            width: '100%'
+        }
+    },
+
     saveIndicator: {
         color: Colors.white,
         position: 'absolute',
@@ -240,6 +255,8 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 } else {
                     setBanner('Error occurred retrieving hikers', 'error');
                 }
+
+                SharedService.scrollToTop(topOfPageRef);
             }
         }
 
@@ -272,6 +289,8 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 } else {
                     setBanner('Error occurred retrieving the hike', 'error');
                 }
+
+                SharedService.scrollToTop(topOfPageRef);
             }
         }
 
@@ -346,6 +365,16 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             filePath,
             caption
         }
+    };
+
+    const getUploadProgressHandler = (): ((progressEvent: AxiosProgressEvent) => void) | undefined => {
+        let handler: ((progressEvent: AxiosProgressEvent) => void) | undefined;
+
+        if (photos.find((photo: Photo) => photo.action === 'add' || photo.action === 'update')) {
+            handler = handleUploadProgress;
+        }
+
+        return handler;
     };
 
     const handleChangeHikers = (event: React.SyntheticEvent, value: string[], reason: string, details?: AutocompleteChangeDetails<string> | undefined) => {
@@ -443,25 +472,29 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const handleSave = async () => {
         try {
             if (validInput()) {
-                setSaving(true);
                 const hikersToSave = hikers.map((hiker: string) => ({ fullName: hiker }))
                 const hike: Hike = {
                     trail, dateOfHike: dateOfHike ? dateOfHike.toString() : '', conditions, crowds, hikers: hikersToSave, description, link, linkLabel,
                     tags: tags.join(','), photos
                 };
+                const uploadProgressHandler = getUploadProgressHandler();
                 let hikeIdForNav = hikeId;
                 let response: Hike;
 
+                if (uploadProgressHandler) {
+                    setSaving(true);
+                }
+
                 if (hikeId) {
                     hike.id = hikeId;
-                    response = await DataService.updateHike(hike, abortController.current.signal);
+                    response = await DataService.updateHike(hike, abortController.current.signal, uploadProgressHandler);
 
                     const updatedSearchResults = [...searchResults];
                     const index = updatedSearchResults.findIndex((hike: Hike) => hike.id === hikeId);
                     updatedSearchResults[index] = getHikeForSearchResults(response);
                     setSearchResults(updatedSearchResults);
                 } else {
-                    response = await DataService.createHike(hike, abortController.current.signal, handleUploadProgress);
+                    response = await DataService.createHike(hike, abortController.current.signal, uploadProgressHandler);
                     hikeIdForNav = response.id;
                 }
 
@@ -470,8 +503,12 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 navigate(`/hike/${hikeIdForNav}`);
             }
         } catch (error) {
-            if (Axios.isAxiosError(error) && error.response?.status === 401) {
-                setBanner('You need to log in', 'warning');
+            if (Axios.isAxiosError(error)) {
+                if (error.response?.status === 401) {
+                    setBanner('You need to log in', 'warning');
+                } else if (error.code === 'ERR_CANCELED') {
+                    setBanner('Save was cancelled', 'warning');
+                }
             } else {
                 setBanner('Error saving hike', 'error');
             }
@@ -485,11 +522,12 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const handleCancel = () => {
         if (saving) {
             abortController.current.abort();
+            abortController.current = new AbortController();
 
-            // TODO: Tell the user that they have aborted the request
+            // TODO: Tell the user that they have cancelled the request
+        } else {
+            navigate(-1);
         }
-
-        navigate(-1);
     };
 
     return (
@@ -742,6 +780,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                                             value={photo.caption || ''}
                                             size='small'
                                             placeholder='Type a caption'
+                                            inputProps={{ maxLength: 255 }}
                                             onChange={(event) => handleChangePhotoCaption(photo.fileName, event.target.value)}
                                         />
 
@@ -764,7 +803,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
 
                 {
                     saving &&
-                    <Box style={{ marginLeft: '128px', width: '522px', marginTop: '16px'}}>
+                    <Box className={cx(classes.progressIndicator)}>
                         <LinearProgress variant="determinate" value={uploadProgress} />
                     </Box>
                 }

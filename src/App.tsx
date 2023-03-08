@@ -64,7 +64,7 @@ function App() {
                         <Routes>
                             <Route path="/" element={<Home />} />
                             <Route path="/hike" element={<EditHike topOfPageRef={topOfPageRef} />} />
-                            <Route path="/hike/:hikeId" element={<ViewHike />} />
+                            <Route path="/hike/:hikeId" element={<ViewHike topOfPageRef={topOfPageRef} />} />
                             <Route path="/hike/:hikeId/edit" element={<EditHike topOfPageRef={topOfPageRef} />} />
                             <Route path="/preferences" element={<Preferences />} />
                             <Route path="/login" element={<Login />} />

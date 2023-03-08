@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState } from 'react';
+import React, { FC, RefObject, useContext, useEffect, useState } from 'react';
 import { Link as RouteLink, useNavigate, useParams } from 'react-router-dom';
 import { Box, Button, Card, CardContent, Chip, IconButton, Link, Typography } from '@mui/material';
 import { DeleteOutlineOutlined, EditOutlined } from '@mui/icons-material';
@@ -105,7 +105,11 @@ const useStyles = makeStyles()((theme) => ({
     }
 }));
 
-const ViewHike = () => {
+interface ViewHikeProps {
+    topOfPageRef: RefObject<HTMLElement>;
+}
+
+const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
     const { classes, cx } = useStyles();
     const [ hike, setHike ] = useState<Hike>({ trail: '', dateOfHike: '' });
     const [ retrievedHike, setRetrievedHike ] = useState<boolean>(false);
@@ -136,6 +140,8 @@ const ViewHike = () => {
                 } else {
                     setBanner('Error occurred retrieving the hike', 'error');
                 }
+
+                SharedService.scrollToTop(topOfPageRef);
             } finally {
                 setRetrievedHike(true);
                 setLoading(false);
@@ -153,7 +159,7 @@ const ViewHike = () => {
                 getHike();
             }
         }
-    }, [hikeId, retrievedHike, updatedHike, setUpdatedHike, setBanner]);
+    }, [hikeId, retrievedHike, updatedHike, setUpdatedHike, setBanner, topOfPageRef]);
 
     const getValidUrl = () => {
         let valueToCheck = hike.link;
