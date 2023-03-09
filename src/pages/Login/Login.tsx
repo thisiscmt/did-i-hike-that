@@ -4,9 +4,11 @@ import { makeStyles } from 'tss-react/mui';
 import { DateTime } from 'luxon';
 import Axios from 'axios';
 
+import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
 import * as DataService from '../../services/dataService';
 import { MainContext } from '../../contexts/MainContext';
-import {STORAGE_EMAIL_KEY, STORAGE_LAST_LOGIN_KEY} from '../../constants/constants';
+import { STORAGE_EMAIL_KEY, STORAGE_LAST_LOGIN_KEY } from '../../constants/constants';
+import {useNavigate} from 'react-router-dom';
 
 const useStyles = makeStyles()((theme) => ({
     row: {
@@ -62,16 +64,30 @@ const useStyles = makeStyles()((theme) => ({
 
 const Login = () => {
     const { classes, cx } = useStyles();
-    const { setBanner } = useContext(MainContext);
+
     const [ email, setEmail ] = useState<string>(localStorage.getItem(STORAGE_EMAIL_KEY) || '');
     const [ password, setPassword ] = useState<string>('');
     const [ lastLogin, setLastLogin ] = useState<string>(localStorage.getItem(STORAGE_LAST_LOGIN_KEY) || '');
     const [ emailInputError, setEmailInputError ] = useState<boolean>(false);
     const [ passwordInputError, setPasswordInputError ] = useState<boolean>(false);
+    const [ loading, setLoading ] = useState<boolean>(false);
+    const { setBanner, setLoggedIn } = useContext(MainContext);
+    const navigate = useNavigate();
 
     useEffect(() => {
         document.title = 'Login - Did I Hike That?';
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
     });
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.key === 'Enter') {
+            handleLogin();
+        }
+    }
 
     const handleLogin = async () => {
         try {
@@ -92,25 +108,32 @@ const Login = () => {
             }
 
             setBanner('');
+            setLoading(true);
             await DataService.login(email, password);
 
             const lastLogin = Date.now().toString();
             setLastLogin(lastLogin);
+            setPassword('');
+            setLoggedIn(true);
+
             localStorage.setItem(STORAGE_EMAIL_KEY, email);
             localStorage.setItem(STORAGE_LAST_LOGIN_KEY, lastLogin);
+            navigate('/');
         } catch (error) {
             if (Axios.isAxiosError(error) && error.response?.status === 401) {
                 setBanner('Email or password were invalid', 'warning');
             } else {
                 setBanner('Error occurred during login', 'error');
             }
+        } finally {
+            setLoading(false);
         }
     };
 
     const formattedLastLogin = lastLogin ? 'Last login on ' + DateTime.fromMillis(Number(lastLogin)).toLocaleString(DateTime.DATETIME_FULL) : '';
 
     return (
-        <form name='EditHike'>
+        <>
             <Grid item xs={12} className={cx(classes.row)}>
                 <FormControl className={cx(classes.field)}>
                     <FormControlLabel
@@ -119,7 +142,6 @@ const Login = () => {
                         classes={{ label: classes.fieldLabel }}
                         control={
                             <TextField
-                                name='Email'
                                 margin='none'
                                 variant='outlined'
                                 value={email}
@@ -166,9 +188,11 @@ const Login = () => {
             }
 
             <Grid item xs={12} className={cx(classes.actions)}>
-                <Button onClick={handleLogin} variant='contained' color='primary' type='submit'>Login</Button>
+                <Button onClick={handleLogin} variant='contained' color='primary'>Login</Button>
             </Grid>
-        </form>
+
+            <LoadingOverlay open={loading} />
+        </>
     )
 };
 

@@ -111,11 +111,12 @@ interface ViewHikeProps {
 
 const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
     const { classes, cx } = useStyles();
+
     const [ hike, setHike ] = useState<Hike>({ trail: '', dateOfHike: '' });
     const [ retrievedHike, setRetrievedHike ] = useState<boolean>(false);
     const [ openDeleteConfirmation, setIsOpenDeleteConfirmation ] = useState<boolean>(false);
-    const [ loading, setLoading ] = useState<boolean>(false);
-    const { searchResults, updatedHike, setSearchResults, setUpdatedHike, setBanner } = useContext(MainContext);
+    const [ loading, setLoading ] = useState<boolean>(true);
+    const { searchResults, updatedHike, loggedIn, setSearchResults, setUpdatedHike, setBanner } = useContext(MainContext);
     const { hikeId } = useParams();
     const navigate = useNavigate();
 
@@ -124,9 +125,8 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
             try {
                 if (hikeId) {
                     setBanner('');
-                    setLoading(true);
-
                     const currentHike = await DataService.getHike(hikeId);
+
                     setHike(currentHike);
                     setRetrievedHike(true);
                 } else {
@@ -154,6 +154,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
             if (updatedHike) {
                 setHike(updatedHike);
                 setUpdatedHike(null);
+                setLoading(false);
                 setRetrievedHike(true);
             } else {
                 getHike();
@@ -213,37 +214,40 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
 
     return (
         <Box className='loadable-container'>
-            <Box className={cx(classes.trail)}>
-                <Typography variant='h4'>{hike.trail}</Typography>
+            {
+                !loading && loggedIn &&
+                <Box className={cx(classes.trail)}>
+                    <Typography variant='h4'>{hike.trail}</Typography>
 
-                <IconButton
-                    aria-label='edit hike'
-                    title='Edit hike'
-                    component={RouteLink}
-                    to={`/hike/${hike.id}/edit`}
-                    size='small'
-                    color='primary'
-                >
-                    <EditOutlined />
-                </IconButton>
+                    <IconButton
+                        aria-label='edit hike'
+                        title='Edit hike'
+                        component={RouteLink}
+                        to={`/hike/${hike.id}/edit`}
+                        size='small'
+                        color='primary'
+                    >
+                        <EditOutlined />
+                    </IconButton>
 
-                <IconButton
-                    aria-label='delete hike'
-                    className={cx(classes.deleteButton)}
-                    title='Delete hike'
-                    onClick={() => setIsOpenDeleteConfirmation(true)}
-                    size='small'
-                    color='error'
-                >
-                    <DeleteOutlineOutlined />
-                </IconButton>
-            </Box>
+                    <IconButton
+                        aria-label='delete hike'
+                        className={cx(classes.deleteButton)}
+                        title='Delete hike'
+                        onClick={() => setIsOpenDeleteConfirmation(true)}
+                        size='small'
+                        color='error'
+                    >
+                        <DeleteOutlineOutlined />
+                    </IconButton>
+                </Box>
+            }
 
-            <Card className={cx(classes.section)}>
-                <CardContent>
-                    <Box>
-                        {
-                            !loading &&
+            {
+                !loading && loggedIn &&
+                <Card className={cx(classes.section)}>
+                    <CardContent>
+                        <Box>
                             <>
                                 <Box className={cx(classes.field)}>
                                     <Typography variant='body2' className={cx(classes.fieldLabel)}>Date of hike</Typography>
@@ -266,10 +270,10 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
                                     </Box>
                                 }
                             </>
-                        }
-                    </Box>
-                </CardContent>
-            </Card>
+                        </Box>
+                    </CardContent>
+                </Card>
+            }
 
             {
                 hike.description &&
@@ -336,15 +340,17 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
             }
 
             {
-                !loading &&
-                <Box className={cx(classes.section)}>
-                    <Typography variant='body2' className={cx(classes.lastUpdated)}>{`Last updated on ${formattedUpdatedAt}`}</Typography>
-                </Box>
+                !loading && loggedIn &&
+                <>
+                    <Box className={cx(classes.section)}>
+                        <Typography variant='body2' className={cx(classes.lastUpdated)}>{`Last updated on ${formattedUpdatedAt}`}</Typography>
+                    </Box>
+
+                    <Button variant='contained' color='primary' onClick={() => navigate(-1)}>Back</Button>
+                </>
             }
 
-            <Button variant='contained' color='primary' onClick={() => navigate(-1)}>Back</Button>
             <ConfirmationPrompt title='Delete this hike?' open={openDeleteConfirmation} content='Are you sure you want to delete this hike?' onClose={handleDeleteConfirmation} />
-
             <LoadingOverlay open={loading} />
         </Box>
     )

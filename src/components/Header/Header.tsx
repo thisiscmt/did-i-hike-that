@@ -59,7 +59,7 @@ const useStyles = makeStyles()((theme) => ({
 const Header = () => {
     const { classes, cx } = useStyles();
     const [ mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
-    const { bannerMessage, bannerSeverity, setBanner } = useContext(MainContext);
+    const { bannerMessage, bannerSeverity, loggedIn, setBanner, setLoggedIn } = useContext(MainContext);
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -75,14 +75,14 @@ const Header = () => {
     const handleLogout = async () => {
         try {
             await DataService.logout();
+
             localStorage.removeItem(STORAGE_LAST_LOGIN_KEY);
+            setLoggedIn(false);
             navigate('/');
         } catch(error) {
             setBanner('Error occurred during logout', 'error');
         }
     }
-
-    const loggedIn = !!localStorage.getItem(STORAGE_LAST_LOGIN_KEY);
 
     return (
         <>
