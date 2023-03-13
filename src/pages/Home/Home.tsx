@@ -1,6 +1,6 @@
 import React, { FC, useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TextField, Box, Typography, Button, InputAdornment, IconButton} from '@mui/material';
+import {TextField, Box, Typography, Button, InputAdornment, IconButton, Pagination} from '@mui/material';
 import { CloseOutlined } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
 import Axios from 'axios';
@@ -69,11 +69,18 @@ const useStyles = makeStyles()((theme) => ({
         textAlign: 'center'
     },
 
+    pagination: {
+        '& .MuiPagination-ul': {
+            justifyContent: 'center'
+        }
+    }
 }));
+
+const PAGE_SIZE = 2;
 
 const Home: FC = () => {
     const { classes, cx } = useStyles();
-    const { searchText, searchResults, setSearchText, setSearchResults, setBanner } = useContext(MainContext);
+    const { searchText, searchResults, page, pageCount, setSearchText, setSearchResults, setPage, setPageCount, setBanner } = useContext(MainContext);
     const [ loading, setLoading ] = useState<boolean>(false);
     const [ showResults, setShowResults ] = useState<boolean>(searchResults.length > 0);
     const navigate = useNavigate();
@@ -86,15 +93,19 @@ const Home: FC = () => {
         setSearchText('');
     };
 
-    const handleSearch = async () => {
+    const handleSearch = async (page?: number) => {
         try {
             setLoading(true);
             setBanner('');
+
             const searchParams = SharedService.getSearchParams(searchText);
+            searchParams.page = page || 1;
+            searchParams.pageSize = PAGE_SIZE;
             const hikes = await DataService.getHikes(searchParams);
 
             setSearchText(searchText);
             setSearchResults(hikes.rows);
+            setPageCount(Math.ceil(hikes.count / PAGE_SIZE));
             setShowResults(true);
         } catch (error){
             if (Axios.isAxiosError(error) && error.response?.status === 401) {
@@ -106,6 +117,11 @@ const Home: FC = () => {
             setLoading(false);
         }
     };
+
+    const handleChangePage = (_event: React.ChangeEvent<unknown>, value: number) => {
+        setPage(value);
+        handleSearch(value);
+    }
 
     return (
         <Box className='loadable-container'>
@@ -144,27 +160,34 @@ const Home: FC = () => {
                 </Box>
 
                 <Box>
-                    <Button color='primary' onClick={handleSearch}>Search</Button>
+                    <Button color='primary' onClick={() => handleSearch()}>Search</Button>
                 </Box>
             </Box>
 
             <Box className={`${cx(classes.searchResultsContainer)}`}>
                 {
-                    showResults ?
-                        searchResults.length > 0
-                            ?
-                                <Box className={cx(classes.searchResults)}>
-                                    {
-                                        searchResults.map((hike: Hike) => {
-                                            return (
-                                                <Box key={hike.id} className={cx(classes.searchResult)} onClick={() => navigate(`/hike/${hike.id}`)}>
-                                                    <SearchResult hike={hike} />
-                                                </Box>
-                                            )
-                                        })
-                                    }
-                                </Box> : <Box className={cx(classes.noResults)}>No hikes found</Box>
-                            : ''
+                    showResults
+                        ?
+                            searchResults.length > 0
+                                ?
+                                    <>
+                                        <Box className={cx(classes.searchResults)}>
+                                            {
+                                                searchResults.map((hike: Hike) => {
+                                                    return (
+                                                        <Box key={hike.id} className={cx(classes.searchResult)} onClick={() => navigate(`/hike/${hike.id}`)}>
+                                                            <SearchResult hike={hike} />
+                                                        </Box>
+                                                    )
+                                                })
+                                            }
+                                        </Box>
+
+                                        <Pagination onChange={handleChangePage} page={page} count={pageCount} className={cx(classes.pagination)} />
+                                    </>
+                                :
+                                    <Box className={cx(classes.noResults)}>No hikes found</Box>
+                        : ''
                 }
             </Box>
 

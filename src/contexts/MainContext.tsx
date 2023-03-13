@@ -7,12 +7,16 @@ interface MainContextProps {
     bannerSeverity: 'error' | 'info' | 'success' | 'warning';
     searchText: string;
     searchResults: Hike[];
-    updatedHike: Hike | null;
+    page: number;
+    pageCount: number;
+    currentHike: Hike | null;
     loggedIn: boolean;
     setBanner: (message: string, severity?: AlertSeverity) => void;
     setSearchText: React.Dispatch<React.SetStateAction<string>>;
     setSearchResults: React.Dispatch<React.SetStateAction<Hike[]>>;
-    setUpdatedHike: React.Dispatch<React.SetStateAction<Hike | null>>;
+    setPage: React.Dispatch<React.SetStateAction<number>>;
+    setPageCount: React.Dispatch<React.SetStateAction<number>>;
+    setCurrentHike: React.Dispatch<React.SetStateAction<Hike | null>>;
     setLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -25,12 +29,16 @@ export const MainContext = React.createContext<MainContextProps>({
     bannerSeverity: 'info',
     searchText: '',
     searchResults: [],
-    updatedHike: null,
+    page: 1,
+    pageCount: 1,
+    currentHike: null,
     loggedIn: false,
     setBanner: () => {},
     setSearchText: () => {},
     setSearchResults: () => {},
-    setUpdatedHike: () => {},
+    setPage: () => {},
+    setPageCount: () => {},
+    setCurrentHike: () => {},
     setLoggedIn: () => {}
 });
 
@@ -41,7 +49,9 @@ export const MainProvider = ({ children }: MainProviderProps) => {
     const [ bannerSeverity, setBannerSeverity ] = useState<AlertSeverity>('info');
     const [ searchText, setSearchText ] = useState<string>('');
     const [ searchResults, setSearchResults ] = useState<Hike[]>([]);
-    const [ updatedHike, setUpdatedHike ] = useState<Hike | null>(null);
+    const [ page, setPage ] = useState<number>(1);
+    const [ pageCount, setPageCount ] = useState<number>(1);
+    const [ currentHike, setCurrentHike ] = useState<Hike | null>(null);
     const [ loggedIn, setLoggedIn ] = useState<boolean>(!!localStorage.getItem(STORAGE_LAST_LOGIN_KEY));
 
     const setBanner = (message: string, severity?: AlertSeverity) => {
@@ -55,12 +65,16 @@ export const MainProvider = ({ children }: MainProviderProps) => {
             bannerSeverity,
             searchText,
             searchResults,
-            updatedHike,
+            page,
+            pageCount,
+            currentHike,
             loggedIn,
             setBanner,
             setSearchText,
             setSearchResults,
-            setUpdatedHike,
+            setPage,
+            setPageCount,
+            setCurrentHike,
             setLoggedIn
         }}
         >

@@ -111,12 +111,11 @@ interface ViewHikeProps {
 
 const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
     const { classes, cx } = useStyles();
-
     const [ hike, setHike ] = useState<Hike>({ trail: '', dateOfHike: '' });
     const [ retrievedHike, setRetrievedHike ] = useState<boolean>(false);
     const [ openDeleteConfirmation, setIsOpenDeleteConfirmation ] = useState<boolean>(false);
     const [ loading, setLoading ] = useState<boolean>(true);
-    const { searchResults, updatedHike, loggedIn, setSearchResults, setUpdatedHike, setBanner } = useContext(MainContext);
+    const { searchResults, currentHike, loggedIn, setSearchResults, setCurrentHike, setBanner } = useContext(MainContext);
     const { hikeId } = useParams();
     const navigate = useNavigate();
 
@@ -125,9 +124,10 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
             try {
                 if (hikeId) {
                     setBanner('');
-                    const currentHike = await DataService.getHike(hikeId);
+                    const hike = await DataService.getHike(hikeId);
 
-                    setHike(currentHike);
+                    setHike(hike);
+                    setCurrentHike(hike);
                     setRetrievedHike(true);
                 } else {
                     setBanner('Missing a hike ID', 'error');
@@ -151,16 +151,15 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
         document.title = 'View Hike - Did I Hike That?';
 
         if (!retrievedHike) {
-            if (updatedHike) {
-                setHike(updatedHike);
-                setUpdatedHike(null);
+            if (currentHike) {
+                setHike(currentHike);
                 setLoading(false);
                 setRetrievedHike(true);
             } else {
                 getHike();
             }
         }
-    }, [hikeId, retrievedHike, updatedHike, setUpdatedHike, setBanner, topOfPageRef]);
+    }, [hikeId, retrievedHike, currentHike, setCurrentHike, setBanner, topOfPageRef]);
 
     const getValidUrl = () => {
         let valueToCheck = hike.link;

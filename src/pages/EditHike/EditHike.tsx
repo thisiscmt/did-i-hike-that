@@ -223,7 +223,7 @@ interface EditHikeProps {
 
 const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const { classes, cx } = useStyles();
-    const { searchResults, setSearchResults, setUpdatedHike, setBanner } = useContext(MainContext);
+    const { searchResults, currentHike, setSearchResults, setCurrentHike, setBanner } = useContext(MainContext);
     const { hikeId } = useParams();
     const navigate = useNavigate();
     const abortController = useRef<AbortController>(new AbortController());
@@ -247,6 +247,20 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const [ uploadProgress, setUploadProgress ] = useState<number>(0);
 
     useEffect(() => {
+        const setData = (hike: Hike) => {
+            setTrail(hike.trail);
+            setDateOfHike(DateTime.fromFormat(hike.dateOfHike, 'yyyy-MM-dd'));
+            setConditions(hike.conditions || '');
+            setCrowds(hike.crowds || '');
+            setHikers(hike.hikers?.map((hiker: Hiker) => hiker.fullName) || []);
+            setLink(hike.link || '');
+            setLinkLabel(hike.linkLabel || '');
+            setDescription(hike.description || '');
+            setTags(hike.tags ? hike.tags.split(',').map((tag: string) => tag.trim()) : []);
+            setPhotos(hike.photos || []);
+            setRetrievedHike(true);
+        };
+
         const getKnownHikers = async () => {
             try {
                 const currentHikers = await DataService.getHikers();
@@ -261,7 +275,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
 
                 SharedService.scrollToTop(topOfPageRef);
             }
-        }
+        };
 
         const getHike = async () => {
             try {
@@ -270,17 +284,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                     const hike = await DataService.getHike(hikeId);
 
                     if (hike) {
-                        setTrail(hike.trail);
-                        setDateOfHike(DateTime.fromFormat(hike.dateOfHike, 'yyyy-MM-dd'));
-                        setConditions(hike.conditions || '');
-                        setCrowds(hike.crowds || '');
-                        setHikers(hike.hikers?.map((hiker: Hiker) => hiker.fullName) || []);
-                        setLink(hike.link || '');
-                        setLinkLabel(hike.linkLabel || '');
-                        setDescription(hike.description || '');
-                        setTags(hike.tags ? hike.tags.split(',').map((tag: string) => tag.trim()) : []);
-                        setPhotos(hike.photos || []);
-                        setRetrievedHike(true);
+                        setData(hike);
                     }
                 } else {
                     setBanner('Missing a hike ID', 'error');
@@ -295,7 +299,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
 
                 SharedService.scrollToTop(topOfPageRef);
             }
-        }
+        };
 
         document.title = 'Edit Hike - Did I Hike That?';
 
@@ -304,7 +308,12 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
         }
 
         if (hikeId && !retrievedHike) {
-            getHike();
+            if (currentHike) {
+                setData(currentHike);
+                setCurrentHike(null);
+            } else {
+                getHike();
+            }
         }
     });
 
@@ -501,7 +510,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                     hikeIdForNav = response.id;
                 }
 
-                setUpdatedHike(response);
+                setCurrentHike(response);
                 setSaving(false);
                 navigate(`/hike/${hikeIdForNav}`);
             }
