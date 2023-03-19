@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {Hike} from '../models/models';
-import {STORAGE_LAST_LOGIN_KEY} from '../constants/constants';
+import {STORAGE_LAST_LOGIN} from '../constants/constants';
 
 interface MainContextProps {
     bannerMessage: string;
@@ -52,7 +52,7 @@ export const MainProvider = ({ children }: MainProviderProps) => {
     const [ page, setPage ] = useState<number>(1);
     const [ pageCount, setPageCount ] = useState<number>(1);
     const [ currentHike, setCurrentHike ] = useState<Hike | null>(null);
-    const [ loggedIn, setLoggedIn ] = useState<boolean>(!!localStorage.getItem(STORAGE_LAST_LOGIN_KEY));
+    const [ loggedIn, setLoggedIn ] = useState<boolean>(!!localStorage.getItem(STORAGE_LAST_LOGIN));
 
     const setBanner = (message: string, severity?: AlertSeverity) => {
         setBannerMessage(message);

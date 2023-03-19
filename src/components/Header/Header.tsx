@@ -7,7 +7,7 @@ import { makeStyles } from 'tss-react/mui';
 import MobileMenu from '../MobileMenu/MobileMenu';
 import { Colors } from '../../services/themeService';
 import { MainContext } from '../../contexts/MainContext';
-import { STORAGE_LAST_LOGIN_KEY } from '../../constants/constants';
+import { STORAGE_LAST_LOGIN } from '../../constants/constants';
 import * as DataService from '../../services/dataService';
 
 const useStyles = makeStyles()((theme) => ({
@@ -76,7 +76,7 @@ const Header = () => {
         try {
             await DataService.logout();
 
-            localStorage.removeItem(STORAGE_LAST_LOGIN_KEY);
+            localStorage.removeItem(STORAGE_LAST_LOGIN);
             setLoggedIn(false);
             navigate('/');
         } catch(error) {

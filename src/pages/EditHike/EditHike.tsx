@@ -747,6 +747,8 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                                 margin='none'
                                 variant='outlined'
                                 value={link}
+                                type='url'
+                                autoComplete='url'
                                 size='small'
                                 placeholder='Add web address'
                                 fullWidth={true}

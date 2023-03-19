@@ -7,7 +7,7 @@ import Axios from 'axios';
 import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
 import * as DataService from '../../services/dataService';
 import { MainContext } from '../../contexts/MainContext';
-import { STORAGE_EMAIL_KEY, STORAGE_LAST_LOGIN_KEY } from '../../constants/constants';
+import { STORAGE_EMAIL, STORAGE_LAST_LOGIN } from '../../constants/constants';
 import {useNavigate} from 'react-router-dom';
 
 const useStyles = makeStyles()((theme) => ({
@@ -65,9 +65,9 @@ const useStyles = makeStyles()((theme) => ({
 const Login = () => {
     const { classes, cx } = useStyles();
 
-    const [ email, setEmail ] = useState<string>(localStorage.getItem(STORAGE_EMAIL_KEY) || '');
+    const [ email, setEmail ] = useState<string>(localStorage.getItem(STORAGE_EMAIL) || '');
     const [ password, setPassword ] = useState<string>('');
-    const [ lastLogin, setLastLogin ] = useState<string>(localStorage.getItem(STORAGE_LAST_LOGIN_KEY) || '');
+    const [ lastLogin, setLastLogin ] = useState<string>(localStorage.getItem(STORAGE_LAST_LOGIN) || '');
     const [ emailInputError, setEmailInputError ] = useState<boolean>(false);
     const [ passwordInputError, setPasswordInputError ] = useState<boolean>(false);
     const [ loading, setLoading ] = useState<boolean>(false);
@@ -116,8 +116,8 @@ const Login = () => {
             setPassword('');
             setLoggedIn(true);
 
-            localStorage.setItem(STORAGE_EMAIL_KEY, email);
-            localStorage.setItem(STORAGE_LAST_LOGIN_KEY, lastLogin);
+            localStorage.setItem(STORAGE_EMAIL, email);
+            localStorage.setItem(STORAGE_LAST_LOGIN, lastLogin);
             navigate('/');
         } catch (error) {
             if (Axios.isAxiosError(error) && error.response?.status === 401) {
@@ -145,6 +145,8 @@ const Login = () => {
                                 margin='none'
                                 variant='outlined'
                                 value={email}
+                                type='email'
+                                autoComplete='email'
                                 size='small'
                                 error={emailInputError}
                                 fullWidth={true}

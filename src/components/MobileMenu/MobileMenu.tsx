@@ -7,7 +7,7 @@ import { makeStyles } from 'tss-react/mui';
 import { Colors } from '../../services/themeService';
 import { MainContext } from '../../contexts/MainContext';
 import * as DataService from '../../services/dataService';
-import { STORAGE_LAST_LOGIN_KEY } from '../../constants/constants';
+import { STORAGE_LAST_LOGIN } from '../../constants/constants';
 
 const useStyles = makeStyles()(() => ({
     mainContainer: {
@@ -52,7 +52,7 @@ const MobileMenu: FC<MobileMenuProps> = ({ onClose }) => {
     const handleLogout = async () => {
         try {
             await DataService.logout();
-            localStorage.removeItem(STORAGE_LAST_LOGIN_KEY);
+            localStorage.removeItem(STORAGE_LAST_LOGIN);
             setLoggedIn(false);
             navigate('/');
         } catch(error) {
