@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Did I Hike That?" />
 
-    <% if (process.env.NODE_ENV !== 'production') { %>
+    <% if (process.env.NODE_ENV !== 'production' || (process.env.NODE_ENV === 'production' && process.env.REACT_APP_DIHT_DEBUG === 'true')) { %>
       <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; connect-src 'self' localhost:*; img-src 'self' localhost:*; style-src 'self' 'unsafe-inline';base-uri 'self';form-action 'self'">
     <% } %>
 
-    <% if (process.env.NODE_ENV === 'production') { %>
+    <% if (process.env.NODE_ENV === 'production' && process.env.REACT_APP_DIHT_DEBUG !== 'true') { %>
       <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; connect-src 'self' https://diht-api.cmtybur.com; img-src 'self' https://diht-api.cmtybur.com; style-src 'self' 'unsafe-inline';base-uri 'self';form-action 'self'">
     <% } %>
 

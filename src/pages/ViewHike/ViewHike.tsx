@@ -325,7 +325,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
                     {
                         hike.photos.map((photo: Photo, index: number) => (
                             <Box key={index} className={cx(classes.photoContainer)}>
-                                <img src={process.env.REACT_APP_API_URL + '/images/' + photo.filePath} className={cx(classes.photo)} alt='Hike pic' />
+                                <img src={process.env.REACT_APP_API_URL + '/images/' + photo.filePath} className={cx(classes.photo)} alt='Hike pic' crossOrigin='anonymous' />
 
                                 {
                                     photo.caption &&
