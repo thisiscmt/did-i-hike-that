@@ -76,7 +76,7 @@ const useStyles = makeStyles()((theme) => ({
     }
 }));
 
-const PAGE_SIZE = 2;
+const PAGE_SIZE = 10;
 
 const Home: FC = () => {
     const { classes, cx } = useStyles();
