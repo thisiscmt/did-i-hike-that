@@ -14,9 +14,9 @@ const useStyles = makeStyles()((theme) => ({
         },
     },
 
-    thumbnail: {
-        width: '150px'
-    },
+    // thumbnail: {
+    //     width: `${PHOTO_THUMBNAIL_SIZE}px`
+    // },
 
     details: {
         marginLeft: '40px',
@@ -60,14 +60,26 @@ interface SearchResultProps {
 
 const SearchResult: FC<SearchResultProps> = ({ hike }) => {
     const { classes, cx } = useStyles();
-    const thumbnailSource = hike.filePath ? `${process.env.REACT_APP_API_URL}/images/` + hike.filePath : 'images/no_hike_images.png';
+
+    const getThumbnailSrc = () => {
+        let thumbnailSrc = 'images/no_hike_images.png';
+
+        if (hike.filePath) {
+            const photoExt = hike.filePath.split('.').pop() || '';
+            thumbnailSrc = `${process.env.REACT_APP_API_URL}/images/` + hike.filePath.replace(`.${photoExt}`, `_thumbnail.${photoExt}`);
+        }
+
+        return thumbnailSrc;
+    };
+
+    const thumbnailSrc = getThumbnailSrc();
     const hikers = hike.fullNames ? hike.fullNames.split(',') : [];
 
     return (
         <Card>
             <CardContent className={cx(classes.cardContent)}>
                 <Box>
-                    <img className={cx(classes.thumbnail)} alt='Hike pic' src={thumbnailSource} aria-label='Hike photo' />
+                    <img alt='Hike pic' src={thumbnailSrc} aria-label='Hike pic' />
                 </Box>
 
                 <Box className={cx(classes.details)}>

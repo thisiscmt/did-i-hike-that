@@ -26,6 +26,8 @@ export interface Photo {
     fileName: string;
     filePath: string;
     caption?: string;
+    editCaption?: boolean;
+    thumbnailSrc?: string;
     action: 'add' | 'update' | 'delete';
 }
 

@@ -28,6 +28,7 @@ import * as SharedService from '../../services/sharedService';
 import { Colors } from '../../services/themeService';
 import { Hike, Hiker, Photo } from '../../models/models';
 import { MainContext } from '../../contexts/MainContext';
+import { PHOTO_THUMBNAIL_SIZE } from '../../constants/constants';
 
 const useStyles = makeStyles()((theme) => ({
     row: {
@@ -147,6 +148,7 @@ const useStyles = makeStyles()((theme) => ({
 
         '& .MuiListItem-padding': {
             paddingBottom: 0,
+            paddingTop: '20px',
 
             ':first-child': {
                 paddingTop: 0
@@ -157,28 +159,38 @@ const useStyles = makeStyles()((theme) => ({
             paddingRight: 0
         },
 
-        [theme.breakpoints.down(700)]: {
+        [theme.breakpoints.down(1024)]: {
+            '& .MuiListItem-root': {
+                flexWrap: 'wrap'
+            }
+        },
+
+        [theme.breakpoints.down(470)]: {
             marginLeft: 0,
 
             '& .MuiFormLabel-root': {
                 width: '100%'
-            },
-
-            '& .MuiListItem-root': {
-                flexWrap: 'wrap',
-                paddingTop: '16px'
             }
         }
     },
 
-    photoFileName: {
-        fontSize: '14px',
-        marginRight: '10px',
-        width: '250px',
+    photoThumbnail: {
+        display: 'flex',
+        minWidth: `${PHOTO_THUMBNAIL_SIZE}px`,
 
-        [theme.breakpoints.down(700)]: {
-            marginBottom: '4px',
-            marginRight: 0
+        [theme.breakpoints.down(1024)]: {
+            flex: '0 0 100%'
+        }
+    },
+
+    photoCaption: {
+        display: 'flex',
+        marginLeft: '24px',
+
+        [theme.breakpoints.down(1024)]: {
+            marginLeft: 0,
+            marginTop: '12px',
+            width: '250px'
         }
     },
 
@@ -257,8 +269,8 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             setLinkLabel(hike.linkLabel || '');
             setDescription(hike.description || '');
             setTags(hike.tags ? hike.tags.split(',').map((tag: string) => tag.trim()) : []);
-            setPhotos(hike.photos || []);
             setRetrievedHike(true);
+            setPhotos(hike.photos || []);
         };
 
         const getKnownHikers = async () => {
@@ -417,7 +429,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
         setTags(value);
     };
 
-    const handleSelectPhoto = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleSelectPhoto = async (event: React.ChangeEvent<HTMLInputElement>) => {
         let index: number;
         let photo: Photo;
         let newPhotos = [...photos];
@@ -427,17 +439,20 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 return;
             }
 
+            const thumbnailSrc = await SharedService.getThumbnailSource(event.target.files[0], PHOTO_THUMBNAIL_SIZE);
             const fileName = event.target.files[0].name;
             index = newPhotos.findIndex((photo: Photo) => photo.fileName.toLowerCase() === fileName.toLowerCase());
 
             if (index > -1) {
                 if (hikeId && newPhotos[index].action !== 'add') {
+
                     newPhotos[index].file = event.target.files[0];
                     newPhotos[index].action = 'update';
+                    newPhotos[index].thumbnailSrc = thumbnailSrc;
                 }
             } else {
                 photo = {
-                    file: event.target.files[0], fileName, filePath: '', caption: '', action: 'add'
+                    file: event.target.files[0], fileName, filePath: '', caption: '', action: 'add', thumbnailSrc
                 };
 
                 newPhotos.push(photo);
@@ -787,27 +802,32 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                                 {
                                     photo.action !== 'delete' &&
                                     <ListItem disableGutters={true}>
-                                        <FormLabel htmlFor={`hike-photo-${photo.fileName}`} className={cx(classes.photoFileName)}>{SharedService.getFileNameForPhoto(photo)}</FormLabel>
+                                        <Box className={cx(classes.photoThumbnail)}>
+                                            <img src={photo.thumbnailSrc} alt='Thumbnail' />
+                                        </Box>
 
-                                        <TextField
-                                            id={`hike-photo-${photo.fileName}`}
-                                            value={photo.caption || ''}
-                                            size='small'
-                                            placeholder='Type a caption'
-                                            inputProps={{ maxLength: 255 }}
-                                            onChange={(event) => handleChangePhotoCaption(photo.fileName, event.target.value)}
-                                        />
+                                        <Box className={cx(classes.photoCaption)}>
+                                            <TextField
+                                                id={`hike-photo-${photo.fileName}`}
+                                                value={photo.caption || ''}
+                                                style={{ flexGrow: 2 }}
+                                                size='small'
+                                                placeholder='Type a caption'
+                                                inputProps={{ maxLength: 255 }}
+                                                onChange={(event) => handleChangePhotoCaption(photo.fileName, event.target.value)}
+                                            />
 
-                                        <IconButton
-                                            aria-label='delete photo'
-                                            className={cx(classes.deletePhotoButton)}
-                                            onClick={() => handleDeletePhoto(photo.fileName)}
-                                            title='Remove photo'
-                                            size='small'
-                                            color='error'
-                                        >
-                                            <DeleteOutlineOutlined />
-                                        </IconButton>
+                                            <IconButton
+                                                aria-label='delete photo'
+                                                className={cx(classes.deletePhotoButton)}
+                                                onClick={() => handleDeletePhoto(photo.fileName)}
+                                                title='Remove photo'
+                                                size='small'
+                                                color='error'
+                                            >
+                                                <DeleteOutlineOutlined />
+                                            </IconButton>
+                                        </Box>
                                     </ListItem>
                                 }
                             </React.Fragment>

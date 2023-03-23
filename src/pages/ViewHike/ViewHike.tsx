@@ -151,7 +151,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
         document.title = 'View Hike - Did I Hike That?';
 
         if (!retrievedHike) {
-            if (currentHike) {
+            if (currentHike && currentHike.id === hikeId) {
                 setHike(currentHike);
                 setLoading(false);
                 setRetrievedHike(true);
@@ -181,7 +181,11 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
         }
 
         return url;
-    }
+    };
+
+    const handleCaptionEdit = () => {
+
+    };
 
     const handleDeleteConfirmation = async (value: boolean) => {
         setIsOpenDeleteConfirmation(false);
@@ -189,7 +193,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
         if (value) {
             await handleDeleteHike();
         }
-    }
+    };
 
     const handleDeleteHike = async () => {
         if (hikeId) {
@@ -329,11 +333,12 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
 
                                 {
                                     photo.caption &&
-                                    <Typography variant='body2' className={cx(classes.photoCaption)}>{photo.caption}</Typography>
+                                    <Button variant='text' onClick={handleCaptionEdit}>
+                                        <Typography variant='body2' className={cx(classes.photoCaption)}>{photo.caption}</Typography>
+                                    </Button>
                                 }
                             </Box>
                         ))
-
                     }
                 </Box>
             }

@@ -1,5 +1,7 @@
-import {RefObject} from 'react';
-import {HikeSearchParams, Photo} from '../models/models';
+import { RefObject } from 'react';
+import Resizer from 'react-image-file-resizer';
+
+import { HikeSearchParams } from '../models/models';
 
 export const getSearchParams = (searchText: string) => {
     const searchParams: HikeSearchParams = {};
@@ -22,21 +24,12 @@ export const getSearchParams = (searchText: string) => {
     return searchParams;
 };
 
-export const getFileNameForPhoto = (photo: Photo) => {
-    let fileName = '';
-
-    if (photo.fileName) {
-        fileName = photo.fileName;
-    } else if (photo.filePath) {
-        const index = photo.filePath.indexOf('/');
-
-        if (index > -1) {
-            fileName = photo.filePath.slice(index + 1);
-        }
-    }
-
-    return fileName;
-};
+export const getThumbnailSource = (file: File, maxSize: number) => new Promise<string>(resolve => {
+    Resizer.imageFileResizer(file, maxSize, maxSize, 'JPEG', 100, 0,
+        uri => {
+            resolve(uri as string);
+        }, 'base64' );
+});
 
 export const formatDateOfHike = (dateOfHike: string) => {
     const dateParts = dateOfHike.split('-');
