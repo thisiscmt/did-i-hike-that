@@ -24,7 +24,18 @@ export const getSearchParams = (searchText: string) => {
     return searchParams;
 };
 
-export const getThumbnailSource = (file: File, maxSize: number) => new Promise<string>(resolve => {
+export const getThumbnailSrc = (filePath: string) => {
+    let thumbnailSrc = '/images/no_hike_images.png';
+
+    if (filePath) {
+        const photoExt = filePath.split('.').pop() || '';
+        thumbnailSrc = `${process.env.REACT_APP_API_URL}/images/` + filePath.replace(`.${photoExt}`, `_thumbnail.${photoExt}`);
+    }
+
+    return thumbnailSrc;
+};
+
+export const getThumbnailDataSrc = (file: File, maxSize: number) => new Promise<string>(resolve => {
     Resizer.imageFileResizer(file, maxSize, maxSize, 'JPEG', 100, 0,
         uri => {
             resolve(uri as string);

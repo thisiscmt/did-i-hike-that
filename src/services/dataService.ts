@@ -33,7 +33,7 @@ export const createHike = async (hike: Hike, signal: AbortSignal, onUploadProgre
     return response.data;
 };
 
-export const updateHike = async (hike: Hike, signal: AbortSignal, onUploadProgress?: (progressEvent: AxiosProgressEvent) => void): Promise<Hike> => {
+export const updateHike = async (hike: Hike, signal?: AbortSignal, onUploadProgress?: (progressEvent: AxiosProgressEvent) => void): Promise<Hike> => {
     const formData = getFormData(hike);
     const config = getRequestConfig(true);
     config.signal = signal;

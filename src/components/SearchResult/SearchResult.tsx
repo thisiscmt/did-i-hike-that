@@ -4,6 +4,7 @@ import { makeStyles } from 'tss-react/mui';
 
 import {Hike} from '../../models/models';
 import * as SharedService from '../../services/sharedService';
+import {PHOTO_THUMBNAIL_SIZE} from '../../constants/constants';
 
 const useStyles = makeStyles()((theme) => ({
     cardContent: {
@@ -14,15 +15,17 @@ const useStyles = makeStyles()((theme) => ({
         },
     },
 
-    // thumbnail: {
-    //     width: `${PHOTO_THUMBNAIL_SIZE}px`
-    // },
+    thumbnail: {
+        display: 'flex',
+        width: `${PHOTO_THUMBNAIL_SIZE}px`
+    },
 
     details: {
         marginLeft: '40px',
 
         '& .MuiChip-root': {
-            marginRight: '8px'
+            marginRight: '8px',
+            marginTop: '6px'
         },
 
         '& .MuiChip-root:last-child': {
@@ -60,25 +63,13 @@ interface SearchResultProps {
 
 const SearchResult: FC<SearchResultProps> = ({ hike }) => {
     const { classes, cx } = useStyles();
-
-    const getThumbnailSrc = () => {
-        let thumbnailSrc = 'images/no_hike_images.png';
-
-        if (hike.filePath) {
-            const photoExt = hike.filePath.split('.').pop() || '';
-            thumbnailSrc = `${process.env.REACT_APP_API_URL}/images/` + hike.filePath.replace(`.${photoExt}`, `_thumbnail.${photoExt}`);
-        }
-
-        return thumbnailSrc;
-    };
-
-    const thumbnailSrc = getThumbnailSrc();
+    const thumbnailSrc = SharedService.getThumbnailSrc(hike.filePath || '');
     const hikers = hike.fullNames ? hike.fullNames.split(',') : [];
 
     return (
         <Card>
             <CardContent className={cx(classes.cardContent)}>
-                <Box>
+                <Box className={cx(classes.thumbnail)}>
                     <img alt='Hike pic' src={thumbnailSrc} aria-label='Hike pic' />
                 </Box>
 

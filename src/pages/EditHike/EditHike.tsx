@@ -176,6 +176,7 @@ const useStyles = makeStyles()((theme) => ({
 
     photoThumbnail: {
         display: 'flex',
+        justifyContent: 'center',
         minWidth: `${PHOTO_THUMBNAIL_SIZE}px`,
 
         [theme.breakpoints.down(1024)]: {
@@ -270,7 +271,15 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             setDescription(hike.description || '');
             setTags(hike.tags ? hike.tags.split(',').map((tag: string) => tag.trim()) : []);
             setRetrievedHike(true);
-            setPhotos(hike.photos || []);
+
+            const newPhotos = (hike.photos || []).map((photo: Photo) => {
+                return {
+                    ...photo,
+                    thumbnailSrc: SharedService.getThumbnailSrc(photo.filePath)
+                };
+            });
+
+            setPhotos(newPhotos);
         };
 
         const getKnownHikers = async () => {
@@ -430,8 +439,6 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     };
 
     const handleSelectPhoto = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        let index: number;
-        let photo: Photo;
         let newPhotos = [...photos];
 
         if (event.target.files && event.target.files.length > 0) {
@@ -439,9 +446,9 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 return;
             }
 
-            const thumbnailSrc = await SharedService.getThumbnailSource(event.target.files[0], PHOTO_THUMBNAIL_SIZE);
+            const thumbnailSrc = await SharedService.getThumbnailDataSrc(event.target.files[0], PHOTO_THUMBNAIL_SIZE);
             const fileName = event.target.files[0].name;
-            index = newPhotos.findIndex((photo: Photo) => photo.fileName.toLowerCase() === fileName.toLowerCase());
+            const index = newPhotos.findIndex((photo: Photo) => photo.fileName.toLowerCase() === fileName.toLowerCase());
 
             if (index > -1) {
                 if (hikeId && newPhotos[index].action !== 'add') {
@@ -451,7 +458,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                     newPhotos[index].thumbnailSrc = thumbnailSrc;
                 }
             } else {
-                photo = {
+                const photo: Photo = {
                     file: event.target.files[0], fileName, filePath: '', caption: '', action: 'add', thumbnailSrc
                 };
 
@@ -462,7 +469,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
         }
     };
 
-    const handleChangePhotoCaption = (fileName: string, caption: string) => {
+    const handleChangePhotoCaption = (caption: string, fileName: string) => {
         const index = photos.findIndex((photo: Photo) => photo.fileName === fileName);
 
         if (index > -1) {
@@ -814,7 +821,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                                                 size='small'
                                                 placeholder='Type a caption'
                                                 inputProps={{ maxLength: 255 }}
-                                                onChange={(event) => handleChangePhotoCaption(photo.fileName, event.target.value)}
+                                                onChange={(event) => handleChangePhotoCaption(event.target.value, photo.fileName)}
                                             />
 
                                             <IconButton
