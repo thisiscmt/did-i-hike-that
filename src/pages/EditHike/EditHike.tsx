@@ -180,7 +180,8 @@ const useStyles = makeStyles()((theme) => ({
         minWidth: `${PHOTO_THUMBNAIL_SIZE}px`,
 
         [theme.breakpoints.down(1024)]: {
-            flex: '0 0 100%'
+            flex: '0 0 100%',
+            justifyContent: 'normal',
         }
     },
 

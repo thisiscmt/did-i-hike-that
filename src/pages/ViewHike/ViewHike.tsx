@@ -18,7 +18,7 @@ const useStyles = makeStyles()((theme) => ({
         marginBottom: '24px',
 
         '&.chips': {
-            marginBottom: '16px'
+            marginBottom: '14px'
         }
     },
 
@@ -72,6 +72,11 @@ const useStyles = makeStyles()((theme) => ({
 
     deleteButton: {
         marginLeft: '4px'
+    },
+
+    chipContainer: {
+        display: 'flex',
+        flexWrap: 'wrap'
     },
 
     chip: {
@@ -345,11 +350,13 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
                 <Box className={`${cx(classes.field)} ${cx(classes.section)} chips`}>
                     <Typography variant='body2' className={cx(classes.shortFieldLabel)}>Hikers</Typography>
 
-                    {
-                        hike.hikers.map((hiker: Hiker) => (
-                            <Chip key={hiker.fullName} label={hiker.fullName} className={cx(classes.chip)}></Chip>
-                        ))
-                    }
+                    <Box className={cx(classes.chipContainer)}>
+                        {
+                            hike.hikers.map((hiker: Hiker) => (
+                                <Chip key={hiker.fullName} label={hiker.fullName} className={cx(classes.chip)}></Chip>
+                            ))
+                        }
+                    </Box>
                 </Box>
             }
 
@@ -358,11 +365,13 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
                 <Box className={`${cx(classes.field)} ${cx(classes.section)} chips`}>
                     <Typography variant='body2' className={cx(classes.shortFieldLabel)}>Tags</Typography>
 
-                    {
-                        hike.tags.split(',').map((tag: string) => (
-                            <Chip key={tag} label={tag} className={cx(classes.chip)}></Chip>
-                        ))
-                    }
+                    <Box className={cx(classes.chipContainer)}>
+                        {
+                            hike.tags.split(',').map((tag: string) => (
+                                <Chip key={tag} label={tag} className={cx(classes.chip)}></Chip>
+                            ))
+                        }
+                    </Box>
                 </Box>
             }
 

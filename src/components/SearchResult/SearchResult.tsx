@@ -43,12 +43,13 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     hikers: {
-        marginTop: '10px'
+        marginBottom: '5px',
+        marginTop: '5px'
     },
 
     description: {
         fontSize: '14px',
-        marginTop: '10px',
+        marginTop: '12px',
         display: '-webkit-box',
         '-webkitLineClamp': '4',
         '-webkitBoxOrient': 'vertical',
