@@ -102,11 +102,23 @@ const useStyles = makeStyles()((theme) => ({
 
     photoCaption: {
         marginTop: '4px',
-        textTransform: 'capitalize'
+        textTransform: 'lowercase',
+
+        '&:first-letter': {
+            textTransform: 'capitalize'
+        }
+    },
+
+    noCaption: {
+        fontStyle: 'italic'
     },
 
     photoCaptionEditContainer: {
-        marginTop: '4px'
+        marginTop: '4px',
+
+        '& .MuiButtonBase-root': {
+            marginTop: '3px'
+        }
     },
 
     photoCaptionInput: {
@@ -393,51 +405,62 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
                                 <img src={process.env.REACT_APP_API_URL + '/images/' + photo.filePath} className={cx(classes.photo)} alt='Hike pic' />
 
                                 {
-                                    photo.caption &&
-                                    <>
-                                        {
-                                            photo.editCaption
-                                                ?
-                                                    <Box className={cx(classes.photoCaptionEditContainer)}>
-                                                        <TextField
-                                                            name='Caption'
-                                                            margin='none'
-                                                            variant='outlined'
-                                                            value={captions[photo.fileName]}
-                                                            size='small'
-                                                            className={cx(classes.photoCaptionInput)}
-                                                            autoCorrect='off'
-                                                            inputProps={{ maxLength: 255 }}
-                                                            onChange={(event) => handlePhotoCaptionChange(event.target.value, photo.fileName)}
-                                                        />
-                                                        <IconButton
-                                                            aria-label='save caption'
-                                                            title='Save caption'
-                                                            size='small'
-                                                            color='primary'
-                                                            onClick={() => handleSavePhotoCaption(photo.fileName)}
-                                                        >
-                                                            <SaveOutlined />
-                                                        </IconButton>
+                                    photo.editCaption ?
+                                        <Box className={cx(classes.photoCaptionEditContainer)}>
+                                            <TextField
+                                                name='Caption'
+                                                margin='none'
+                                                variant='outlined'
+                                                value={captions[photo.fileName]}
+                                                size='small'
+                                                className={cx(classes.photoCaptionInput)}
+                                                autoCorrect='off'
+                                                inputProps={{ maxLength: 255 }}
+                                                onChange={(event) => handlePhotoCaptionChange(event.target.value, photo.fileName)}
+                                            />
 
-                                                        <IconButton
-                                                            aria-label='cancel save caption'
-                                                            title='Cancel'
-                                                            size='small'
-                                                            color='default'
-                                                            onClick={() => handleCancelSavePhotoCaption(photo.fileName)}
-                                                        >
-                                                            <CancelOutlined />
-                                                        </IconButton>
-                                                    </Box>
-                                                :
-                                                    <Box>
-                                                        <Button variant='text' onClick={() => handlePhotoCaptionEdit(photo.fileName)}>
-                                                            <Typography variant='body2' className={cx(classes.photoCaption)}>{photo.caption}</Typography>
-                                                        </Button>
-                                                    </Box>
-                                        }
-                                    </>
+                                            <IconButton
+                                                aria-label='save caption'
+                                                title='Save caption'
+                                                size='small'
+                                                color='primary'
+                                                onClick={() => handleSavePhotoCaption(photo.fileName)}
+                                            >
+                                                <SaveOutlined />
+                                            </IconButton>
+
+                                            <IconButton
+                                                aria-label='cancel save caption'
+                                                title='Cancel'
+                                                size='small'
+                                                color='default'
+                                                onClick={() => handleCancelSavePhotoCaption(photo.fileName)}
+                                            >
+                                                <CancelOutlined />
+                                            </IconButton>
+                                        </Box> :
+
+                                        <>
+                                            {
+                                                photo.caption
+                                                    ?
+                                                        <Box>
+                                                            <Button variant='text' onClick={() => handlePhotoCaptionEdit(photo.fileName)}>
+                                                                <Typography variant='body2' className={cx(classes.photoCaption)}>
+                                                                    {photo.caption}
+                                                                </Typography>
+                                                            </Button>
+                                                        </Box>
+                                                    :
+                                                        <Box>
+                                                            <Button variant='text' onClick={() => handlePhotoCaptionEdit(photo.fileName)}>
+                                                                <Typography variant='body2' className={`${cx(classes.photoCaption)} ${cx(classes.noCaption)}`}>
+                                                                    Add a caption
+                                                                </Typography>
+                                                            </Button>
+                                                        </Box>
+                                            }
+                                        </>
                                 }
                             </Box>
                         ))
