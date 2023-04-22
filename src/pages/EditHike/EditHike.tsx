@@ -19,7 +19,6 @@ import {
 import { DeleteOutlineOutlined } from '@mui/icons-material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { makeStyles } from 'tss-react/mui';
-import { AdapterLuxon} from '@mui/x-date-pickers/AdapterLuxon';
 import Axios, { AxiosProgressEvent } from 'axios';
 import { DateTime } from 'luxon';
 
@@ -27,6 +26,7 @@ import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
 import { Colors } from '../../services/themeService';
 import { Hike, Hiker, Photo } from '../../models/models';
+import { CustomLuxonAdapter} from '../../classes/customLuxonAdapter';
 import { MainContext } from '../../contexts/MainContext';
 import { PHOTO_THUMBNAIL_SIZE } from '../../constants/constants';
 
@@ -598,7 +598,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                         label='Date of hike *'
                         classes={{ label: classes.fieldLabel }}
                         control={
-                            <LocalizationProvider dateAdapter={AdapterLuxon}>
+                            <LocalizationProvider dateAdapter={CustomLuxonAdapter}>
                                 <DatePicker
                                     value={dateOfHike}
                                     onChange={(newValue) => setDateOfHike(newValue || null) }

@@ -17,6 +17,7 @@ const useStyles = makeStyles()((theme) => ({
 
     thumbnail: {
         display: 'flex',
+        minWidth: `${PHOTO_THUMBNAIL_SIZE}px`,
         width: `${PHOTO_THUMBNAIL_SIZE}px`
     },
 
