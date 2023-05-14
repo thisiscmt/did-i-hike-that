@@ -6,11 +6,11 @@
     <meta name="description" content="Did I Hike That?" />
 
     <% if (process.env.NODE_ENV !== 'production') { %>
-      <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; connect-src 'self' localhost:*; img-src 'self' localhost:*; style-src 'self' 'unsafe-inline';base-uri 'self';form-action 'self'">
+      <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; connect-src 'self' localhost:*; img-src 'self' localhost:* data:; style-src 'self' 'unsafe-inline';base-uri 'self';form-action 'self'">
     <% } %>
 
     <% if (process.env.NODE_ENV === 'production') { %>
-      <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; connect-src 'self' https://diht-api.cmtybur.com; img-src 'self' https://diht-api.cmtybur.com; style-src 'self' 'unsafe-inline';base-uri 'self';form-action 'self'">
+      <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; connect-src 'self' https://diht-api.cmtybur.com; img-src 'self' https://diht-api.cmtybur.com data:; style-src 'self' 'unsafe-inline';base-uri 'self';form-action 'self'">
     <% } %>
 
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />

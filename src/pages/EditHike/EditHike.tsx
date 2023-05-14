@@ -19,7 +19,6 @@ import {
 import { DeleteOutlineOutlined } from '@mui/icons-material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { makeStyles } from 'tss-react/mui';
-import { AdapterLuxon} from '@mui/x-date-pickers/AdapterLuxon';
 import Axios, { AxiosProgressEvent } from 'axios';
 import { DateTime } from 'luxon';
 
@@ -27,6 +26,7 @@ import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
 import { Colors } from '../../services/themeService';
 import { Hike, Hiker, Photo } from '../../models/models';
+import { CustomLuxonAdapter} from '../../classes/customLuxonAdapter';
 import { MainContext } from '../../contexts/MainContext';
 import { PHOTO_THUMBNAIL_SIZE } from '../../constants/constants';
 
@@ -440,33 +440,36 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     };
 
     const handleSelectPhoto = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        let newPhotos = [...photos];
-
         if (event.target.files && event.target.files.length > 0) {
             if (photos.length === MAX_PHOTOS_FOR_UPLOAD) {
                 return;
             }
 
-            const thumbnailSrc = await SharedService.getThumbnailDataSrc(event.target.files[0], PHOTO_THUMBNAIL_SIZE);
-            const fileName = event.target.files[0].name;
-            const index = newPhotos.findIndex((photo: Photo) => photo.fileName.toLowerCase() === fileName.toLowerCase());
+            try {
+                let newPhotos = [...photos];
+                const thumbnailSrc = await SharedService.getThumbnailDataSrc(event.target.files[0], PHOTO_THUMBNAIL_SIZE);
+                const fileName = event.target.files[0].name;
+                const index = newPhotos.findIndex((photo: Photo) => photo.fileName.toLowerCase() === fileName.toLowerCase());
 
-            if (index > -1) {
-                if (hikeId && newPhotos[index].action !== 'add') {
+                if (index > -1) {
+                    if (hikeId && newPhotos[index].action !== 'add') {
 
-                    newPhotos[index].file = event.target.files[0];
-                    newPhotos[index].action = 'update';
-                    newPhotos[index].thumbnailSrc = thumbnailSrc;
+                        newPhotos[index].file = event.target.files[0];
+                        newPhotos[index].action = 'update';
+                        newPhotos[index].thumbnailSrc = thumbnailSrc;
+                    }
+                } else {
+                    const photo: Photo = {
+                        file: event.target.files[0], fileName, filePath: '', caption: '', action: 'add', thumbnailSrc
+                    };
+
+                    newPhotos.push(photo);
                 }
-            } else {
-                const photo: Photo = {
-                    file: event.target.files[0], fileName, filePath: '', caption: '', action: 'add', thumbnailSrc
-                };
 
-                newPhotos.push(photo);
+                setPhotos(newPhotos);
+            } catch (error) {
+                DataService.logError(error)
             }
-
-            setPhotos(newPhotos);
         }
     };
 
@@ -598,7 +601,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                         label='Date of hike *'
                         classes={{ label: classes.fieldLabel }}
                         control={
-                            <LocalizationProvider dateAdapter={AdapterLuxon}>
+                            <LocalizationProvider dateAdapter={CustomLuxonAdapter}>
                                 <DatePicker
                                     value={dateOfHike}
                                     onChange={(newValue) => setDateOfHike(newValue || null) }
