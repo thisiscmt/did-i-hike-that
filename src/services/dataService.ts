@@ -33,7 +33,7 @@ export const createHike = async (hike: Hike, signal: AbortSignal, onUploadProgre
     return response.data;
 };
 
-export const updateHike = async (hike: Hike, signal: AbortSignal, onUploadProgress?: (progressEvent: AxiosProgressEvent) => void): Promise<Hike> => {
+export const updateHike = async (hike: Hike, signal?: AbortSignal, onUploadProgress?: (progressEvent: AxiosProgressEvent) => void): Promise<Hike> => {
     const formData = getFormData(hike);
     const config = getRequestConfig(true);
     config.signal = signal;
@@ -63,6 +63,10 @@ export const login = async (email: string, password: string) => {
 
 export const logout = async () => {
     return await Axios.delete(process.env.REACT_APP_API_URL + `/auth`, getRequestConfig());
+};
+
+export const logError = (errorData: any) => {
+    Axios.post(process.env.REACT_APP_API_URL + `/error`, { errorData }, getRequestConfig());
 };
 
 const getRequestConfig = (multipartRequest: boolean = false): AxiosRequestConfig => {

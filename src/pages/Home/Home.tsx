@@ -13,10 +13,12 @@ import {MainContext} from '../../contexts/MainContext';
 import { Hike } from '../../models/models';
 
 const useStyles = makeStyles()((theme) => ({
-    content: {
-        display: 'flex',
-        flexDirection: 'column',
-        textAlign: 'center',
+    mainContainer: {
+        textAlign: 'center'
+    },
+
+    intro: {
+        marginBottom: '30px',
 
         '& .MuiTypography-root': {
             marginBottom: '20px'
@@ -28,8 +30,7 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     searchInputContainer: {
-        marginBottom: '10px',
-        marginTop: '10px',
+        marginBottom: '10px'
     },
 
     searchInput: {
@@ -41,10 +42,8 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     searchResultsContainer: {
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        marginTop: '16px'
+        marginTop: '16px',
+        textAlign: 'left'
     },
 
     searchResults: {
@@ -124,8 +123,8 @@ const Home: FC = () => {
     }
 
     return (
-        <Box className='loadable-container'>
-            <Box className={cx(classes.content)}>
+        <Box className={classes.mainContainer}>
+            <Box className={cx(classes.intro)}>
                 <Typography variant='h5'>
                     Ever ask yourself if you've hiked a particular trail before?
                 </Typography>
@@ -135,7 +134,9 @@ const Home: FC = () => {
                 <Typography variant='body1' className={cx(classes.quote)}>
                     "Not all those who wander are lost"
                 </Typography>
+            </Box>
 
+            <Box className='loadable-container'>
                 <Box className={cx(classes.searchInputContainer)}>
                     <TextField
                         onChange={handleSearchTextChange}
@@ -162,36 +163,36 @@ const Home: FC = () => {
                 <Box>
                     <Button color='primary' onClick={() => handleSearch()}>Search</Button>
                 </Box>
-            </Box>
 
-            <Box className={`${cx(classes.searchResultsContainer)}`}>
-                {
-                    showResults
-                        ?
+                <Box className={`${cx(classes.searchResultsContainer)}`}>
+                    {
+                        showResults
+                            ?
                             searchResults.length > 0
                                 ?
-                                    <>
-                                        <Box className={cx(classes.searchResults)}>
-                                            {
-                                                searchResults.map((hike: Hike) => {
-                                                    return (
-                                                        <Box key={hike.id} className={cx(classes.searchResult)} onClick={() => navigate(`/hike/${hike.id}`)}>
-                                                            <SearchResult hike={hike} />
-                                                        </Box>
-                                                    )
-                                                })
-                                            }
-                                        </Box>
+                                <>
+                                    <Box className={cx(classes.searchResults)}>
+                                        {
+                                            searchResults.map((hike: Hike) => {
+                                                return (
+                                                    <Box key={hike.id} className={cx(classes.searchResult)} onClick={() => navigate(`/hike/${hike.id}`)}>
+                                                        <SearchResult hike={hike} />
+                                                    </Box>
+                                                )
+                                            })
+                                        }
+                                    </Box>
 
-                                        <Pagination onChange={handleChangePage} page={page} count={pageCount} className={cx(classes.pagination)} />
-                                    </>
+                                    <Pagination onChange={handleChangePage} page={page} count={pageCount} className={cx(classes.pagination)} />
+                                </>
                                 :
-                                    <Box className={cx(classes.noResults)}>No hikes found</Box>
-                        : ''
-                }
-            </Box>
+                                <Box className={cx(classes.noResults)}>No hikes found</Box>
+                            : ''
+                    }
+                </Box>
 
-            <LoadingOverlay open={loading} />
+                <LoadingOverlay open={loading} />
+            </Box>
         </Box>
     )
 };

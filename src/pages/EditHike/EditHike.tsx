@@ -19,7 +19,6 @@ import {
 import { DeleteOutlineOutlined } from '@mui/icons-material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { makeStyles } from 'tss-react/mui';
-import { AdapterLuxon} from '@mui/x-date-pickers/AdapterLuxon';
 import Axios, { AxiosProgressEvent } from 'axios';
 import { DateTime } from 'luxon';
 
@@ -27,7 +26,9 @@ import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
 import { Colors } from '../../services/themeService';
 import { Hike, Hiker, Photo } from '../../models/models';
+import { CustomLuxonAdapter} from '../../classes/customLuxonAdapter';
 import { MainContext } from '../../contexts/MainContext';
+import { PHOTO_THUMBNAIL_SIZE } from '../../constants/constants';
 
 const useStyles = makeStyles()((theme) => ({
     row: {
@@ -147,6 +148,7 @@ const useStyles = makeStyles()((theme) => ({
 
         '& .MuiListItem-padding': {
             paddingBottom: 0,
+            paddingTop: '20px',
 
             ':first-child': {
                 paddingTop: 0
@@ -157,28 +159,40 @@ const useStyles = makeStyles()((theme) => ({
             paddingRight: 0
         },
 
-        [theme.breakpoints.down(700)]: {
+        [theme.breakpoints.down(1024)]: {
+            '& .MuiListItem-root': {
+                flexWrap: 'wrap'
+            }
+        },
+
+        [theme.breakpoints.down(470)]: {
             marginLeft: 0,
 
             '& .MuiFormLabel-root': {
                 width: '100%'
-            },
-
-            '& .MuiListItem-root': {
-                flexWrap: 'wrap',
-                paddingTop: '16px'
             }
         }
     },
 
-    photoFileName: {
-        fontSize: '14px',
-        marginRight: '10px',
-        width: '250px',
+    photoThumbnail: {
+        display: 'flex',
+        justifyContent: 'center',
+        minWidth: `${PHOTO_THUMBNAIL_SIZE}px`,
 
-        [theme.breakpoints.down(700)]: {
-            marginBottom: '4px',
-            marginRight: 0
+        [theme.breakpoints.down(1024)]: {
+            flex: '0 0 100%',
+            justifyContent: 'normal',
+        }
+    },
+
+    photoCaption: {
+        display: 'flex',
+        marginLeft: '24px',
+
+        [theme.breakpoints.down(1024)]: {
+            marginLeft: 0,
+            marginTop: '12px',
+            width: '250px'
         }
     },
 
@@ -257,8 +271,16 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             setLinkLabel(hike.linkLabel || '');
             setDescription(hike.description || '');
             setTags(hike.tags ? hike.tags.split(',').map((tag: string) => tag.trim()) : []);
-            setPhotos(hike.photos || []);
             setRetrievedHike(true);
+
+            const newPhotos = (hike.photos || []).map((photo: Photo) => {
+                return {
+                    ...photo,
+                    thumbnailSrc: SharedService.getThumbnailSrc(photo.filePath)
+                };
+            });
+
+            setPhotos(newPhotos);
         };
 
         const getKnownHikers = async () => {
@@ -417,37 +439,41 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
         setTags(value);
     };
 
-    const handleSelectPhoto = (event: React.ChangeEvent<HTMLInputElement>) => {
-        let index: number;
-        let photo: Photo;
-        let newPhotos = [...photos];
-
+    const handleSelectPhoto = async (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files.length > 0) {
             if (photos.length === MAX_PHOTOS_FOR_UPLOAD) {
                 return;
             }
 
-            const fileName = event.target.files[0].name;
-            index = newPhotos.findIndex((photo: Photo) => photo.fileName.toLowerCase() === fileName.toLowerCase());
+            try {
+                let newPhotos = [...photos];
+                const thumbnailSrc = await SharedService.getThumbnailDataSrc(event.target.files[0], PHOTO_THUMBNAIL_SIZE);
+                const fileName = event.target.files[0].name;
+                const index = newPhotos.findIndex((photo: Photo) => photo.fileName.toLowerCase() === fileName.toLowerCase());
 
-            if (index > -1) {
-                if (hikeId && newPhotos[index].action !== 'add') {
-                    newPhotos[index].file = event.target.files[0];
-                    newPhotos[index].action = 'update';
+                if (index > -1) {
+                    if (hikeId && newPhotos[index].action !== 'add') {
+
+                        newPhotos[index].file = event.target.files[0];
+                        newPhotos[index].action = 'update';
+                        newPhotos[index].thumbnailSrc = thumbnailSrc;
+                    }
+                } else {
+                    const photo: Photo = {
+                        file: event.target.files[0], fileName, filePath: '', caption: '', action: 'add', thumbnailSrc
+                    };
+
+                    newPhotos.push(photo);
                 }
-            } else {
-                photo = {
-                    file: event.target.files[0], fileName, filePath: '', caption: '', action: 'add'
-                };
 
-                newPhotos.push(photo);
+                setPhotos(newPhotos);
+            } catch (error) {
+                DataService.logError(error)
             }
-
-            setPhotos(newPhotos);
         }
     };
 
-    const handleChangePhotoCaption = (fileName: string, caption: string) => {
+    const handleChangePhotoCaption = (caption: string, fileName: string) => {
         const index = photos.findIndex((photo: Photo) => photo.fileName === fileName);
 
         if (index > -1) {
@@ -575,7 +601,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                         label='Date of hike *'
                         classes={{ label: classes.fieldLabel }}
                         control={
-                            <LocalizationProvider dateAdapter={AdapterLuxon}>
+                            <LocalizationProvider dateAdapter={CustomLuxonAdapter}>
                                 <DatePicker
                                     value={dateOfHike}
                                     onChange={(newValue) => setDateOfHike(newValue || null) }
@@ -787,27 +813,32 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                                 {
                                     photo.action !== 'delete' &&
                                     <ListItem disableGutters={true}>
-                                        <FormLabel htmlFor={`hike-photo-${photo.fileName}`} className={cx(classes.photoFileName)}>{SharedService.getFileNameForPhoto(photo)}</FormLabel>
+                                        <Box className={cx(classes.photoThumbnail)}>
+                                            <img src={photo.thumbnailSrc} alt='Thumbnail' />
+                                        </Box>
 
-                                        <TextField
-                                            id={`hike-photo-${photo.fileName}`}
-                                            value={photo.caption || ''}
-                                            size='small'
-                                            placeholder='Type a caption'
-                                            inputProps={{ maxLength: 255 }}
-                                            onChange={(event) => handleChangePhotoCaption(photo.fileName, event.target.value)}
-                                        />
+                                        <Box className={cx(classes.photoCaption)}>
+                                            <TextField
+                                                id={`hike-photo-${photo.fileName}`}
+                                                value={photo.caption || ''}
+                                                style={{ flexGrow: 2 }}
+                                                size='small'
+                                                placeholder='Type a caption'
+                                                inputProps={{ maxLength: 255 }}
+                                                onChange={(event) => handleChangePhotoCaption(event.target.value, photo.fileName)}
+                                            />
 
-                                        <IconButton
-                                            aria-label='delete photo'
-                                            className={cx(classes.deletePhotoButton)}
-                                            onClick={() => handleDeletePhoto(photo.fileName)}
-                                            title='Remove photo'
-                                            size='small'
-                                            color='error'
-                                        >
-                                            <DeleteOutlineOutlined />
-                                        </IconButton>
+                                            <IconButton
+                                                aria-label='delete photo'
+                                                className={cx(classes.deletePhotoButton)}
+                                                onClick={() => handleDeletePhoto(photo.fileName)}
+                                                title='Remove photo'
+                                                size='small'
+                                                color='error'
+                                            >
+                                                <DeleteOutlineOutlined />
+                                            </IconButton>
+                                        </Box>
                                     </ListItem>
                                 }
                             </React.Fragment>

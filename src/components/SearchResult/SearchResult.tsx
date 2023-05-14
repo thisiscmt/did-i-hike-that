@@ -4,6 +4,7 @@ import { makeStyles } from 'tss-react/mui';
 
 import {Hike} from '../../models/models';
 import * as SharedService from '../../services/sharedService';
+import {PHOTO_THUMBNAIL_SIZE} from '../../constants/constants';
 
 const useStyles = makeStyles()((theme) => ({
     cardContent: {
@@ -15,14 +16,17 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     thumbnail: {
-        width: '150px'
+        display: 'flex',
+        minWidth: `${PHOTO_THUMBNAIL_SIZE}px`,
+        width: `${PHOTO_THUMBNAIL_SIZE}px`
     },
 
     details: {
         marginLeft: '40px',
 
         '& .MuiChip-root': {
-            marginRight: '8px'
+            marginRight: '8px',
+            marginTop: '6px'
         },
 
         '& .MuiChip-root:last-child': {
@@ -40,12 +44,13 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     hikers: {
-        marginTop: '10px'
+        marginBottom: '5px',
+        marginTop: '5px'
     },
 
     description: {
         fontSize: '14px',
-        marginTop: '10px',
+        marginTop: '12px',
         display: '-webkit-box',
         '-webkitLineClamp': '4',
         '-webkitBoxOrient': 'vertical',
@@ -60,7 +65,7 @@ interface SearchResultProps {
 
 const SearchResult: FC<SearchResultProps> = ({ hike }) => {
     const { classes, cx } = useStyles();
-    const thumbnailSource = hike.filePath ? `${process.env.REACT_APP_API_URL}/images/` + hike.filePath : 'images/no_hike_images.png';
+    const thumbnailSrc = SharedService.getThumbnailSrc(hike.filePath || '');
     const hikers = hike.fullNames ? hike.fullNames.split(',') : [];
 
     return (

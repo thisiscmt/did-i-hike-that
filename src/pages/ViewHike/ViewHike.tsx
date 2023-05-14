@@ -1,7 +1,7 @@
 import React, { FC, RefObject, useContext, useEffect, useState } from 'react';
 import { Link as RouteLink, useNavigate, useParams } from 'react-router-dom';
-import { Box, Button, Card, CardContent, Chip, IconButton, Link, Typography } from '@mui/material';
-import { DeleteOutlineOutlined, EditOutlined } from '@mui/icons-material';
+import {Box, Button, Card, CardContent, Chip, IconButton, Link, TextField, Typography} from '@mui/material';
+import { DeleteOutlineOutlined, EditOutlined, SaveOutlined, CancelOutlined } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
 import Axios from 'axios';
 import { DateTime } from 'luxon';
@@ -18,7 +18,7 @@ const useStyles = makeStyles()((theme) => ({
         marginBottom: '24px',
 
         '&.chips': {
-            marginBottom: '16px'
+            marginBottom: '14px'
         }
     },
 
@@ -74,6 +74,11 @@ const useStyles = makeStyles()((theme) => ({
         marginLeft: '4px'
     },
 
+    chipContainer: {
+        display: 'flex',
+        flexWrap: 'wrap'
+    },
+
     chip: {
         marginBottom: '8px',
         marginRight: '8px',
@@ -96,7 +101,28 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     photoCaption: {
-        marginTop: '4px'
+        marginTop: '4px',
+        textTransform: 'lowercase',
+
+        '&:first-letter': {
+            textTransform: 'capitalize'
+        }
+    },
+
+    noCaption: {
+        fontStyle: 'italic'
+    },
+
+    photoCaptionEditContainer: {
+        marginTop: '4px',
+
+        '& .MuiButtonBase-root': {
+            marginTop: '3px'
+        }
+    },
+
+    photoCaptionInput: {
+        marginRight: '8px'
     },
 
     lastUpdated: {
@@ -109,9 +135,14 @@ interface ViewHikeProps {
     topOfPageRef: RefObject<HTMLElement>;
 }
 
+interface Caption {
+    [id: string]: string
+}
+
 const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
     const { classes, cx } = useStyles();
     const [ hike, setHike ] = useState<Hike>({ trail: '', dateOfHike: '' });
+    const [ captions, setCaptions ] = useState<Caption>({});
     const [ retrievedHike, setRetrievedHike ] = useState<boolean>(false);
     const [ openDeleteConfirmation, setIsOpenDeleteConfirmation ] = useState<boolean>(false);
     const [ loading, setLoading ] = useState<boolean>(true);
@@ -151,7 +182,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
         document.title = 'View Hike - Did I Hike That?';
 
         if (!retrievedHike) {
-            if (currentHike) {
+            if (currentHike && currentHike.id === hikeId) {
                 setHike(currentHike);
                 setLoading(false);
                 setRetrievedHike(true);
@@ -181,7 +212,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
         }
 
         return url;
-    }
+    };
 
     const handleDeleteConfirmation = async (value: boolean) => {
         setIsOpenDeleteConfirmation(false);
@@ -189,7 +220,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
         if (value) {
             await handleDeleteHike();
         }
-    }
+    };
 
     const handleDeleteHike = async () => {
         if (hikeId) {
@@ -200,6 +231,48 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
             updatedSearchResults.splice(index, 1);
             setSearchResults(updatedSearchResults);
             navigate(-1);
+        }
+    };
+
+    const handlePhotoCaptionEdit = (fileName: string) => {
+        const index = hike.photos?.findIndex((photo: Photo) => photo.fileName === fileName);
+
+        if (index !== undefined && index > -1) {
+            const newHike = structuredClone(hike);
+            newHike.photos[index].editCaption = true;
+            captions[fileName] = newHike.photos[index].caption;
+            setHike(newHike);
+        }
+    };
+
+    const handlePhotoCaptionChange = (caption: string, fileName: string) => {
+        const newCaptions = { ...captions };
+        newCaptions[fileName] = caption;
+        setCaptions(newCaptions);
+    };
+
+    const handleSavePhotoCaption = async (fileName: string) => {
+        const index = hike.photos?.findIndex((photo: Photo) => photo.fileName === fileName);
+
+        if (index !== undefined && index > -1) {
+            const newHike = structuredClone(hike);
+            newHike.photos[index].caption = captions[fileName];
+            newHike.photos[index].editCaption = false;
+            newHike.photos[index].action = 'update';
+
+            await DataService.updateHike(newHike)
+            setCurrentHike(newHike);
+            setHike(newHike);
+        }
+    };
+
+    const handleCancelSavePhotoCaption = (fileName: string) => {
+        const index = hike.photos?.findIndex((photo: Photo) => photo.fileName === fileName);
+
+        if (index !== undefined && index > -1) {
+            const newHike = structuredClone(hike);
+            newHike.photos[index].editCaption = false;
+            setHike(newHike);
         }
     };
 
@@ -289,11 +362,13 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
                 <Box className={`${cx(classes.field)} ${cx(classes.section)} chips`}>
                     <Typography variant='body2' className={cx(classes.shortFieldLabel)}>Hikers</Typography>
 
-                    {
-                        hike.hikers.map((hiker: Hiker) => (
-                            <Chip key={hiker.fullName} label={hiker.fullName} className={cx(classes.chip)}></Chip>
-                        ))
-                    }
+                    <Box className={cx(classes.chipContainer)}>
+                        {
+                            hike.hikers.map((hiker: Hiker) => (
+                                <Chip key={hiker.fullName} label={hiker.fullName} className={cx(classes.chip)}></Chip>
+                            ))
+                        }
+                    </Box>
                 </Box>
             }
 
@@ -302,11 +377,13 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
                 <Box className={`${cx(classes.field)} ${cx(classes.section)} chips`}>
                     <Typography variant='body2' className={cx(classes.shortFieldLabel)}>Tags</Typography>
 
-                    {
-                        hike.tags.split(',').map((tag: string) => (
-                            <Chip key={tag} label={tag} className={cx(classes.chip)}></Chip>
-                        ))
-                    }
+                    <Box className={cx(classes.chipContainer)}>
+                        {
+                            hike.tags.split(',').map((tag: string) => (
+                                <Chip key={tag} label={tag} className={cx(classes.chip)}></Chip>
+                            ))
+                        }
+                    </Box>
                 </Box>
             }
 
@@ -328,12 +405,65 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
                                 <img src={process.env.REACT_APP_API_URL + '/images/' + photo.filePath} className={cx(classes.photo)} alt='Hike pic' crossOrigin='anonymous' />
 
                                 {
-                                    photo.caption &&
-                                    <Typography variant='body2' className={cx(classes.photoCaption)}>{photo.caption}</Typography>
+                                    photo.editCaption ?
+                                        <Box className={cx(classes.photoCaptionEditContainer)}>
+                                            <TextField
+                                                name='Caption'
+                                                margin='none'
+                                                variant='outlined'
+                                                value={captions[photo.fileName]}
+                                                size='small'
+                                                className={cx(classes.photoCaptionInput)}
+                                                autoCorrect='off'
+                                                inputProps={{ maxLength: 255 }}
+                                                onChange={(event) => handlePhotoCaptionChange(event.target.value, photo.fileName)}
+                                            />
+
+                                            <IconButton
+                                                aria-label='save caption'
+                                                title='Save caption'
+                                                size='small'
+                                                color='primary'
+                                                onClick={() => handleSavePhotoCaption(photo.fileName)}
+                                            >
+                                                <SaveOutlined />
+                                            </IconButton>
+
+                                            <IconButton
+                                                aria-label='cancel save caption'
+                                                title='Cancel'
+                                                size='small'
+                                                color='default'
+                                                onClick={() => handleCancelSavePhotoCaption(photo.fileName)}
+                                            >
+                                                <CancelOutlined />
+                                            </IconButton>
+                                        </Box> :
+
+                                        <>
+                                            {
+                                                photo.caption
+                                                    ?
+                                                        <Box>
+                                                            <Button variant='text' onClick={() => handlePhotoCaptionEdit(photo.fileName)}>
+                                                                <Typography variant='body2' className={cx(classes.photoCaption)}>
+                                                                    {photo.caption}
+                                                                </Typography>
+                                                            </Button>
+                                                        </Box>
+                                                    :
+                                                        <Box>
+                                                            <Button variant='text' onClick={() => handlePhotoCaptionEdit(photo.fileName)}>
+                                                                <Typography variant='body2' className={`${cx(classes.photoCaption)} ${cx(classes.noCaption)}`}>
+                                                                    Add a caption
+                                                                </Typography>
+                                                            </Button>
+                                                        </Box>
+                                            }
+                                        </>
                                 }
                             </Box>
                         ))
-
                     }
                 </Box>
             }
