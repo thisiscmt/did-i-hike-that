@@ -72,7 +72,7 @@ const SearchResult: FC<SearchResultProps> = ({ hike }) => {
         <Card>
             <CardContent className={cx(classes.cardContent)}>
                 <Box>
-                    <img className={cx(classes.thumbnail)} alt='Hike pic' src={thumbnailSource} aria-label='Hike photo' crossOrigin='anonymous' />
+                    <img className={cx(classes.thumbnail)} alt='Hike pic' src={thumbnailSrc} aria-label='Hike photo' crossOrigin='anonymous' />
                 </Box>
 
                 <Box className={cx(classes.details)}>

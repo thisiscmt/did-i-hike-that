@@ -109,8 +109,11 @@ const Home: FC = () => {
         } catch (error){
             if (Axios.isAxiosError(error) && error.response?.status === 401) {
                 setBanner('You need to log in', 'warning');
+            } else if (SharedService.appOffline()) {
+                setBanner('You are currently offline and some search results may not be available', 'warning');
             } else {
                 setBanner('Error occurred retrieving hikes', 'error');
+                DataService.logError(error);
             }
         } finally {
             setLoading(false);

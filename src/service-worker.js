@@ -27,98 +27,66 @@ precacheAndRoute(self.__WB_MANIFEST);
 const fileExtensionRegexp = new RegExp('/[^/?]+\\.[^/]+$');
 
 registerRoute(
-  // Return false to exempt requests from being fulfilled by index.html.
-  ({ request, url }) => {
-    // If this isn't a navigation, skip.
-    if (request.mode !== 'navigate') {
-      return false;
-    } // If this is a URL that starts with /_, skip.
+    // Return false to exempt requests from being fulfilled by index.html.
+    ({ request, url }) => {
+        // If this isn't a navigation, skip.
+        if (request.mode !== 'navigate') {
+            return false;
+        } // If this is a URL that starts with /_, skip.
 
-    if (url.pathname.startsWith('/_')) {
-      return false;
-    } // If this looks like a URL for a resource, because it contains // a file extension, skip.
+        if (url.pathname.startsWith('/_')) {
+            return false;
+        } // If this looks like a URL for a resource, because it contains // a file extension, skip.
 
-    if (url.pathname.match(fileExtensionRegexp)) {
-      return false;
-    } // Return true to signal that we want to use the handler.
+        if (url.pathname.match(fileExtensionRegexp)) {
+            return false;
+        } // Return true to signal that we want to use the handler.
 
-    return true;
-  },
-  createHandlerBoundToURL(process.env.PUBLIC_URL + '/index.html')
+        return true;
+    },
+    createHandlerBoundToURL(process.env.PUBLIC_URL + '/index.html')
 );
 
-// An example runtime caching route for requests that aren't handled by the
-// precache, in this case same-origin .png requests like those from in public/
-registerRoute(
-  // Add in any other file extensions or routing criteria as needed.
-  ({ url }) => url.origin === self.location.origin && url.pathname.endsWith('.png'), // Customize this strategy as needed, e.g., by changing to CacheFirst.
-  new StaleWhileRevalidate({
-    cacheName: 'images',
-    plugins: [
-      // Ensure that once this runtime cache reaches a maximum size the least-recently used images are removed.
-      new ExpirationPlugin({ maxEntries: 50 }),
-    ],
-  })
-);
+registerRoute(({ url }) => {
+    return url.origin === self.location.origin && (url.pathname.endsWith('.png') || url.pathname.endsWith('.ico'))
+},
+    new StaleWhileRevalidate({
+        cacheName: 'images',
+        plugins: [
+            // Ensure that once this runtime cache reaches a maximum size the least-recently used images are removed.
+            new ExpirationPlugin({ maxEntries: 50 }),
+        ],
+}));
 
-registerRoute(({ url }) => url.href.includes(process.env.REACT_APP_API_URL),
+registerRoute(({ url }) => {
+    return url.href.includes(process.env.REACT_APP_API_URL) && !url.href.endsWith('error');
+},
     new NetworkFirst({
-        cacheName: 'api'
+        cacheName: 'diht-api'
     })
 );
 
-// This allows the web app to trigger skipWaiting via
-// registration.waiting.postMessage({type: 'SKIP_WAITING'})
+// This allows the web app to trigger skipWaiting via registration.waiting.postMessage({type: 'SKIP_WAITING'})
 self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
 });
 
-self.addEventListener('load', (event) => {
+self.addEventListener('fetch', (event) => {
     event.respondWith(
         caches.match(event.request).then((response) => {
-            console.log('mark');
-
             if (response) {
                 return response;
             }
 
-            console.log('Making request for: %o', event.request.url);
-
             return fetch(event.request)
                 .then((response) => {
-                    console.log('Response from network is: %o', response);
-
                     return response;
                 })
                 .catch((error) => {
-                    console.error(`Fetching failed: ${error}`);
                     throw error;
                 });
         })
     );
 });
-
-// self.addEventListener('fetch', (event) => {
-//     event.respondWith(
-//         caches.match(event.request).then((response) => {
-//             if (response) {
-//                 return response;
-//             }
-//
-//             console.log('Making request for: %o', event.request);
-//
-//             return fetch(event.request)
-//                 .then((response) => {
-//                     console.log('Response from network: %o', response);
-//
-//                     return response;
-//                 })
-//                 .catch((error) => {
-//                     console.error(`Fetching failed: ${error}`);
-//                     throw error;
-//                 });
-//         })
-//     );
-// });

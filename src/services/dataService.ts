@@ -66,7 +66,9 @@ export const logout = async () => {
 };
 
 export const logError = (errorData: any) => {
-    Axios.post(process.env.REACT_APP_API_URL + `/error`, { errorData }, getRequestConfig());
+    Axios.post(process.env.REACT_APP_API_URL + `/error`, { errorData }, getRequestConfig()).catch((error) => {
+        console.log('Something went wrong while logging error information: %o', error.message);
+    });
 };
 
 const getRequestConfig = (multipartRequest: boolean = false): AxiosRequestConfig => {

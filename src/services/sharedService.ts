@@ -2,6 +2,7 @@ import { RefObject } from 'react';
 import Resizer from 'react-image-file-resizer';
 
 import { HikeSearchParams } from '../models/models';
+import { STORAGE_OFFLINE } from '../constants/constants';
 
 export const getSearchParams = (searchText: string) => {
     const searchParams: HikeSearchParams = {};
@@ -46,6 +47,10 @@ export const formatDateOfHike = (dateOfHike: string) => {
     const dateParts = dateOfHike.split('-');
     return `${Number(dateParts[1])}/${Number(dateParts[2])}/${dateParts[0]}`;
 };
+
+export const appOffline = () => {
+    return sessionStorage.getItem(STORAGE_OFFLINE) === 'true';
+}
 
 export const scrollToTop = (ref: RefObject<HTMLElement>) => {
     if (ref && ref.current) {

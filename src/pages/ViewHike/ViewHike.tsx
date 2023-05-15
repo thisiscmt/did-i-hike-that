@@ -145,7 +145,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
     const [ captions, setCaptions ] = useState<Caption>({});
     const [ retrievedHike, setRetrievedHike ] = useState<boolean>(false);
     const [ openDeleteConfirmation, setIsOpenDeleteConfirmation ] = useState<boolean>(false);
-    const [ loading, setLoading ] = useState<boolean>(true);
+    const [ loading, setLoading ] = useState<boolean>(false);
     const { searchResults, currentHike, loggedIn, setSearchResults, setCurrentHike, setBanner } = useContext(MainContext);
     const { hikeId } = useParams();
     const navigate = useNavigate();
@@ -155,6 +155,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
             try {
                 if (hikeId) {
                     setBanner('');
+                    setLoading(true);
                     const hike = await DataService.getHike(hikeId);
 
                     setHike(hike);
@@ -163,13 +164,16 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
                 } else {
                     setBanner('Missing a hike ID', 'error');
                 }
-            } catch(error) {
+            } catch (error) {
                 if (Axios.isAxiosError(error) && error.response?.status === 401) {
                     setBanner('You need to log in', 'warning');
                 } else if (Axios.isAxiosError(error) && error.response?.status === 404) {
                     setBanner('Could not find the hike', 'warning');
+                } else if (SharedService.appOffline()) {
+                    setBanner('You are currently offline and some hikes may not be available', 'warning');
                 } else {
                     setBanner('Error occurred retrieving the hike', 'error');
+                    DataService.logError(error);
                 }
 
                 SharedService.scrollToTop(topOfPageRef);
@@ -184,7 +188,6 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
         if (!retrievedHike) {
             if (currentHike && currentHike.id === hikeId) {
                 setHike(currentHike);
-                setLoading(false);
                 setRetrievedHike(true);
             } else {
                 getHike();
@@ -224,13 +227,24 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
 
     const handleDeleteHike = async () => {
         if (hikeId) {
-            await DataService.deleteHike(hikeId);
+            try {
+                await DataService.deleteHike(hikeId);
 
-            const updatedSearchResults = [...searchResults];
-            const index = updatedSearchResults.findIndex((hike: Hike) => hike.id === hikeId);
-            updatedSearchResults.splice(index, 1);
-            setSearchResults(updatedSearchResults);
-            navigate(-1);
+                const updatedSearchResults = [...searchResults];
+                const index = updatedSearchResults.findIndex((hike: Hike) => hike.id === hikeId);
+                updatedSearchResults.splice(index, 1);
+                setSearchResults(updatedSearchResults);
+                navigate(-1);
+            } catch (error) {
+                if (Axios.isAxiosError(error) && error.response?.status === 401) {
+                    setBanner('You need to log in', 'warning');
+                } else if (SharedService.appOffline()) {
+                    setBanner('You are currently offline and this hike can\'t be deleted right now', 'warning');
+                } else {
+                    setBanner('Error occurred deleting the hike', 'error');
+                    DataService.logError(error);
+                }
+            }
         }
     };
 
@@ -260,9 +274,23 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
             newHike.photos[index].editCaption = false;
             newHike.photos[index].action = 'update';
 
-            await DataService.updateHike(newHike)
-            setCurrentHike(newHike);
-            setHike(newHike);
+            try {
+                await DataService.updateHike(newHike);
+
+                setCurrentHike(newHike);
+                setHike(newHike);
+            } catch (error) {
+                if (Axios.isAxiosError(error) && error.response?.status === 401) {
+                    setBanner('You need to log in', 'warning');
+                } else if (SharedService.appOffline()) {
+                    setBanner('You are currently offline and this caption can\'t be modified right now', 'warning');
+                } else {
+                    setBanner('Error occurred saving the caption', 'error');
+                    DataService.logError(error);
+                }
+
+                SharedService.scrollToTop(topOfPageRef);
+            }
         }
     };
 
@@ -284,10 +312,12 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
         formattedUpdatedAt = parsedUpdatedAt.toLocaleString(DateTime.DATETIME_FULL);
     }
 
+    const showDataSection = !loading && loggedIn && hike.trail;
+
     return (
         <Box className='loadable-container'>
             {
-                !loading && loggedIn &&
+                showDataSection &&
                 <Box className={cx(classes.trail)}>
                     <Typography variant='h4'>{hike.trail}</Typography>
 
@@ -316,7 +346,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
             }
 
             {
-                !loading && loggedIn &&
+                showDataSection &&
                 <Card className={cx(classes.section)}>
                     <CardContent>
                         <Box>
@@ -469,15 +499,23 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
             }
 
             {
-                !loading && loggedIn &&
+                !showDataSection &&
+                <Box className={cx(classes.section)}>
+                    <Typography variant='body2'>Hike was not found</Typography>
+                </Box>
+            }
+
+            {
+                showDataSection &&
                 <>
                     <Box className={cx(classes.section)}>
                         <Typography variant='body2' className={cx(classes.lastUpdated)}>{`Last updated on ${formattedUpdatedAt}`}</Typography>
                     </Box>
 
-                    <Button variant='contained' color='primary' onClick={() => navigate(-1)}>Back</Button>
                 </>
             }
+
+            <Button variant='contained' color='primary' onClick={() => navigate(-1)}>Back</Button>
 
             <ConfirmationPrompt title='Delete this hike?' open={openDeleteConfirmation} content='Are you sure you want to delete this hike?' onClose={handleDeleteConfirmation} />
             <LoadingOverlay open={loading} />

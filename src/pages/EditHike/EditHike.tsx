@@ -14,7 +14,7 @@ import {
     LinearProgress,
     List,
     ListItem,
-    TextField
+    TextField, Typography
 } from '@mui/material';
 import { DeleteOutlineOutlined } from '@mui/icons-material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
@@ -29,6 +29,7 @@ import { Hike, Hiker, Photo } from '../../models/models';
 import { CustomLuxonAdapter} from '../../classes/customLuxonAdapter';
 import { MainContext } from '../../contexts/MainContext';
 import { PHOTO_THUMBNAIL_SIZE } from '../../constants/constants';
+import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
 
 const useStyles = makeStyles()((theme) => ({
     row: {
@@ -237,7 +238,7 @@ interface EditHikeProps {
 
 const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const { classes, cx } = useStyles();
-    const { searchResults, currentHike, setSearchResults, setCurrentHike, setBanner } = useContext(MainContext);
+    const { searchResults, currentHike, loggedIn, setSearchResults, setCurrentHike, setBanner } = useContext(MainContext);
     const { hikeId } = useParams();
     const navigate = useNavigate();
     const abortController = useRef<AbortController>(new AbortController());
@@ -259,9 +260,10 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const [ dateOfHikeInputError, setDateOfHikeInputError ] = useState<boolean>(false);
     const [ saving, setSaving ] = useState<boolean>(false);
     const [ uploadProgress, setUploadProgress ] = useState<number>(0);
+    const [ loading, setLoading ] = useState<boolean>(false);
 
     useEffect(() => {
-        const setData = (hike: Hike) => {
+        const setHikeData = (hike: Hike) => {
             setTrail(hike.trail);
             setDateOfHike(DateTime.fromFormat(hike.dateOfHike, 'yyyy-MM-dd'));
             setConditions(hike.conditions || '');
@@ -288,11 +290,14 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 const currentHikers = await DataService.getHikers();
                 setKnownHikers(currentHikers);
                 setRetrievedKnownHikers(true);
-            } catch(error) {
+            } catch (error) {
                 if (Axios.isAxiosError(error) && error.response?.status === 401) {
                     setBanner('You need to log in', 'warning');
+                } else if (SharedService.appOffline()) {
+                    setBanner('You are currently offline and may not be able to retriev hkers', 'warning');
                 } else {
                     setBanner('Error occurred retrieving hikers', 'error');
+                    DataService.logError(error);
                 }
 
                 SharedService.scrollToTop(topOfPageRef);
@@ -303,23 +308,31 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             try {
                 if (hikeId) {
                     setBanner('');
+                    setLoading(true);
                     const hike = await DataService.getHike(hikeId);
 
                     if (hike) {
-                        setData(hike);
+                        setHikeData(hike);
                     }
                 } else {
                     setBanner('Missing a hike ID', 'error');
                 }
+            } catch (error) {
+                console.log('error: %o', error);
+                console.log('SharedService.appOffline(): %o', SharedService.appOffline());
 
-            } catch(error) {
                 if (Axios.isAxiosError(error) && error.response?.status === 401) {
                     setBanner('You need to log in', 'warning');
+                } else if (SharedService.appOffline()) {
+                    setBanner('You are currently offline and some hikes may not be available', 'warning');
                 } else {
                     setBanner('Error occurred retrieving the hike', 'error');
+                    DataService.logError(error);
                 }
 
                 SharedService.scrollToTop(topOfPageRef);
+            } finally {
+                setLoading(false);
             }
         };
 
@@ -331,7 +344,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
 
         if (hikeId && !retrievedHike) {
             if (currentHike) {
-                setData(currentHike);
+                setHikeData(currentHike);
                 setCurrentHike(null);
             } else {
                 getHike();
@@ -568,302 +581,316 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
         }
     };
 
+    const showDataSection = !loading && loggedIn && trail;
+
     return (
-        <>
-            <Grid item xs={12} className={cx(classes.row)}>
-                <FormControl className={cx(classes.field)}>
-                    <FormControlLabel
-                        labelPlacement='start'
-                        label='Trail *'
-                        classes={{ label: classes.fieldLabel }}
-                        control={
-                            <TextField
-                                name='Trail'
-                                margin='none'
-                                variant='outlined'
-                                value={trail}
-                                size='small'
-                                error={trailInputError}
-                                fullWidth={true}
-                                autoCorrect='off'
-                                inputProps={{ maxLength: 255 }}
-                                onChange={(event) => setTrail(event.target.value)}
-                            />
-                        }
-                    />
-                </FormControl>
-            </Grid>
-
-            <Grid item xs={12} className={cx(classes.row)}>
-                <FormControl className={cx(classes.field, classes.datePickerField)}>
-                    <FormControlLabel
-                        labelPlacement='start'
-                        label='Date of hike *'
-                        classes={{ label: classes.fieldLabel }}
-                        control={
-                            <LocalizationProvider dateAdapter={CustomLuxonAdapter}>
-                                <DatePicker
-                                    value={dateOfHike}
-                                    onChange={(newValue) => setDateOfHike(newValue || null) }
-                                    renderInput={(params) => (
-                                        <TextField {...params} size='small' error={dateOfHikeInputError} inputProps={{ ...params.inputProps, maxLength: 10 }} />
-                                    )}
-                                />
-                            </LocalizationProvider>
-                        }
-                    />
-                </FormControl>
-            </Grid>
-
-            <Grid item xs={12} className={cx(classes.row)}>
-                <FormControl className={cx(classes.field)}>
-                    <FormControlLabel
-                        labelPlacement='start'
-                        label='Conditions'
-                        classes={{ label: classes.fieldLabel }}
-                        control={
-                            <TextField
-                                name='Conditions'
-                                margin='none'
-                                variant='outlined'
-                                value={conditions}
-                                size='small'
-                                fullWidth={true}
-                                autoCorrect='off'
-                                inputProps={{ maxLength: 255 }}
-                                onChange={(event) => setConditions(event.target.value)}
-                            />
-                        }
-                    />
-                </FormControl>
-            </Grid>
-
-            <Grid item xs={12} className={cx(classes.row)}>
-                <FormControl className={cx(classes.field)}>
-                    <FormControlLabel
-                        labelPlacement='start'
-                        label='Crowds'
-                        classes={{ label: classes.fieldLabel }}
-                        control={
-                            <TextField
-                                name='Crowds'
-                                margin='none'
-                                variant='outlined'
-                                value={crowds}
-                                size='small'
-                                fullWidth={true}
-                                autoCorrect='off'
-                                inputProps={{ maxLength: 255 }}
-                                onChange={(event) => setCrowds(event.target.value)}
-                            />
-                        }
-                    />
-                </FormControl>
-            </Grid>
-
-            <Grid item xs={12} className={cx(classes.row)}>
-                <FormControl className={cx(classes.wideField, classes.multilineTextField)}>
-                    <FormControlLabel
-                        labelPlacement='start'
-                        label='Notes'
-                        classes={{ label: classes.fieldLabel }}
-                        control={
-                            <TextField
-                                name='Notes'
-                                margin='none'
-                                variant='outlined'
-                                value={description}
-                                size='small'
-                                fullWidth={true}
-                                autoCorrect='off'
-                                multiline={true}
-                                rows={6}
-                                onChange={(event) => setDescription(event.target.value)}
-                            />
-                        }
-                    />
-                </FormControl>
-            </Grid>
-
-            <Grid item xs={12} className={cx(classes.row)}>
-                <FormControl className={cx(classes.wideField)}>
-                    <FormControlLabel
-                        labelPlacement='start'
-                        label='Hikers'
-                        classes={{ label: classes.fieldLabel }}
-                        control={
-                            <Autocomplete
-                                multiple={true}
-                                freeSolo={true}
-                                options={knownHikers || []}
-                                getOptionLabel={(option) => option}
-                                value={hikers}
-                                fullWidth={true}
-                                size='small'
-                                onChange={handleChangeHikers}
-                                filterSelectedOptions
-                                renderInput={(params) => (
-                                    <TextField {...params} multiline={true} rows={1} />
-                                )}
-                            />
-                        }
-                    />
-                </FormControl>
-            </Grid>
-
-            <Grid item xs={12} className={cx(classes.row)}>
-                <FormControl className={cx(classes.wideField)}>
-                    <FormControlLabel
-                        labelPlacement='start'
-                        label='Tags'
-                        classes={{ label: classes.fieldLabel }}
-                        control={
-                            <Autocomplete
-                                multiple={true}
-                                freeSolo={true}
-                                options={[]}
-                                getOptionLabel={(option) => option}
-                                value={tags}
-                                fullWidth={true}
-                                size='small'
-                                onChange={handleChangeTags}
-                                filterSelectedOptions
-                                renderInput={(params) => (
-                                    <TextField {...params} multiline={true} rows={1} />
-                                )}
-                            />
-                        }
-                    />
-                </FormControl>
-            </Grid>
-
-            <Grid item xs={12} className={`${cx(classes.row)} linkLabelField`}>
-                <FormControl className={`${cx(classes.field)} shortField`}>
-                    <FormControlLabel
-                        labelPlacement='start'
-                        label='Link'
-                        classes={{ label: classes.fieldLabel }}
-                        control={
-                            <TextField
-                                name='LinkLabel'
-                                margin='none'
-                                variant='outlined'
-                                value={linkLabel}
-                                size='small'
-                                placeholder='Add label'
-                                fullWidth={true}
-                                autoCorrect='off'
-                                inputProps={{ maxLength: 255 }}
-                                onChange={(event) => setLinkLabel(event.target.value)}
-                            />
-                        }
-                    />
-                </FormControl>
-            </Grid>
-
-            <Grid item xs={12} className={cx(classes.row)}>
-                <FormControl className={cx(classes.wideField)}>
-                    <FormControlLabel
-                        labelPlacement='start'
-                        label=''
-                        classes={{ label: classes.fieldLabel }}
-                        control={
-                            <TextField
-                                name='Link'
-                                margin='none'
-                                variant='outlined'
-                                value={link}
-                                type='url'
-                                autoComplete='url'
-                                size='small'
-                                placeholder='Add web address'
-                                fullWidth={true}
-                                autoCorrect='off'
-                                inputProps={{ maxLength: 255 }}
-                                onChange={(event) => setLink(event.target.value)}
-                            />
-                        }
-                    />
-                </FormControl>
-            </Grid>
-
-            <Grid item xs={12}>
-                <Box className={cx(classes.photoFileInput)}>
-                    <FormLabel className={cx(classes.fieldLabel)}>Photos</FormLabel>
-
-                        <input
-                            type='file'
-                            id='FileUpload'
-                            name='file'
-                            className={classes.fileUploadInput}
-                            onChange={handleSelectPhoto}
-                            accept='image/*'
-                        />
-                        <label htmlFor='FileUpload'>
-                            <Button component='span'>Browse</Button>
-                        </label>
-                </Box>
-            </Grid>
-
-            <Grid item xs={12}>
-                <List className={cx(classes.photosList)} disablePadding={true}>
-                    {
-                        photos.map((photo: Photo) => (
-                            <React.Fragment key={photo.fileName}>
-                                {
-                                    photo.action !== 'delete' &&
-                                    <ListItem disableGutters={true}>
-                                        <Box className={cx(classes.photoThumbnail)}>
-                                            <img src={photo.thumbnailSrc} alt='Thumbnail' />
-                                        </Box>
-
-                                        <Box className={cx(classes.photoCaption)}>
+        <Box className='loadable-container'>
+            {
+                showDataSection
+                    ?
+                        <>
+                            <Grid item xs={12} className={cx(classes.row)}>
+                                <FormControl className={cx(classes.field)}>
+                                    <FormControlLabel
+                                        labelPlacement='start'
+                                        label='Trail *'
+                                        classes={{ label: classes.fieldLabel }}
+                                        control={
                                             <TextField
-                                                id={`hike-photo-${photo.fileName}`}
-                                                value={photo.caption || ''}
-                                                style={{ flexGrow: 2 }}
+                                                name='Trail'
+                                                margin='none'
+                                                variant='outlined'
+                                                value={trail}
                                                 size='small'
-                                                placeholder='Type a caption'
+                                                error={trailInputError}
+                                                fullWidth={true}
+                                                autoCorrect='off'
                                                 inputProps={{ maxLength: 255 }}
-                                                onChange={(event) => handleChangePhotoCaption(event.target.value, photo.fileName)}
+                                                onChange={(event) => setTrail(event.target.value)}
                                             />
+                                        }
+                                    />
+                                </FormControl>
+                            </Grid>
 
-                                            <IconButton
-                                                aria-label='delete photo'
-                                                className={cx(classes.deletePhotoButton)}
-                                                onClick={() => handleDeletePhoto(photo.fileName)}
-                                                title='Remove photo'
+                            <Grid item xs={12} className={cx(classes.row)}>
+                                <FormControl className={cx(classes.field, classes.datePickerField)}>
+                                    <FormControlLabel
+                                        labelPlacement='start'
+                                        label='Date of hike *'
+                                        classes={{ label: classes.fieldLabel }}
+                                        control={
+                                            <LocalizationProvider dateAdapter={CustomLuxonAdapter}>
+                                                <DatePicker
+                                                    value={dateOfHike}
+                                                    onChange={(newValue) => setDateOfHike(newValue || null) }
+                                                    renderInput={(params) => (
+                                                        <TextField {...params} size='small' error={dateOfHikeInputError} inputProps={{ ...params.inputProps, maxLength: 10 }} />
+                                                    )}
+                                                />
+                                            </LocalizationProvider>
+                                        }
+                                    />
+                                </FormControl>
+                            </Grid>
+
+                            <Grid item xs={12} className={cx(classes.row)}>
+                                <FormControl className={cx(classes.field)}>
+                                    <FormControlLabel
+                                        labelPlacement='start'
+                                        label='Conditions'
+                                        classes={{ label: classes.fieldLabel }}
+                                        control={
+                                            <TextField
+                                                name='Conditions'
+                                                margin='none'
+                                                variant='outlined'
+                                                value={conditions}
                                                 size='small'
-                                                color='error'
-                                            >
-                                                <DeleteOutlineOutlined />
-                                            </IconButton>
-                                        </Box>
-                                    </ListItem>
+                                                fullWidth={true}
+                                                autoCorrect='off'
+                                                inputProps={{ maxLength: 255 }}
+                                                onChange={(event) => setConditions(event.target.value)}
+                                            />
+                                        }
+                                    />
+                                </FormControl>
+                            </Grid>
+
+                            <Grid item xs={12} className={cx(classes.row)}>
+                                <FormControl className={cx(classes.field)}>
+                                    <FormControlLabel
+                                        labelPlacement='start'
+                                        label='Crowds'
+                                        classes={{ label: classes.fieldLabel }}
+                                        control={
+                                            <TextField
+                                                name='Crowds'
+                                                margin='none'
+                                                variant='outlined'
+                                                value={crowds}
+                                                size='small'
+                                                fullWidth={true}
+                                                autoCorrect='off'
+                                                inputProps={{ maxLength: 255 }}
+                                                onChange={(event) => setCrowds(event.target.value)}
+                                            />
+                                        }
+                                    />
+                                </FormControl>
+                            </Grid>
+
+                            <Grid item xs={12} className={cx(classes.row)}>
+                                <FormControl className={cx(classes.wideField, classes.multilineTextField)}>
+                                    <FormControlLabel
+                                        labelPlacement='start'
+                                        label='Notes'
+                                        classes={{ label: classes.fieldLabel }}
+                                        control={
+                                            <TextField
+                                                name='Notes'
+                                                margin='none'
+                                                variant='outlined'
+                                                value={description}
+                                                size='small'
+                                                fullWidth={true}
+                                                autoCorrect='off'
+                                                multiline={true}
+                                                rows={6}
+                                                onChange={(event) => setDescription(event.target.value)}
+                                            />
+                                        }
+                                    />
+                                </FormControl>
+                            </Grid>
+
+                            <Grid item xs={12} className={cx(classes.row)}>
+                                <FormControl className={cx(classes.wideField)}>
+                                    <FormControlLabel
+                                        labelPlacement='start'
+                                        label='Hikers'
+                                        classes={{ label: classes.fieldLabel }}
+                                        control={
+                                            <Autocomplete
+                                                multiple={true}
+                                                freeSolo={true}
+                                                options={knownHikers || []}
+                                                getOptionLabel={(option) => option}
+                                                value={hikers}
+                                                fullWidth={true}
+                                                size='small'
+                                                onChange={handleChangeHikers}
+                                                filterSelectedOptions
+                                                renderInput={(params) => (
+                                                    <TextField {...params} multiline={true} rows={1} />
+                                                )}
+                                            />
+                                        }
+                                    />
+                                </FormControl>
+                            </Grid>
+
+                            <Grid item xs={12} className={cx(classes.row)}>
+                                <FormControl className={cx(classes.wideField)}>
+                                    <FormControlLabel
+                                        labelPlacement='start'
+                                        label='Tags'
+                                        classes={{ label: classes.fieldLabel }}
+                                        control={
+                                            <Autocomplete
+                                                multiple={true}
+                                                freeSolo={true}
+                                                options={[]}
+                                                getOptionLabel={(option) => option}
+                                                value={tags}
+                                                fullWidth={true}
+                                                size='small'
+                                                onChange={handleChangeTags}
+                                                filterSelectedOptions
+                                                renderInput={(params) => (
+                                                    <TextField {...params} multiline={true} rows={1} />
+                                                )}
+                                            />
+                                        }
+                                    />
+                                </FormControl>
+                            </Grid>
+
+                            <Grid item xs={12} className={`${cx(classes.row)} linkLabelField`}>
+                                <FormControl className={`${cx(classes.field)} shortField`}>
+                                    <FormControlLabel
+                                        labelPlacement='start'
+                                        label='Link'
+                                        classes={{ label: classes.fieldLabel }}
+                                        control={
+                                            <TextField
+                                                name='LinkLabel'
+                                                margin='none'
+                                                variant='outlined'
+                                                value={linkLabel}
+                                                size='small'
+                                                placeholder='Add label'
+                                                fullWidth={true}
+                                                autoCorrect='off'
+                                                inputProps={{ maxLength: 255 }}
+                                                onChange={(event) => setLinkLabel(event.target.value)}
+                                            />
+                                        }
+                                    />
+                                </FormControl>
+                            </Grid>
+
+                            <Grid item xs={12} className={cx(classes.row)}>
+                                <FormControl className={cx(classes.wideField)}>
+                                    <FormControlLabel
+                                        labelPlacement='start'
+                                        label=''
+                                        classes={{ label: classes.fieldLabel }}
+                                        control={
+                                            <TextField
+                                                name='Link'
+                                                margin='none'
+                                                variant='outlined'
+                                                value={link}
+                                                type='url'
+                                                autoComplete='url'
+                                                size='small'
+                                                placeholder='Add web address'
+                                                fullWidth={true}
+                                                autoCorrect='off'
+                                                inputProps={{ maxLength: 255 }}
+                                                onChange={(event) => setLink(event.target.value)}
+                                            />
+                                        }
+                                    />
+                                </FormControl>
+                            </Grid>
+
+                            <Grid item xs={12}>
+                                <Box className={cx(classes.photoFileInput)}>
+                                    <FormLabel className={cx(classes.fieldLabel)}>Photos</FormLabel>
+
+                                    <input
+                                        type='file'
+                                        id='FileUpload'
+                                        name='file'
+                                        className={classes.fileUploadInput}
+                                        onChange={handleSelectPhoto}
+                                        accept='image/*'
+                                    />
+                                    <label htmlFor='FileUpload'>
+                                        <Button component='span'>Browse</Button>
+                                    </label>
+                                </Box>
+                            </Grid>
+
+                            <Grid item xs={12}>
+                                <List className={cx(classes.photosList)} disablePadding={true}>
+                                    {
+                                        photos.map((photo: Photo) => (
+                                            <React.Fragment key={photo.fileName}>
+                                                {
+                                                    photo.action !== 'delete' &&
+                                                    <ListItem disableGutters={true}>
+                                                        <Box className={cx(classes.photoThumbnail)}>
+                                                            <img src={photo.thumbnailSrc} alt='Thumbnail' />
+                                                        </Box>
+
+                                                        <Box className={cx(classes.photoCaption)}>
+                                                            <TextField
+                                                                id={`hike-photo-${photo.fileName}`}
+                                                                value={photo.caption || ''}
+                                                                style={{ flexGrow: 2 }}
+                                                                size='small'
+                                                                placeholder='Type a caption'
+                                                                inputProps={{ maxLength: 255 }}
+                                                                onChange={(event) => handleChangePhotoCaption(event.target.value, photo.fileName)}
+                                                            />
+
+                                                            <IconButton
+                                                                aria-label='delete photo'
+                                                                className={cx(classes.deletePhotoButton)}
+                                                                onClick={() => handleDeletePhoto(photo.fileName)}
+                                                                title='Remove photo'
+                                                                size='small'
+                                                                color='error'
+                                                            >
+                                                                <DeleteOutlineOutlined />
+                                                            </IconButton>
+                                                        </Box>
+                                                    </ListItem>
+                                                }
+                                            </React.Fragment>
+                                        ))
+                                    }
+                                </List>
+
+                                {
+                                    saving &&
+                                    <Box className={cx(classes.progressIndicator)}>
+                                        <LinearProgress variant="determinate" value={uploadProgress} />
+                                    </Box>
                                 }
-                            </React.Fragment>
-                        ))
-                    }
-                </List>
+                            </Grid>
 
-                {
-                    saving &&
-                    <Box className={cx(classes.progressIndicator)}>
-                        <LinearProgress variant="determinate" value={uploadProgress} />
-                    </Box>
-                }
-            </Grid>
+                            <Grid item xs={12} className={cx(classes.actions)}>
+                                <Button onClick={handleSave} variant='contained' color='primary' disabled={saving}>Save
+                                    {saving && (
+                                        <CircularProgress size={20} className={cx(classes.saveIndicator)} />
+                                    )}
+                                </Button>
 
-            <Grid item xs={12} className={cx(classes.actions)}>
-                <Button onClick={handleSave} variant='contained' color='primary' disabled={saving}>Save
-                    {saving && (
-                        <CircularProgress size={20} className={cx(classes.saveIndicator)} />
-                    )}
-                </Button>
+                                <Button onClick={handleCancel} variant='outlined' color='secondary' className={cx(classes.cancelButton)}>Cancel</Button>
+                            </Grid>
+                        </>
+                    :
+                        <Box>
+                            <Typography variant='body2'>Hike could not be retrievd</Typography>
+                        </Box>
+            }
 
-                <Button onClick={handleCancel} variant='outlined' color='secondary' className={cx(classes.cancelButton)}>Cancel</Button>
-            </Grid>
-        </>
+            <LoadingOverlay open={loading} />
+        </Box>
     )
 };
 

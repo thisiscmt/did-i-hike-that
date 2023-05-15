@@ -47,12 +47,16 @@ export const Offline = (props: PropsWithChildren) => {
     const [ backdropOpen, setBackdropOpen ] = useState<boolean>(false);
 
     const handleOnline = () => {
+        console.log('inside handleOnline');
+
         setOffline(false);
         setBackdropOpen(false);
         sessionStorage.setItem(STORAGE_OFFLINE, 'false');
     };
 
     const handleOffline = () => {
+        console.log('inside handleOffline');
+
         setOffline(true);
         setBackdropOpen(true);
         sessionStorage.setItem(STORAGE_OFFLINE, 'true');
@@ -84,8 +88,8 @@ export const Offline = (props: PropsWithChildren) => {
                                 <Typography variant='body1'>It looks like you are offline.</Typography>
                             </Box>
 
-                            <Typography variant='body2' className={cx(classes.contentText)}>No worries, we'll save any changes you make and apply
-                                them when you get back online.</Typography>
+                            <Typography variant='body2' className={cx(classes.contentText)}>No worries, any changes you make will be saved and applied
+                                when you get back online.</Typography>
                             <Typography variant='body2'>Click here to continue.</Typography>
                         </Box>
                     </Backdrop>

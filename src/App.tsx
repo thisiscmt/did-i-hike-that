@@ -48,6 +48,8 @@ const useStyles = makeStyles()((theme) => ({
 function App() {
     const { classes, cx } = useStyles();
 
+    // TODO: Add code to deal with a switch from offline to online mode
+
     // This ref is used by child components to scroll to the top of the page, if needed
     const topOfPageRef = useRef<HTMLElement>(null);
 
@@ -58,9 +60,8 @@ function App() {
 
                 <Box className={cx(classes.mainContainer)}>
                     <Box className={cx(classes.leftColumn)} />
+
                     <Box className={cx(classes.contentColumn)}>
-
-
                         <Routes>
                             <Route path="/" element={<Home />} />
                             <Route path="/hike" element={<EditHike topOfPageRef={topOfPageRef} />} />
@@ -71,6 +72,7 @@ function App() {
                             <Route path="*" element={<ErrorPage />} />
                         </Routes>
                     </Box>
+
                     <Box className={cx(classes.rightColumn)} />
                 </Box>
             </BrowserRouter>
