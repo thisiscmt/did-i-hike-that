@@ -9,12 +9,12 @@ export const getHikes = async (searchParams?: HikeSearchParams): Promise<{ rows:
         config.params = { ...searchParams };
     }
 
-    const response = await Axios.get(process.env.REACT_APP_API_URL + '/hike', config);
+    const response = await Axios.get(`${process.env.REACT_APP_API_URL}/hike`, config);
     return response.data;
 };
 
 export const getHike = async (hikeId: string): Promise<Hike> => {
-    const response = await Axios.get(process.env.REACT_APP_API_URL + `/hike/${hikeId}`, getRequestConfig());
+    const response = await Axios.get(`${process.env.REACT_APP_API_URL}/hike/${hikeId}`, getRequestConfig());
     return response.data;
 };
 
@@ -29,7 +29,7 @@ export const createHike = async (hike: Hike, signal: AbortSignal, onUploadProgre
         config.onUploadProgress = onUploadProgress;
     }
 
-    const response = await Axios.post(process.env.REACT_APP_API_URL + '/hike', formData, config);
+    const response = await Axios.post(`${process.env.REACT_APP_API_URL}/hike`, formData, config);
     return response.data;
 };
 
@@ -44,29 +44,35 @@ export const updateHike = async (hike: Hike, signal?: AbortSignal, onUploadProgr
         config.onUploadProgress = onUploadProgress;
     }
 
-    const response = await Axios.put(process.env.REACT_APP_API_URL + `/hike/${hike.id}`, formData, config);
+    const response = await Axios.put(`${process.env.REACT_APP_API_URL}/hike/${hike.id}`, formData, config);
     return response.data;
 };
 
 export const deleteHike = (hikeId: string) => {
-    return Axios.delete(process.env.REACT_APP_API_URL + `/hike/${hikeId}`, getRequestConfig());
+    return Axios.delete(`${process.env.REACT_APP_API_URL}/hike/${hikeId}`, getRequestConfig());
 };
 
 export const getHikers = async (): Promise<string[]> => {
-    const response = await Axios.get(process.env.REACT_APP_API_URL + '/hiker', getRequestConfig());
+    const response = await Axios.get(`${process.env.REACT_APP_API_URL}/hiker`, getRequestConfig());
     return response.data;
 };
 
 export const login = async (email: string, password: string) => {
-    return await Axios.get(process.env.REACT_APP_API_URL + `/auth?email=${email}&password=${password}`, getRequestConfig());
+    return await Axios.post(`${process.env.REACT_APP_API_URL}/auth/login`, { email, password }, getRequestConfig());
 };
 
 export const logout = async () => {
-    return await Axios.delete(process.env.REACT_APP_API_URL + `/auth`, getRequestConfig());
+    return await Axios.delete(`${process.env.REACT_APP_API_URL}/auth`, getRequestConfig());
 };
 
 export const logError = (errorData: any) => {
-    Axios.post(process.env.REACT_APP_API_URL + `/error`, { errorData }, getRequestConfig());
+    Axios.post(`${process.env.REACT_APP_API_URL}/error`, { errorData }, getRequestConfig()).catch((error) => {
+        console.log('Something went wrong while logging error information: %o', error.message);
+    });
+};
+
+export const ping = async () => {
+    return await Axios.get(`${process.env.REACT_APP_API_URL}/?${new Date().getTime()}`, getRequestConfig());
 };
 
 const getRequestConfig = (multipartRequest: boolean = false): AxiosRequestConfig => {
