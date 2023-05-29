@@ -72,7 +72,7 @@ export const logError = (errorData: any) => {
 };
 
 export const ping = async () => {
-    return await Axios.get(`${process.env.REACT_APP_API_URL}/?${new Date().getTime()}`, getRequestConfig());
+    return await Axios.get(`${process.env.REACT_APP_API_URL}/?id=${new Date().getTime()}`, getRequestConfig());
 };
 
 const getRequestConfig = (multipartRequest: boolean = false): AxiosRequestConfig => {
