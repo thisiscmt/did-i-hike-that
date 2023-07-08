@@ -823,7 +823,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                                                 value={photo.caption || ''}
                                                 style={{ flexGrow: 2 }}
                                                 size='small'
-                                                placeholder='Type a caption'
+                                                placeholder='Add a caption'
                                                 inputProps={{ maxLength: 255 }}
                                                 onChange={(event) => handleChangePhotoCaption(event.target.value, photo.fileName)}
                                             />

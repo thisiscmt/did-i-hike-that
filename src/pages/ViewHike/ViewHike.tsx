@@ -445,7 +445,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
                                                 photo.caption
                                                     ?
                                                         <Box>
-                                                            <Button variant='text' onClick={() => handlePhotoCaptionEdit(photo.fileName)}>
+                                                            <Button variant='text' title='Change caption' onClick={() => handlePhotoCaptionEdit(photo.fileName)}>
                                                                 <Typography variant='body2' className={cx(classes.photoCaption)}>
                                                                     {photo.caption}
                                                                 </Typography>
