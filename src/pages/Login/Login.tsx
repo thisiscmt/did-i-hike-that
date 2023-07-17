@@ -1,5 +1,7 @@
 import React, {useContext, useEffect, useState} from 'react';
-import { Button, FormControl, FormControlLabel, Grid, TextField, Typography } from '@mui/material';
+import {useNavigate} from 'react-router-dom';
+import {Button, FormControl, FormControlLabel, Grid, IconButton, InputAdornment, TextField, Typography} from '@mui/material';
+import {VisibilityOffOutlined, VisibilityOutlined} from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
 import { DateTime } from 'luxon';
 import Axios from 'axios';
@@ -8,7 +10,6 @@ import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
 import * as DataService from '../../services/dataService';
 import { MainContext } from '../../contexts/MainContext';
 import { STORAGE_EMAIL, STORAGE_LAST_LOGIN } from '../../constants/constants';
-import {useNavigate} from 'react-router-dom';
 
 const useStyles = makeStyles()((theme) => ({
     row: {
@@ -57,6 +58,15 @@ const useStyles = makeStyles()((theme) => ({
         fontStyle: 'italic'
     },
 
+    passwordVisibility: {
+        marginRight: '6px',
+
+        '& svg': {
+            height: '18px',
+            width: '18px'
+        }
+    },
+
     actions: {
         marginTop: '24px'
     }
@@ -67,6 +77,7 @@ const Login = () => {
 
     const [ email, setEmail ] = useState<string>(localStorage.getItem(STORAGE_EMAIL) || '');
     const [ password, setPassword ] = useState<string>('');
+    const [ showPassword, setShowPassword ] = useState<boolean>(false);
     const [ lastLogin, setLastLogin ] = useState<string>(localStorage.getItem(STORAGE_LAST_LOGIN) || '');
     const [ emailInputError, setEmailInputError ] = useState<boolean>(false);
     const [ passwordInputError, setPasswordInputError ] = useState<boolean>(false);
@@ -88,6 +99,10 @@ const Login = () => {
             handleLogin();
         }
     }
+
+    const handleShowPassword = () => {
+        setShowPassword(!showPassword);
+    };
 
     const handleLogin = async () => {
         try {
@@ -171,13 +186,27 @@ const Login = () => {
                                 margin='none'
                                 variant='outlined'
                                 value={password}
-                                type='password'
+                                type={ showPassword ? 'text' : 'password'}
                                 size='small'
                                 error={passwordInputError}
                                 fullWidth={true}
                                 autoCorrect='off'
                                 inputProps={{ maxLength: 255 }}
                                 onChange={(event) => setPassword(event.target.value)}
+                                InputProps={{
+                                    endAdornment:
+                                        <InputAdornment position="end" className={classes.passwordVisibility}>
+                                            <IconButton
+                                                aria-label="toggle password visibility"
+                                                onClick={handleShowPassword}
+                                                size='small'
+                                                // className={classes.passwordVisibility}
+                                                // onMouseDown={handleMouseDownPassword}
+                                            >
+                                                {showPassword ? <VisibilityOutlined /> : <VisibilityOffOutlined />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                }}
                             />
                         }
                     />
