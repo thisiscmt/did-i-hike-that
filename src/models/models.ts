@@ -25,6 +25,7 @@ export interface Photo {
     file: File;
     fileName: string;
     filePath: string;
+    ordinal: number;
     caption?: string;
     editCaption?: boolean;
     thumbnailSrc?: string;

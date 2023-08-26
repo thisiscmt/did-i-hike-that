@@ -12,13 +12,14 @@ import {
     Grid,
     IconButton,
     LinearProgress,
-    List,
     ListItem,
-    TextField
+    TextField,
+    List as MuiList
 } from '@mui/material';
 import { DeleteOutlineOutlined } from '@mui/icons-material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { makeStyles } from 'tss-react/mui';
+import { List, arrayMove  } from 'react-movable';
 import Axios, { AxiosProgressEvent } from 'axios';
 import { DateTime } from 'luxon';
 
@@ -790,7 +791,6 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             <Grid item xs={12}>
                 <Box className={cx(classes.photoFileInput)}>
                     <FormLabel className={cx(classes.fieldLabel)}>Photos</FormLabel>
-
                         <input
                             type='file'
                             id='FileUpload'
@@ -806,45 +806,66 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             </Grid>
 
             <Grid item xs={12}>
-                <List className={cx(classes.photosList)} disablePadding={true}>
-                    {
-                        photos.map((photo: Photo) => (
-                            <React.Fragment key={photo.fileName}>
+                <List
+                    values={photos}
+                    onChange={({ oldIndex, newIndex }) => setPhotos(arrayMove(photos, oldIndex, newIndex))}
+                    renderList={({ children, props }) => {
+                        return (
+                            <MuiList {...props} className={cx(classes.photosList)} disablePadding={true}>
+                                {children}
+                            </MuiList>
+                        )}
+                    }
+                    renderItem={({ value, props, isDragged }) => {
+                        return (
+                            <React.Fragment key={value.fileName}>
                                 {
-                                    photo.action !== 'delete' &&
-                                    <ListItem disableGutters={true}>
-                                        <Box className={cx(classes.photoThumbnail)}>
-                                            <img src={photo.thumbnailSrc} alt='Thumbnail' />
-                                        </Box>
+                                    isDragged
+                                        ?
+                                            <ListItem {...props} disableGutters={true}>
+                                                <Box className={cx(classes.photoThumbnail)}>
+                                                    <img src={value.thumbnailSrc} alt='Thumbnail' />
+                                                </Box>
+                                            </ListItem>
+                                        :
+                                            <>
+                                                {
+                                                    value.action !== 'delete' &&
+                                                    <ListItem {...props} disableGutters={true}>
+                                                        <Box className={cx(classes.photoThumbnail)}>
+                                                            <img src={value.thumbnailSrc} alt='Thumbnail' />
+                                                        </Box>
 
-                                        <Box className={cx(classes.photoCaption)}>
-                                            <TextField
-                                                id={`hike-photo-${photo.fileName}`}
-                                                value={photo.caption || ''}
-                                                style={{ flexGrow: 2 }}
-                                                size='small'
-                                                placeholder='Add a caption'
-                                                inputProps={{ maxLength: 255 }}
-                                                onChange={(event) => handleChangePhotoCaption(event.target.value, photo.fileName)}
-                                            />
+                                                        <Box className={cx(classes.photoCaption)}>
+                                                            <TextField
+                                                                id={`hike-photo-${value.fileName}`}
+                                                                value={value.caption || ''}
+                                                                style={{ flexGrow: 2 }}
+                                                                size='small'
+                                                                placeholder='Add a caption'
+                                                                inputProps={{ maxLength: 255 }}
+                                                                onChange={(event) => handleChangePhotoCaption(event.target.value, value.fileName)}
+                                                            />
 
-                                            <IconButton
-                                                aria-label='delete photo'
-                                                className={cx(classes.deletePhotoButton)}
-                                                onClick={() => handleDeletePhoto(photo.fileName)}
-                                                title='Remove photo'
-                                                size='small'
-                                                color='error'
-                                            >
-                                                <DeleteOutlineOutlined />
-                                            </IconButton>
-                                        </Box>
-                                    </ListItem>
+                                                            <IconButton
+                                                                aria-label='delete photo'
+                                                                className={cx(classes.deletePhotoButton)}
+                                                                onClick={() => handleDeletePhoto(value.fileName)}
+                                                                title='Remove photo'
+                                                                size='small'
+                                                                color='error'
+                                                            >
+                                                                <DeleteOutlineOutlined />
+                                                            </IconButton>
+                                                        </Box>
+                                                    </ListItem>
+                                                }
+                                            </>
                                 }
                             </React.Fragment>
-                        ))
-                    }
-                </List>
+                        );
+                    }}
+                />
 
                 {
                     saving &&
