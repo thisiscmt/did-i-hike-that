@@ -68,6 +68,16 @@ const SearchResult: FC<SearchResultProps> = ({ hike }) => {
     const thumbnailSrc = SharedService.getThumbnailSrc(hike.filePath || '');
     const hikers = hike.fullNames ? hike.fullNames.split(',') : [];
 
+    const getHikeDateValue = () => {
+        let dateValue = SharedService.formatDateValue(hike.dateOfHike);
+
+        if (hike.endDateOfHike) {
+            dateValue += ` - ${SharedService.formatDateValue(hike.endDateOfHike)}`;
+        }
+
+        return dateValue;
+    };
+
     return (
         <Card>
             <CardContent className={cx(classes.cardContent)}>
@@ -77,7 +87,7 @@ const SearchResult: FC<SearchResultProps> = ({ hike }) => {
 
                 <Box className={cx(classes.details)}>
                     <Typography variant='body2'>{hike.trail}</Typography>
-                    <Typography variant='body2'>{SharedService.formatDateOfHike(hike.dateOfHike)}</Typography>
+                    <Typography variant='body2'>{getHikeDateValue()}</Typography>
 
                     {
                         hikers && hikers.length > 0 &&

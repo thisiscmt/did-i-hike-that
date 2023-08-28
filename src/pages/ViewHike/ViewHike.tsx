@@ -322,9 +322,17 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
                         <Box>
                             <>
                                 <Box className={cx(classes.field)}>
-                                    <Typography variant='body2' className={cx(classes.fieldLabel)}>Date of hike</Typography>
-                                    <Typography variant='body2'>{SharedService.formatDateOfHike(hike.dateOfHike)}</Typography>
+                                    <Typography variant='body2' className={cx(classes.fieldLabel)}>Start date</Typography>
+                                    <Typography variant='body2'>{SharedService.formatDateValue(hike.dateOfHike)}</Typography>
                                 </Box>
+
+                                {
+                                    hike.endDateOfHike &&
+                                    <Box className={cx(classes.field)}>
+                                        <Typography variant='body2' className={cx(classes.fieldLabel)}>End date</Typography>
+                                        <Typography variant='body2'>{SharedService.formatDateValue(hike.endDateOfHike)}</Typography>
+                                    </Box>
+                                }
 
                                 {
                                     hike.conditions &&
@@ -475,7 +483,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
                         <Typography variant='body2' className={cx(classes.lastUpdated)}>{`Last updated on ${formattedUpdatedAt}`}</Typography>
                     </Box>
 
-                    <Button variant='contained' color='primary' onClick={() => navigate(-1)}>Back</Button>
+                    <Button variant='contained' color='primary' onClick={() => navigate('/')}>Go to Home</Button>
                 </>
             }
 

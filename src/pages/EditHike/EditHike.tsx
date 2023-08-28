@@ -126,6 +126,18 @@ const useStyles = makeStyles()((theme) => ({
         }
     },
 
+    endDateLabel: {
+        fontSize: '14px',
+        marginRight: '16px',
+        minWidth: '120px',
+        textAlign: 'end',
+
+        [theme.breakpoints.down(470)]: {
+            marginBottom: '4px',
+            width: '100%'
+        }
+    },
+
     photoFileInput: {
         display: 'flex',
         alignItems: 'center',
@@ -245,6 +257,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
 
     const [ trail, setTrail ] = useState<string>('');
     const [ dateOfHike, setDateOfHike ] = useState<DateTime | null>(null);
+    const [ endDateOfHike, setEndDateOfHike ] = useState<DateTime | null>(null);
     const [ conditions, setConditions ] = useState<string>('');
     const [ crowds, setCrowds ] = useState<string>('');
     const [ description, setDescription ] = useState<string>('');
@@ -258,6 +271,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const [ retrievedHike, setRetrievedHike ] = useState<boolean>(false);
     const [ trailInputError, setTrailInputError ] = useState<boolean>(false);
     const [ dateOfHikeInputError, setDateOfHikeInputError ] = useState<boolean>(false);
+    const [ endDateOfHikeInputError, setEndDateOfHikeInputError ] = useState<boolean>(false);
     const [ saving, setSaving ] = useState<boolean>(false);
     const [ uploadProgress, setUploadProgress ] = useState<number>(0);
 
@@ -265,6 +279,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
         const setData = (hike: Hike) => {
             setTrail(hike.trail);
             setDateOfHike(DateTime.fromFormat(hike.dateOfHike, 'yyyy-MM-dd'));
+            setEndDateOfHike(hike.endDateOfHike ? DateTime.fromFormat(hike.endDateOfHike, 'yyyy-MM-dd') : null);
             setConditions(hike.conditions || '');
             setCrowds(hike.crowds || '');
             setHikers(hike.hikers?.map((hiker: Hiker) => hiker.fullName) || []);
@@ -360,9 +375,21 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             if (!dateOfHike.isValid) {
                 setDateOfHikeInputError(true);
                 valid = false;
-                errorMsg = 'Invalid date value';
+                errorMsg = 'Invalid start date value';
             } else {
                 setDateOfHikeInputError(false);
+            }
+        }
+
+        if (endDateOfHike === null) {
+            setEndDateOfHikeInputError(false);
+        } else {
+            if (!endDateOfHike.isValid) {
+                setEndDateOfHikeInputError(true);
+                valid = false;
+                errorMsg = 'Invalid end date value';
+            } else {
+                setEndDateOfHikeInputError(false);
             }
         }
 
@@ -394,6 +421,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             id: hike.id,
             trail: hike.trail,
             dateOfHike: hike.dateOfHike,
+            endDateOfHike: hike.endDateOfHike,
             description: hike.description,
             tags: hike.tags,
             fullNames,
@@ -448,23 +476,26 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
 
             try {
                 let newPhotos = [...photos];
-                const thumbnailSrc = await SharedService.getThumbnailDataSrc(event.target.files[0], PHOTO_THUMBNAIL_SIZE);
-                const fileName = event.target.files[0].name;
-                const index = newPhotos.findIndex((photo: Photo) => photo.fileName.toLowerCase() === fileName.toLowerCase());
 
-                if (index > -1) {
-                    if (hikeId && newPhotos[index].action !== 'add') {
+                for (const file of event.target.files) {
+                    const thumbnailSrc = await SharedService.getThumbnailDataSrc(file, PHOTO_THUMBNAIL_SIZE);
+                    const fileName = file.name;
+                    const index = newPhotos.findIndex((photo: Photo) => photo.fileName.toLowerCase() === fileName.toLowerCase());
 
-                        newPhotos[index].file = event.target.files[0];
-                        newPhotos[index].action = 'update';
-                        newPhotos[index].thumbnailSrc = thumbnailSrc;
+                    if (index > -1) {
+                        if (hikeId && newPhotos[index].action !== 'add') {
+
+                            newPhotos[index].file = file;
+                            newPhotos[index].action = 'update';
+                            newPhotos[index].thumbnailSrc = thumbnailSrc;
+                        }
+                    } else {
+                        const photo: Photo = {
+                            file, fileName, filePath: '', caption: '', ordinal: photos.length, action: 'add', thumbnailSrc
+                        };
+
+                        newPhotos.push(photo);
                     }
-                } else {
-                    const photo: Photo = {
-                        file: event.target.files[0], fileName, filePath: '', caption: '', action: 'add', thumbnailSrc
-                    };
-
-                    newPhotos.push(photo);
                 }
 
                 setPhotos(newPhotos);
@@ -487,6 +518,22 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
 
             setPhotos(newPhotos);
         }
+    };
+
+    const handleChangePhotoOrder = (oldIndex: number, newIndex: number) => {
+        const newPhotos = arrayMove(photos, oldIndex, newIndex);
+        let newOrdinal = 0;
+
+        for (const photo of newPhotos) {
+            if (photo.action !== 'add') {
+                photo.action = 'update';
+            }
+
+            photo.ordinal = newOrdinal;
+            newOrdinal++;
+        }
+
+        setPhotos(newPhotos);
     };
 
     const handleDeletePhoto = (fileName: string) => {
@@ -513,8 +560,17 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             if (validInput()) {
                 const hikersToSave = hikers.map((hiker: string) => ({ fullName: hiker }))
                 const hike: Hike = {
-                    trail, dateOfHike: dateOfHike ? dateOfHike.toString() : '', conditions, crowds, hikers: hikersToSave, description, link, linkLabel,
-                    tags: tags.join(','), photos
+                    trail,
+                    dateOfHike: dateOfHike ? dateOfHike.toString() : '',
+                    endDateOfHike: endDateOfHike ? endDateOfHike.toString() : '',
+                    conditions,
+                    crowds,
+                    hikers: hikersToSave,
+                    description,
+                    link,
+                    linkLabel,
+                    tags: tags.join(','),
+                    photos
                 };
                 const uploadProgressHandler = getUploadProgressHandler();
                 let hikeIdForNav = hikeId;
@@ -599,7 +655,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 <FormControl className={cx(classes.field, classes.datePickerField)}>
                     <FormControlLabel
                         labelPlacement='start'
-                        label='Date of hike *'
+                        label='Start date *'
                         classes={{ label: classes.fieldLabel }}
                         control={
                             <LocalizationProvider dateAdapter={CustomLuxonAdapter}>
@@ -608,6 +664,25 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                                     onChange={(newValue) => setDateOfHike(newValue || null) }
                                     renderInput={(params) => (
                                         <TextField {...params} size='small' error={dateOfHikeInputError} inputProps={{ ...params.inputProps, maxLength: 10 }} />
+                                    )}
+                                />
+                            </LocalizationProvider>
+                        }
+                    />
+                </FormControl>
+
+                <FormControl className={cx(classes.field, classes.datePickerField)}>
+                    <FormControlLabel
+                        labelPlacement='start'
+                        label='End date'
+                        classes={{ label: classes.endDateLabel }}
+                        control={
+                            <LocalizationProvider dateAdapter={CustomLuxonAdapter}>
+                                <DatePicker
+                                    value={endDateOfHike}
+                                    onChange={(newValue) => setEndDateOfHike(newValue || null) }
+                                    renderInput={(params) => (
+                                        <TextField {...params} size='small' error={endDateOfHikeInputError} inputProps={{ ...params.inputProps, maxLength: 10 }} />
                                     )}
                                 />
                             </LocalizationProvider>
@@ -798,6 +873,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                             className={classes.fileUploadInput}
                             onChange={handleSelectPhoto}
                             accept='image/*'
+                            multiple
                         />
                         <label htmlFor='FileUpload'>
                             <Button component='span'>Browse</Button>
@@ -808,7 +884,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             <Grid item xs={12}>
                 <List
                     values={photos}
-                    onChange={({ oldIndex, newIndex }) => setPhotos(arrayMove(photos, oldIndex, newIndex))}
+                    onChange={({ oldIndex, newIndex }) => handleChangePhotoOrder(oldIndex, newIndex)}
                     renderList={({ children, props }) => {
                         return (
                             <MuiList {...props} className={cx(classes.photosList)} disablePadding={true}>

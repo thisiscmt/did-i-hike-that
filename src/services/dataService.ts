@@ -97,6 +97,7 @@ const getFormData = (hike: Hike) => {
 
     formData.append('trail', hike.trail);
     formData.append('dateOfHike', hike.dateOfHike);
+    formData.append('endDateOfHike', hike.endDateOfHike || '');
 
     if (hike.conditions) {
         formData.append('conditions', hike.conditions);
@@ -139,6 +140,7 @@ const getFormData = (hike: Hike) => {
                     id: photo.id,
                     fileName: photo.fileName,
                     caption: photo.caption,
+                    ordinal: photo.ordinal,
                     action: photo.action
                 };
             } else {

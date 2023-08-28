@@ -42,8 +42,8 @@ export const getThumbnailDataSrc = (file: File, maxSize: number) => new Promise<
         }, 'base64' );
 });
 
-export const formatDateOfHike = (dateOfHike: string) => {
-    const dateParts = dateOfHike.split('-');
+export const formatDateValue = (date: string) => {
+    const dateParts = date.split('-');
     return `${Number(dateParts[1])}/${Number(dateParts[2])}/${dateParts[0]}`;
 };
 

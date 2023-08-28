@@ -2,6 +2,7 @@ export interface Hike {
     id?: string;
     trail: string;
     dateOfHike: string;
+    endDateOfHike?: string;
     conditions?: string;
     crowds?: string;
     hikers?: Hiker[];
