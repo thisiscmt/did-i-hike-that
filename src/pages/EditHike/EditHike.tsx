@@ -113,15 +113,25 @@ const useStyles = makeStyles()((theme) => ({
         // Prevents the picker button from being too far to the right
         '& .MuiInputBase-root': {
             paddingRight: '14px'
+        },
+
+        [theme.breakpoints.down(470)]: {
+            '&.endDatePickerField': {
+                marginLeft: '12px'
+            }
         }
     },
 
     fieldLabel: {
         fontSize: '14px',
         minWidth: '120px',
+        paddingRight: '16px',
+        textAlign: 'right',
 
         [theme.breakpoints.down(470)]: {
             marginBottom: '4px',
+            paddingRight: 0,
+            textAlign: 'left',
             width: '100%'
         }
     },
@@ -130,10 +140,12 @@ const useStyles = makeStyles()((theme) => ({
         fontSize: '14px',
         marginRight: '16px',
         minWidth: '120px',
-        textAlign: 'end',
+        textAlign: 'right',
 
         [theme.breakpoints.down(470)]: {
             marginBottom: '4px',
+            marginRight: '0',
+            textAlign: 'left',
             width: '100%'
         }
     },
@@ -156,7 +168,7 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     photosList: {
-        marginLeft: '128px',
+        marginLeft: '136px',
         marginTop: '10px',
 
         '& .MuiListItem-padding': {
@@ -671,7 +683,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                     />
                 </FormControl>
 
-                <FormControl className={cx(classes.field, classes.datePickerField)}>
+                <FormControl className={`${cx(classes.field, classes.datePickerField)} endDatePickerField`}>
                     <FormControlLabel
                         labelPlacement='start'
                         label='End date'
