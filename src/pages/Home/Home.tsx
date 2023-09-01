@@ -90,19 +90,23 @@ const Home: FC = () => {
 
     const handleClearSearchText = () => {
         setSearchText('');
+        handleSearch(undefined, true);
     };
 
-    const handleSearch = async (page?: number) => {
+    const handleSearch = async (page?: number, clearSearch?: boolean) => {
         try {
             setLoading(true);
             setBanner('');
 
-            const searchParams = SharedService.getSearchParams(searchText);
+            const searchParams = SharedService.getSearchParams(clearSearch ? '' : searchText);
             searchParams.page = page || 1;
             searchParams.pageSize = PAGE_SIZE;
             const hikes = await DataService.getHikes(searchParams);
 
-            setSearchText(searchText);
+            if (!clearSearch) {
+                setSearchText(searchText);
+            }
+
             setSearchResults(hikes.rows);
             setPageCount(Math.ceil(hikes.count / PAGE_SIZE));
             setShowResults(true);
@@ -117,10 +121,19 @@ const Home: FC = () => {
         }
     };
 
+    const handleKeypress = (event: React.KeyboardEvent<unknown>) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            handleSearch();
+        }
+    };
+
     const handleChangePage = (_event: React.ChangeEvent<unknown>, value: number) => {
         setPage(value);
         handleSearch(value);
     }
+
+    console.log('searchText: %o', searchText);
 
     return (
         <Box className={classes.mainContainer}>
@@ -137,59 +150,65 @@ const Home: FC = () => {
             </Box>
 
             <Box className='loadable-container'>
-                <Box className={cx(classes.searchInputContainer)}>
-                    <TextField
-                        onChange={handleSearchTextChange}
-                        value={searchText}
-                        className={cx(classes.searchInput)}
-                        fullWidth={true}
-                        InputProps={ searchText ?
-                            {
-                                endAdornment:
-                                    <InputAdornment position="end">
-                                        <IconButton
-                                            aria-label="clear search input"
-                                            onClick={handleClearSearchText}
-                                            title='Clear search text'
-                                        >
-                                            <CloseOutlined />
-                                        </IconButton>
-                                    </InputAdornment>
-                            } : undefined
-                        }
-                    />
-                </Box>
+                <form>
+                    <Box className={cx(classes.searchInputContainer)}>
+                        <TextField
+                            onChange={handleSearchTextChange}
+                            value={searchText}
+                            className={cx(classes.searchInput)}
+                            fullWidth={true}
+                            inputProps={{
+                                onKeyPress: handleKeypress
+                            }}
+                            InputProps={ searchText ?
+                                {
+                                    endAdornment:
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label="clear search input"
+                                                onClick={handleClearSearchText}
+                                                title='Clear search text'
+                                                type='submit'
+                                            >
+                                                <CloseOutlined />
+                                            </IconButton>
+                                        </InputAdornment>
+                                } : undefined
+                            }
+                        />
+                    </Box>
 
-                <Box>
-                    <Button color='primary' onClick={() => handleSearch()}>Search</Button>
-                </Box>
+                    <Box>
+                        <Button color='primary' onClick={() => handleSearch()}>Search</Button>
+                    </Box>
 
-                <Box className={`${cx(classes.searchResultsContainer)}`}>
-                    {
-                        showResults
-                            ?
-                            searchResults.length > 0
+                    <Box className={`${cx(classes.searchResultsContainer)}`}>
+                        {
+                            showResults
                                 ?
-                                <>
-                                    <Box className={cx(classes.searchResults)}>
-                                        {
-                                            searchResults.map((hike: Hike) => {
-                                                return (
-                                                    <Box key={hike.id} className={cx(classes.searchResult)} onClick={() => navigate(`/hike/${hike.id}`)}>
-                                                        <SearchResult hike={hike} />
-                                                    </Box>
-                                                )
-                                            })
-                                        }
-                                    </Box>
+                                searchResults.length > 0
+                                    ?
+                                    <>
+                                        <Box className={cx(classes.searchResults)}>
+                                            {
+                                                searchResults.map((hike: Hike) => {
+                                                    return (
+                                                        <Box key={hike.id} className={cx(classes.searchResult)} onClick={() => navigate(`/hike/${hike.id}`)}>
+                                                            <SearchResult hike={hike} />
+                                                        </Box>
+                                                    )
+                                                })
+                                            }
+                                        </Box>
 
-                                    <Pagination onChange={handleChangePage} page={page} count={pageCount} className={cx(classes.pagination)} />
-                                </>
-                                :
-                                <Box className={cx(classes.noResults)}>No hikes found</Box>
-                            : ''
-                    }
-                </Box>
+                                        <Pagination onChange={handleChangePage} page={page} count={pageCount} className={cx(classes.pagination)} />
+                                    </>
+                                    :
+                                    <Box className={cx(classes.noResults)}>No hikes found</Box>
+                                : ''
+                        }
+                    </Box>
+                </form>
 
                 <LoadingOverlay open={loading} />
             </Box>
