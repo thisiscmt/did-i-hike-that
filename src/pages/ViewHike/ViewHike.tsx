@@ -102,11 +102,7 @@ const useStyles = makeStyles()((theme) => ({
 
     photoCaption: {
         marginTop: '4px',
-        textTransform: 'lowercase',
-
-        '&:first-letter': {
-            textTransform: 'capitalize'
-        }
+        textTransform: 'none',
     },
 
     noCaption: {
