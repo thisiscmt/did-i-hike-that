@@ -19,7 +19,8 @@ import {
 import { DeleteOutlineOutlined } from '@mui/icons-material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { makeStyles } from 'tss-react/mui';
-import { List, arrayMove  } from 'react-movable';
+import {DragDropContext, Droppable, Draggable, DropResult} from '@hello-pangea/dnd';
+import { arrayMoveImmutable } from 'array-move';
 import Axios, { AxiosProgressEvent } from 'axios';
 import { DateTime } from 'luxon';
 
@@ -452,7 +453,9 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
         return handler;
     };
 
-    const handleChangeHikers = (event: React.SyntheticEvent, value: string[], reason: string, details?: AutocompleteChangeDetails<string> | undefined) => {
+    const handleChangeHikers = (_event: React.SyntheticEvent, value: readonly string[], reason: string, details?: AutocompleteChangeDetails<string> | undefined) => {
+        const newValue = [...value];
+
         if (reason === 'createOption') {
             if (hikers.find((item: string) => details?.option?.toLowerCase().trim() === item.toLowerCase().trim())) {
                 return;
@@ -463,21 +466,23 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
 
             if (knownHikerIndex > -1) {
                 const hikerIndex = value.indexOf(details?.option || '');
-                value[hikerIndex] = knownHikers[knownHikerIndex];
+                newValue[hikerIndex] = knownHikers[knownHikerIndex];
             }
         }
 
-        setHikers(value);
+        setHikers(newValue);
     };
 
-    const handleChangeTags = (event: React.SyntheticEvent, value: string[], reason: string, details?: AutocompleteChangeDetails<string> | undefined) => {
+    const handleChangeTags = (_event: React.SyntheticEvent, value: readonly string[], reason: string, details?: AutocompleteChangeDetails<string> | undefined) => {
+        const newValue = [...value];
+
         if (reason === 'createOption') {
             if (tags.find((item: string) => details?.option?.toLowerCase().trim() === item.toLowerCase().trim())) {
                 return;
             }
         }
 
-        setTags(value);
+        setTags(newValue);
     };
 
     const handleSelectPhoto = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -532,21 +537,23 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
         }
     };
 
-    const handleChangePhotoOrder = (oldIndex: number, newIndex: number) => {
-        const newPhotos = arrayMove(photos, oldIndex, newIndex);
-        let newOrdinal = 0;
+    const handleChangePhotoOrder = (result: DropResult) => {
+        if (result && result.destination && result.destination.index > -1) {
+            const newPhotos = arrayMoveImmutable<Photo>(photos, result.source.index, result.destination.index);
+            let newOrdinal = 0;
 
-        for (const photo of newPhotos) {
-            if (photo.action !== 'add') {
-                photo.action = 'update';
+            for (const photo of newPhotos) {
+                if (photo.action !== 'add') {
+                    photo.action = 'update';
+                }
+
+                photo.ordinal = newOrdinal;
+                newOrdinal++;
             }
 
-            photo.ordinal = newOrdinal;
-            newOrdinal++;
+            setPhotos(newPhotos);
         }
-
-        setPhotos(newPhotos);
-    };
+    }
 
     const handleDeletePhoto = (fileName: string) => {
         const index = photos.findIndex((photo: Photo) => photo.fileName === fileName);
@@ -894,66 +901,78 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             </Grid>
 
             <Grid item xs={12}>
-                <List
-                    values={photos}
-                    onChange={({ oldIndex, newIndex }) => handleChangePhotoOrder(oldIndex, newIndex)}
-                    renderList={({ children, props }) => {
-                        return (
-                            <MuiList {...props} className={cx(classes.photosList)} disablePadding={true}>
-                                {children}
+                <DragDropContext onDragEnd={handleChangePhotoOrder}>
+                    <Droppable droppableId="droppable">
+                        {(provided, _snapshot) => (
+                            <MuiList ref={provided.innerRef} {...provided.droppableProps} className={cx(classes.photosList)} disablePadding={true}>
+                                {
+                                    photos.map((photo, index) => {
+                                        return (
+                                            <Draggable
+                                                key={photo.fileName}
+                                                index={index}
+                                                draggableId={photo.fileName}
+                                                shouldRespectForcePress={true}
+                                            >
+                                                {(provided, _snapshot) => {
+                                                    const otherProps = {
+                                                        ...provided.draggableProps,
+                                                        ...provided.dragHandleProps,
+                                                        style: {
+                                                            ...provided.draggableProps.style,
+                                                        },
+                                                    };
+
+                                                    return (
+                                                        <>
+                                                            {
+                                                                photo.action !== 'delete' &&
+                                                                <ListItem key={photo.fileName}
+                                                                          ref={provided.innerRef}
+                                                                          {...otherProps}
+                                                                          disableGutters={true}
+                                                                >
+                                                                    <Box className={cx(classes.photoThumbnail)}>
+                                                                        <img src={photo.thumbnailSrc} alt='Thumbnail' />
+                                                                    </Box>
+
+                                                                    <Box className={cx(classes.photoCaption)}>
+                                                                        <TextField
+                                                                            id={`hike-photo-${photo.fileName}`}
+                                                                            value={photo.caption || ''}
+                                                                            style={{ flexGrow: 2 }}
+                                                                            size='small'
+                                                                            placeholder='Add a caption'
+                                                                            inputProps={{ maxLength: 255 }}
+                                                                            onChange={(event) => handleChangePhotoCaption(event.target.value, photo.fileName)}
+                                                                        />
+
+                                                                        <IconButton
+                                                                            aria-label='delete photo'
+                                                                            className={cx(classes.deletePhotoButton)}
+                                                                            onClick={() => handleDeletePhoto(photo.fileName)}
+                                                                            title='Remove photo'
+                                                                            size='small'
+                                                                            color='error'
+                                                                        >
+                                                                            <DeleteOutlineOutlined />
+                                                                        </IconButton>
+                                                                    </Box>
+                                                                </ListItem>
+                                                            }
+                                                        </>
+                                                    );
+                                                }}
+                                            </Draggable>
+                                        )
+                                    })
+                                }
+
+                                { provided.placeholder }
                             </MuiList>
                         )}
-                    }
-                    renderItem={({ value, props, isDragged }) => {
-                        return (
-                            <React.Fragment key={value.fileName}>
-                                {
-                                    isDragged
-                                        ?
-                                            <ListItem {...props} disableGutters={true}>
-                                                <Box className={cx(classes.photoThumbnail)}>
-                                                    <img src={value.thumbnailSrc} alt='Thumbnail' />
-                                                </Box>
-                                            </ListItem>
-                                        :
-                                            <>
-                                                {
-                                                    value.action !== 'delete' &&
-                                                    <ListItem {...props} disableGutters={true}>
-                                                        <Box className={cx(classes.photoThumbnail)}>
-                                                            <img src={value.thumbnailSrc} alt='Thumbnail' />
-                                                        </Box>
-
-                                                        <Box className={cx(classes.photoCaption)}>
-                                                            <TextField
-                                                                id={`hike-photo-${value.fileName}`}
-                                                                value={value.caption || ''}
-                                                                style={{ flexGrow: 2 }}
-                                                                size='small'
-                                                                placeholder='Add a caption'
-                                                                inputProps={{ maxLength: 255 }}
-                                                                onChange={(event) => handleChangePhotoCaption(event.target.value, value.fileName)}
-                                                            />
-
-                                                            <IconButton
-                                                                aria-label='delete photo'
-                                                                className={cx(classes.deletePhotoButton)}
-                                                                onClick={() => handleDeletePhoto(value.fileName)}
-                                                                title='Remove photo'
-                                                                size='small'
-                                                                color='error'
-                                                            >
-                                                                <DeleteOutlineOutlined />
-                                                            </IconButton>
-                                                        </Box>
-                                                    </ListItem>
-                                                }
-                                            </>
-                                }
-                            </React.Fragment>
-                        );
-                    }}
-                />
+                    </Droppable>
+                </DragDropContext>
 
                 {
                     saving &&

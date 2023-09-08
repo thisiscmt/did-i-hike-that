@@ -133,8 +133,6 @@ const Home: FC = () => {
         handleSearch(value);
     }
 
-    console.log('searchText: %o', searchText);
-
     return (
         <Box className={classes.mainContainer}>
             <Box className={cx(classes.intro)}>
