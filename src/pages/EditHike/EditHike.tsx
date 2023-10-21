@@ -30,7 +30,7 @@ import { Colors } from '../../services/themeService';
 import { Hike, Hiker, Photo } from '../../models/models';
 import { CustomLuxonAdapter} from '../../classes/customLuxonAdapter';
 import { MainContext } from '../../contexts/MainContext';
-import { PHOTO_THUMBNAIL_SIZE } from '../../constants/constants';
+import {PHOTO_MAX_SIZE, PHOTO_THUMBNAIL_SIZE} from '../../constants/constants';
 
 const useStyles = makeStyles()((theme) => ({
     row: {
@@ -352,18 +352,36 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             }
         };
 
-        document.title = 'Edit Hike - Did I Hike That?';
+        document.title = hikeId ? 'Edit Hike - Did I Hike That?' : 'Create Hike - Did I Hike That?';
 
         if (!retrievedKnownHikers) {
             getKnownHikers();
         }
 
-        if (hikeId && !retrievedHike) {
-            if (currentHike) {
-                setData(currentHike);
-                setCurrentHike(null);
-            } else {
-                getHike();
+        if (hikeId) {
+            if (!retrievedHike) {
+                if (currentHike) {
+                    setData(currentHike);
+                    setCurrentHike(null);
+                } else {
+                    getHike();
+                }
+            }
+        } else {
+            if (!retrievedHike) {
+                // This wil only occur when the user clicks Create Hike while
+                setTrail('');
+                setDateOfHike(null);
+                setEndDateOfHike(null);
+                setConditions('');
+                setCrowds('');
+                setHikers([]);
+                setLink('');
+                setLinkLabel('');
+                setDescription('');
+                setTags([]);
+                setPhotos([]);
+                setRetrievedHike(true);
             }
         }
     });
@@ -495,6 +513,10 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 let newPhotos = [...photos];
 
                 for (const file of event.target.files) {
+                    if (file.size > PHOTO_MAX_SIZE) {
+                        continue;
+                    }
+
                     const thumbnailSrc = await SharedService.getThumbnailDataSrc(file, PHOTO_THUMBNAIL_SIZE);
                     const fileName = file.name;
                     const index = newPhotos.findIndex((photo: Photo) => photo.fileName.toLowerCase() === fileName.toLowerCase());
