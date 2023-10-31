@@ -117,6 +117,10 @@ const useStyles = makeStyles()((theme) => ({
         }
     },
 
+    photoCaptionEdit: {
+        minWidth: 0
+    },
+
     photoCaptionInput: {
         marginRight: '8px'
     },
@@ -273,6 +277,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
     };
 
     const linkUrl = getValidUrl();
+    const hasHikeBasicData = hike.dateOfHike || hike.endDateOfHike || hike.conditions || hike.crowds;
     let formattedUpdatedAt = '';
 
     if (hike.updatedAt) {
@@ -283,7 +288,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
     return (
         <Box className='loadable-container'>
             {
-                !loading && loggedIn &&
+                !loading && loggedIn && hike.trail &&
                 <Box className={cx(classes.trail)}>
                     <Typography variant='h4'>{hike.trail}</Typography>
 
@@ -312,15 +317,18 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
             }
 
             {
-                !loading && loggedIn &&
+                !loading && loggedIn && hasHikeBasicData &&
                 <Card className={cx(classes.section)}>
                     <CardContent>
                         <Box>
                             <>
-                                <Box className={cx(classes.field)}>
-                                    <Typography variant='body2' className={cx(classes.fieldLabel)}>Start date</Typography>
-                                    <Typography variant='body2'>{SharedService.formatDateValue(hike.dateOfHike)}</Typography>
-                                </Box>
+                                {
+                                    hike.dateOfHike &&
+                                    <Box className={cx(classes.field)}>
+                                        <Typography variant='body2' className={cx(classes.fieldLabel)}>Start date</Typography>
+                                        <Typography variant='body2'>{SharedService.formatDateValue(hike.dateOfHike)}</Typography>
+                                    </Box>
+                                }
 
                                 {
                                     hike.endDateOfHike &&
@@ -449,7 +457,8 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
                                                 photo.caption
                                                     ?
                                                         <Box>
-                                                            <Button variant='text' title='Change caption' onClick={() => handlePhotoCaptionEdit(photo.fileName)}>
+                                                            <Button variant='text' title='Change caption' className={cx(classes.photoCaptionEdit)}
+                                                                    onClick={() => handlePhotoCaptionEdit(photo.fileName)}>
                                                                 <Typography variant='body2' className={cx(classes.photoCaption)}>
                                                                     {photo.caption}
                                                                 </Typography>
@@ -475,9 +484,12 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
             {
                 !loading && loggedIn &&
                 <>
-                    <Box className={cx(classes.section)}>
-                        <Typography variant='body2' className={cx(classes.lastUpdated)}>{`Last updated on ${formattedUpdatedAt}`}</Typography>
-                    </Box>
+                    {
+                        formattedUpdatedAt &&
+                        <Box className={cx(classes.section)}>
+                            <Typography variant='body2' className={cx(classes.lastUpdated)}>{`Last updated on ${formattedUpdatedAt}`}</Typography>
+                        </Box>
+                    }
 
                     <Button variant='contained' color='primary' onClick={() => navigate('/')}>Go to Home</Button>
                 </>
