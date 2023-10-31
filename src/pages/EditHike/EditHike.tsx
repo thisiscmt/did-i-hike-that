@@ -14,7 +14,7 @@ import {
     LinearProgress,
     ListItem,
     TextField,
-    List as MuiList
+    List as MuiList, Snackbar, Fade
 } from '@mui/material';
 import { DeleteOutlineOutlined } from '@mui/icons-material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
@@ -252,6 +252,12 @@ const useStyles = makeStyles()((theme) => ({
     saveIndicator: {
         color: Colors.white,
         position: 'absolute',
+    },
+
+    snackbar: {
+        '& .MuiSnackbarContent-root': {
+            backgroundColor: 'lightslategray'
+        }
     }
 }));
 
@@ -282,11 +288,14 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const [ photos, setPhotos ] = useState<Photo[]>([]);
     const [ retrievedKnownHikers, setRetrievedKnownHikers ] = useState<boolean>(false);
     const [ retrievedHike, setRetrievedHike ] = useState<boolean>(false);
+    const [ clearedHike, setClearedHike ] = useState<boolean>(false);
     const [ trailInputError, setTrailInputError ] = useState<boolean>(false);
     const [ dateOfHikeInputError, setDateOfHikeInputError ] = useState<boolean>(false);
     const [ endDateOfHikeInputError, setEndDateOfHikeInputError ] = useState<boolean>(false);
     const [ saving, setSaving ] = useState<boolean>(false);
     const [ uploadProgress, setUploadProgress ] = useState<number>(0);
+    const [ openSnackbar, setOpenSnackbar ] = useState<boolean>(false);
+    const [ snackbarMessage, setSnackbarMessage ] = useState<string>('');
 
     useEffect(() => {
         const setData = (hike: Hike) => {
@@ -300,7 +309,6 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             setLinkLabel(hike.linkLabel || '');
             setDescription(hike.description || '');
             setTags(hike.tags ? hike.tags.split(',').map((tag: string) => tag.trim()) : []);
-            setRetrievedHike(true);
 
             const newPhotos = (hike.photos || []).map((photo: Photo) => {
                 return {
@@ -310,6 +318,22 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             });
 
             setPhotos(newPhotos);
+            setRetrievedHike(true);
+        };
+
+        const clearData = () => {
+            setTrail('');
+            setDateOfHike(null);
+            setEndDateOfHike(null);
+            setConditions('');
+            setCrowds('');
+            setHikers([]);
+            setLink('');
+            setLinkLabel('');
+            setDescription('');
+            setTags([]);
+            setPhotos([]);
+            setClearedHike(true);
         };
 
         const getKnownHikers = async () => {
@@ -368,20 +392,9 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 }
             }
         } else {
-            if (!retrievedHike) {
-                // This wil only occur when the user clicks Create Hike while
-                setTrail('');
-                setDateOfHike(null);
-                setEndDateOfHike(null);
-                setConditions('');
-                setCrowds('');
-                setHikers([]);
-                setLink('');
-                setLinkLabel('');
-                setDescription('');
-                setTags([]);
-                setPhotos([]);
-                setRetrievedHike(true);
+            if (!clearedHike) {
+                // This will only occur when the user clicks Add Hike while editing another one
+                clearData();
             }
         }
     });
@@ -514,7 +527,12 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
 
                 for (const file of event.target.files) {
                     if (file.size > PHOTO_MAX_SIZE) {
+                        setSnackbarMessage(`File '${file.name}' is too big`);
+                        setOpenSnackbar(true);
                         continue;
+                    } else {
+                        setSnackbarMessage('');
+                        setOpenSnackbar(false);
                     }
 
                     const thumbnailSrc = await SharedService.getThumbnailDataSrc(file, PHOTO_THUMBNAIL_SIZE);
@@ -1013,6 +1031,15 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
 
                 <Button onClick={handleCancel} variant='outlined' color='secondary' className={cx(classes.cancelButton)}>Cancel</Button>
             </Grid>
+
+            <Snackbar
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                open={openSnackbar}
+                TransitionComponent={Fade}
+                onClose={() => setOpenSnackbar(false)}
+                message={snackbarMessage}
+                className={classes.snackbar}
+            />
         </>
     )
 };
