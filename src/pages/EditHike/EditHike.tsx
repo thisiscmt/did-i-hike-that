@@ -680,7 +680,11 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
 
             // TODO: Tell the user that they have cancelled the request
         } else {
-            navigate(-1);
+            if (hikeId) {
+                navigate(-1);
+            } else {
+                navigate('/');
+            }
         }
     };
 

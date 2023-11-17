@@ -106,7 +106,8 @@ const Header = () => {
 
                 <Typography variant='h5' component={Link} to='/' className={cx(classes.headerText)}>Did I Hike That?</Typography>
 
-                <Button variant='text' className={cx(classes.headerButton)} component={Link} to='/preferences'>Preferences</Button>
+                {/*TODO*/}
+                {/*<Button variant='text' className={cx(classes.headerButton)} component={Link} to='/preferences'>Preferences</Button>*/}
 
                 {
                     loggedIn

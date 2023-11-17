@@ -1,7 +1,7 @@
 import React, { FC, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Box, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { CloseOutlined, HomeOutlined, SettingsOutlined, LoginOutlined, LogoutOutlined } from '@mui/icons-material';
+import { CloseOutlined, HomeOutlined, LoginOutlined, LogoutOutlined } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
 
 import { Colors } from '../../services/themeService';
@@ -80,12 +80,14 @@ const MobileMenu: FC<MobileMenuProps> = ({ onClose }) => {
                         <ListItemText primary='Home' />
                     </ListItemButton>
                 </ListItem>
-                <ListItem disablePadding={true}>
-                    <ListItemButton to='/preferences' component={Link} onClick={handleMenuClose}>
-                        <ListItemIcon><SettingsOutlined /></ListItemIcon>
-                        <ListItemText primary='Preferences' />
-                    </ListItemButton>
-                </ListItem>
+
+                {/*TODO*/}
+                {/*<ListItem disablePadding={true}>*/}
+                {/*    <ListItemButton to='/preferences' component={Link} onClick={handleMenuClose}>*/}
+                {/*        <ListItemIcon><SettingsOutlined /></ListItemIcon>*/}
+                {/*        <ListItemText primary='Preferences' />*/}
+                {/*    </ListItemButton>*/}
+                {/*</ListItem>*/}
 
                 {
                     loggedIn
