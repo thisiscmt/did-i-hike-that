@@ -58,19 +58,19 @@ function App() {
 
                 <Box className={cx(classes.mainContainer)}>
                     <Box className={cx(classes.leftColumn)} />
+
                     <Box className={cx(classes.contentColumn)}>
-
-
                         <Routes>
-                            <Route path="/" element={<Home />} />
-                            <Route path="/hike" element={<EditHike topOfPageRef={topOfPageRef} />} />
-                            <Route path="/hike/:hikeId" element={<ViewHike topOfPageRef={topOfPageRef} />} />
-                            <Route path="/hike/:hikeId/edit" element={<EditHike topOfPageRef={topOfPageRef} />} />
-                            <Route path="/preferences" element={<Preferences />} />
-                            <Route path="/login" element={<Login />} />
-                            <Route path="*" element={<ErrorPage />} />
+                            <Route path='/' element={<Home />} />
+                            <Route path='/hike' element={<EditHike topOfPageRef={topOfPageRef} />} />
+                            <Route path='/hike/:hikeId' element={<ViewHike topOfPageRef={topOfPageRef} />} />
+                            <Route path='/hike/:hikeId/edit' element={<EditHike topOfPageRef={topOfPageRef} />} />
+                            <Route path='/preferences' element={<Preferences />} />
+                            <Route path='/login' element={<Login />} />
+                            <Route path='*' element={<ErrorPage />} />
                         </Routes>
                     </Box>
+
                     <Box className={cx(classes.rightColumn)} />
                 </Box>
             </BrowserRouter>
