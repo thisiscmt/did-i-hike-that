@@ -168,17 +168,13 @@ const useStyles = makeStyles()((theme) => ({
         display: 'none'
     },
 
-    photosList: {
+    photoList: {
         marginLeft: '136px',
         marginTop: '10px',
 
         '& .MuiListItem-padding': {
             paddingBottom: 0,
-            paddingTop: '20px',
-
-            ':first-child': {
-                paddingTop: 0
-            }
+            paddingTop: 0
         },
 
         '& .MuiInputBase-root': {
@@ -197,6 +193,14 @@ const useStyles = makeStyles()((theme) => ({
             '& .MuiFormLabel-root': {
                 width: '100%'
             }
+        }
+    },
+
+    photoElement: {
+        paddingTop: '20px',
+
+        ':first-child': {
+            paddingTop: 0
         }
     },
 
@@ -600,10 +604,11 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
 
         if (index > -1) {
             const newPhotos = [...photos];
-            newPhotos[index].action = 'delete';
 
             if (hikeId && newPhotos[index].action === 'add') {
                 newPhotos.splice(index, 1);
+            } else {
+                newPhotos[index].action = 'delete';
             }
 
             setPhotos(newPhotos);
@@ -948,7 +953,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 <DragDropContext onDragEnd={handleChangePhotoOrder}>
                     <Droppable droppableId="droppable">
                         {(provided, _snapshot) => (
-                            <MuiList ref={provided.innerRef} {...provided.droppableProps} className={cx(classes.photosList)} disablePadding={true}>
+                            <MuiList ref={provided.innerRef} {...provided.droppableProps} className={cx(classes.photoList)} disablePadding={true}>
                                 {
                                     photos.map((photo, index) => {
                                         return (
@@ -971,38 +976,40 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                                                         <>
                                                             {
                                                                 photo.action !== 'delete' &&
-                                                                <ListItem key={photo.fileName}
-                                                                          ref={provided.innerRef}
-                                                                          {...otherProps}
-                                                                          disableGutters={true}
+                                                                <div key={photo.fileName}
+                                                                     ref={provided.innerRef}
+                                                                     {...otherProps}
+                                                                     className={cx(classes.photoElement)}
                                                                 >
-                                                                    <Box className={cx(classes.photoThumbnail)}>
-                                                                        <img src={photo.thumbnailSrc} alt='Thumbnail' />
-                                                                    </Box>
+                                                                    <ListItem disableGutters={true}>
+                                                                        <Box className={cx(classes.photoThumbnail)}>
+                                                                            <img src={photo.thumbnailSrc} alt='Thumbnail' />
+                                                                        </Box>
 
-                                                                    <Box className={cx(classes.photoCaption)}>
-                                                                        <TextField
-                                                                            id={`hike-photo-${photo.fileName}`}
-                                                                            value={photo.caption || ''}
-                                                                            style={{ flexGrow: 2 }}
-                                                                            size='small'
-                                                                            placeholder='Add a caption'
-                                                                            inputProps={{ maxLength: 255 }}
-                                                                            onChange={(event) => handleChangePhotoCaption(event.target.value, photo.fileName)}
-                                                                        />
+                                                                        <Box className={cx(classes.photoCaption)}>
+                                                                            <TextField
+                                                                                id={`hike-photo-${photo.fileName}`}
+                                                                                value={photo.caption || ''}
+                                                                                style={{ flexGrow: 2 }}
+                                                                                size='small'
+                                                                                placeholder='Add a caption'
+                                                                                inputProps={{ maxLength: 255 }}
+                                                                                onChange={(event) => handleChangePhotoCaption(event.target.value, photo.fileName)}
+                                                                            />
 
-                                                                        <IconButton
-                                                                            aria-label='delete photo'
-                                                                            className={cx(classes.deletePhotoButton)}
-                                                                            onClick={() => handleDeletePhoto(photo.fileName)}
-                                                                            title='Remove photo'
-                                                                            size='small'
-                                                                            color='error'
-                                                                        >
-                                                                            <DeleteOutlineOutlined />
-                                                                        </IconButton>
-                                                                    </Box>
-                                                                </ListItem>
+                                                                            <IconButton
+                                                                                aria-label='delete photo'
+                                                                                className={cx(classes.deletePhotoButton)}
+                                                                                onClick={() => handleDeletePhoto(photo.fileName)}
+                                                                                title='Remove photo'
+                                                                                size='small'
+                                                                                color='error'
+                                                                            >
+                                                                                <DeleteOutlineOutlined />
+                                                                            </IconButton>
+                                                                        </Box>
+                                                                    </ListItem>
+                                                                </div>
                                                             }
                                                         </>
                                                     );

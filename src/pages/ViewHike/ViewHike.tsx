@@ -239,8 +239,9 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
 
         if (index !== undefined && index > -1) {
             const newHike = structuredClone(hike);
-            newHike.photos[index].editCaption = true;
-            captions[fileName] = newHike.photos[index].caption;
+            newHike.photos![index].editCaption = true;
+            captions[fileName] = newHike.photos![index].caption || '';
+
             setHike(newHike);
         }
     };
@@ -256,9 +257,9 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
 
         if (index !== undefined && index > -1) {
             const newHike = structuredClone(hike);
-            newHike.photos[index].caption = captions[fileName];
-            newHike.photos[index].editCaption = false;
-            newHike.photos[index].action = 'update';
+            newHike.photos![index].caption = captions[fileName];
+            newHike.photos![index].editCaption = false;
+            newHike.photos![index].action = 'update';
 
             await DataService.updateHike(newHike)
             setCurrentHike(newHike);
@@ -271,7 +272,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
 
         if (index !== undefined && index > -1) {
             const newHike = structuredClone(hike);
-            newHike.photos[index].editCaption = false;
+            newHike.photos![index].editCaption = false;
             setHike(newHike);
         }
     };
