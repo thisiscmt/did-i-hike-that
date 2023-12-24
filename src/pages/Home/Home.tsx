@@ -1,6 +1,6 @@
-import React, { FC, useContext, useState } from 'react';
+import React, { FC, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {TextField, Box, Typography, Button, InputAdornment, IconButton, Pagination} from '@mui/material';
+import { TextField, Box, Typography, Button, InputAdornment, IconButton, Pagination, Popover } from '@mui/material';
 import { CloseOutlined } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
 import Axios from 'axios';
@@ -9,7 +9,7 @@ import SearchResult from '../../components/SearchResult/SearchResult';
 import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
-import {MainContext} from '../../contexts/MainContext';
+import { MainContext } from '../../contexts/MainContext';
 import { Hike } from '../../models/models';
 
 const useStyles = makeStyles()((theme) => ({
@@ -41,8 +41,42 @@ const useStyles = makeStyles()((theme) => ({
         }
     },
 
+    searchControls: {
+        display: 'grid',
+        gridTemplateColumns: '1fr repeat(1, auto) 1fr',
+        justifyItems: 'center',
+        margin: 'auto',
+        width: '80%',
+
+        '& button:nth-child(1)': {
+            gridColumnStart: 2
+        },
+
+        '& button:nth-child(2)': {
+            marginLeft: 'auto'
+        },
+
+        [theme.breakpoints.down(700)]: {
+            width: '100%'
+        }
+    },
+
+    searchTipsButton: {
+        fontSize: '12px'
+    },
+
+    searchTipContent: {
+        marginLeft: '16px',
+        marginRight: '16px',
+        width: '400px',
+
+        [theme.breakpoints.down(465)]: {
+            width: 'auto'
+        }
+    },
+
     searchResultsContainer: {
-        marginTop: '16px',
+        marginTop: '24px',
         textAlign: 'left'
     },
 
@@ -82,7 +116,12 @@ const Home: FC = () => {
     const { searchText, searchResults, page, pageCount, setSearchText, setSearchResults, setPage, setPageCount, setBanner } = useContext(MainContext);
     const [ loading, setLoading ] = useState<boolean>(false);
     const [ showResults, setShowResults ] = useState<boolean>(searchResults.length > 0);
+    const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        document.title = 'Did I Hike That?';
+    })
 
     const handleSearchTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchText(event.target.value);
@@ -133,6 +172,14 @@ const Home: FC = () => {
         handleSearch(value);
     }
 
+    const handleOpenSearchTips = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+    }
+
+    const handleCloseSearchTips = () => {
+        setAnchorEl(null);
+    };
+
     return (
         <Box className={classes.mainContainer}>
             <Box className={cx(classes.intro)}>
@@ -176,9 +223,36 @@ const Home: FC = () => {
                         />
                     </Box>
 
-                    <Box>
-                        <Button color='primary' onClick={() => handleSearch()}>Search</Button>
+                    <Box className={cx(classes.searchControls)}>
+                        <Button color='primary' variant='outlined' onClick={() => handleSearch()}>Search</Button>
+                        <Button variant='text' size='small' className={cx(classes.searchTipsButton)} onClick={handleOpenSearchTips}>Search Tips</Button>
                     </Box>
+
+                    <Popover
+                        open={Boolean(anchorEl)}
+                        onClose={handleCloseSearchTips}
+                        anchorEl={anchorEl}
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'center',
+                        }}
+                        transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'center',
+                        }}
+                    >
+                        <Box className={cx(classes.searchTipContent)}>
+                            <p>
+                                You can search for any text that is in the trail name, notes, hikers, or tags. To search by the start date of the
+                                hike, prefix your search text with 'date:' and then type in a date value in the form mm/dd/yyyy.
+                            </p>
+
+                            <p>
+                                To search by date range, type in 'date:' then a value in the form mm/dd/yyyy - mm/dd/yyyy. To see all hikes, click Search
+                                without any search text.
+                            </p>
+                        </Box>
+                    </Popover>
 
                     <Box className={`${cx(classes.searchResultsContainer)}`}>
                         {
