@@ -1,5 +1,6 @@
 import { RefObject } from 'react';
 import Resizer from 'react-image-file-resizer';
+import { DateTime } from 'luxon';
 
 import { HikeSearchParams } from '../models/models';
 
@@ -46,6 +47,17 @@ export const formatDateValue = (date: string) => {
     const dateParts = date.split('-');
     return `${Number(dateParts[1])}/${Number(dateParts[2])}/${dateParts[0]}`;
 };
+
+export const formatISODateValue = (date: Date | undefined) => {
+    let formattedDate = '';
+
+    if (date) {
+        const parsedDate = DateTime.fromISO(date.toString());
+        formattedDate = parsedDate.toLocaleString(DateTime.DATETIME_FULL);
+    }
+
+    return formattedDate;
+}
 
 export const scrollToTop = (ref: RefObject<HTMLElement>) => {
     if (ref && ref.current) {

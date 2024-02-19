@@ -11,6 +11,7 @@ import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
 import { MainContext } from '../../contexts/MainContext';
 import { Hike } from '../../models/models';
+import {HOME_PAGE_FIRST_BREAKPOINT} from '../../constants/constants';
 
 const useStyles = makeStyles()((theme) => ({
     mainContainer: {
@@ -36,7 +37,7 @@ const useStyles = makeStyles()((theme) => ({
     searchInput: {
         width: '80%',
 
-        [theme.breakpoints.down(700)]: {
+        [theme.breakpoints.down(HOME_PAGE_FIRST_BREAKPOINT)]: {
             width: '100%'
         }
     },
@@ -56,7 +57,7 @@ const useStyles = makeStyles()((theme) => ({
             marginLeft: 'auto'
         },
 
-        [theme.breakpoints.down(700)]: {
+        [theme.breakpoints.down(HOME_PAGE_FIRST_BREAKPOINT)]: {
             width: '100%'
         }
     },
@@ -84,7 +85,7 @@ const useStyles = makeStyles()((theme) => ({
         margin: 'auto',
         width: '80%',
 
-        [theme.breakpoints.down(700)]: {
+        [theme.breakpoints.down(HOME_PAGE_FIRST_BREAKPOINT)]: {
             width: '100%'
         }
     },
@@ -116,7 +117,7 @@ const Home: FC = () => {
     const { searchText, searchResults, page, pageCount, setSearchText, setSearchResults, setPage, setPageCount, setBanner } = useContext(MainContext);
     const [ loading, setLoading ] = useState<boolean>(false);
     const [ showResults, setShowResults ] = useState<boolean>(searchResults.length > 0);
-    const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+    const [ anchorEl, setAnchorEl ] = React.useState<HTMLButtonElement | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -241,7 +242,7 @@ const Home: FC = () => {
                             horizontal: 'center',
                         }}
                     >
-                        <Box className={cx(classes.searchTipContent)}>
+                        <Box className={cx(classes.searchTipContent)} onClick={handleCloseSearchTips}>
                             <p>
                                 You can search for any text that is in the trail name, notes, hikers, or tags. To search by the start date of the
                                 hike, prefix your search text with 'date:' and then type in a date value in the form mm/dd/yyyy.

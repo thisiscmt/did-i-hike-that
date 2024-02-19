@@ -1,10 +1,9 @@
 import React, { FC, RefObject, useContext, useEffect, useState } from 'react';
 import { Link as RouteLink, useNavigate, useParams } from 'react-router-dom';
-import {Box, Button, Card, CardContent, Chip, IconButton, Link, TextField, Typography} from '@mui/material';
+import { Box, Button, Card, CardContent, Chip, IconButton, Link, TextField, Typography } from '@mui/material';
 import { DeleteOutlineOutlined, EditOutlined, SaveOutlined, CancelOutlined } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
 import Axios from 'axios';
-import { DateTime } from 'luxon';
 
 import ConfirmationPrompt from '../../components/ConfirmationPrompt/ConfirmationPrompt';
 import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
@@ -279,12 +278,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
 
     const linkUrl = getValidUrl();
     const hasHikeBasicData = hike.dateOfHike || hike.endDateOfHike || hike.conditions || hike.crowds;
-    let formattedUpdatedAt = '';
-
-    if (hike.updatedAt) {
-        const parsedUpdatedAt = DateTime.fromISO(hike.updatedAt.toString());
-        formattedUpdatedAt = parsedUpdatedAt.toLocaleString(DateTime.DATETIME_FULL);
-    }
+    const formattedUpdatedAt = SharedService.formatISODateValue(hike.updatedAt);
 
     return (
         <Box className='loadable-container'>

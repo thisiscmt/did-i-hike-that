@@ -301,8 +301,33 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const [ openSnackbar, setOpenSnackbar ] = useState<boolean>(false);
     const [ snackbarMessage, setSnackbarMessage ] = useState<string>('');
 
+    // useEffect(() => {
+    //     const getKnownHikers = async () => {
+    //         try {
+    //             console.log('about to call getHikers: %o', new Date().getTime());
+    //
+    //             const currentHikers = await DataService.getHikers();
+    //
+    //             setRetrievedKnownHikers(true);
+    //             setKnownHikers(currentHikers);
+    //         } catch(error) {
+    //             if (Axios.isAxiosError(error) && error.response?.status === 401) {
+    //                 setBanner('You need to log in', 'warning');
+    //             } else {
+    //                 setBanner('Error occurred retrieving hikers', 'error');
+    //             }
+    //
+    //             SharedService.scrollToTop(topOfPageRef);
+    //         }
+    //     };
+    //
+    //     if (!retrievedKnownHikers) {
+    //         getKnownHikers();
+    //     }
+    // }, [retrievedKnownHikers, setBanner, topOfPageRef]);
+
     useEffect(() => {
-        const setData = (hike: Hike) => {
+        const setHikeData = (hike: Hike) => {
             setTrail(hike.trail);
             setDateOfHike(DateTime.fromFormat(hike.dateOfHike, 'yyyy-MM-dd'));
             setEndDateOfHike(hike.endDateOfHike ? DateTime.fromFormat(hike.endDateOfHike, 'yyyy-MM-dd') : null);
@@ -325,7 +350,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             setRetrievedHike(true);
         };
 
-        const clearData = () => {
+        const clearHikeData = () => {
             setTrail('');
             setDateOfHike(null);
             setEndDateOfHike(null);
@@ -342,8 +367,11 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
 
         const getKnownHikers = async () => {
             try {
+                console.log('about to call getHikers: %o', new Date().getTime());
+
                 const currentHikers = await DataService.getHikers();
                 setKnownHikers(currentHikers);
+
                 setRetrievedKnownHikers(true);
             } catch(error) {
                 if (Axios.isAxiosError(error) && error.response?.status === 401) {
@@ -363,7 +391,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                     const hike = await DataService.getHike(hikeId);
 
                     if (hike) {
-                        setData(hike);
+                        setHikeData(hike);
                     }
                 } else {
                     setBanner('Missing a hike ID', 'error');
@@ -389,7 +417,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
         if (hikeId) {
             if (!retrievedHike) {
                 if (currentHike) {
-                    setData(currentHike);
+                    setHikeData(currentHike);
                     setCurrentHike(null);
                 } else {
                     getHike();
@@ -398,9 +426,14 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
         } else {
             if (!clearedHike) {
                 // This will only occur when the user clicks Add Hike while editing another one
-                clearData();
+                clearHikeData();
             }
         }
+
+
+        // if (!retrievedKnownHikers.current) {
+        //     getKnownHikers();
+        // }
     });
 
     const validInput = () => {
@@ -692,6 +725,8 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             }
         }
     };
+
+    console.log('retrievedKnownHikers: %o', retrievedKnownHikers);
 
     return (
         <>

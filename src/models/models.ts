@@ -40,3 +40,11 @@ export interface HikeSearchParams {
     endDate?: string;
     searchText?: string;
 }
+
+export interface User {
+    id?: string;
+    name: string;
+    email: string;
+    role: string;
+    updatedAt?: Date;
+}

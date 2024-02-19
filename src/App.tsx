@@ -6,10 +6,11 @@ import { makeStyles } from 'tss-react/mui';
 import Home from './pages/Home/Home';
 import ViewHike from './pages/ViewHike/ViewHike';
 import EditHike from './pages/EditHike/EditHike';
-import Preferences from './pages/Preferences/Preferences';
+import Admin from './pages/Admin/Admin';
 import Login from './pages/Login/Login';
 import ErrorPage from './pages/ErrorPage/ErrorPage';
 import Header from './components/Header/Header';
+import {HOME_PAGE_FIRST_BREAKPOINT} from './constants/constants';
 import './App.scss';
 
 const useStyles = makeStyles()((theme) => ({
@@ -21,7 +22,7 @@ const useStyles = makeStyles()((theme) => ({
     leftColumn: {
         width: '20%',
 
-        [theme.breakpoints.down(700)]: {
+        [theme.breakpoints.down(HOME_PAGE_FIRST_BREAKPOINT)]: {
             width: '8%'
         }
     },
@@ -31,7 +32,7 @@ const useStyles = makeStyles()((theme) => ({
         marginTop: '30px',
         width: '60%',
 
-        [theme.breakpoints.down(700)]: {
+        [theme.breakpoints.down(HOME_PAGE_FIRST_BREAKPOINT)]: {
             width: '84%'
         }
     },
@@ -39,7 +40,7 @@ const useStyles = makeStyles()((theme) => ({
     rightColumn: {
         width: '20%',
 
-        [theme.breakpoints.down(700)]: {
+        [theme.breakpoints.down(HOME_PAGE_FIRST_BREAKPOINT)]: {
             width: '8%'
         }
     }
@@ -65,7 +66,7 @@ function App() {
                             <Route path='/hike' element={<EditHike topOfPageRef={topOfPageRef} />} />
                             <Route path='/hike/:hikeId' element={<ViewHike topOfPageRef={topOfPageRef} />} />
                             <Route path='/hike/:hikeId/edit' element={<EditHike topOfPageRef={topOfPageRef} />} />
-                            <Route path='/preferences' element={<Preferences />} />
+                            <Route path='/admin' element={<Admin />} />
                             <Route path='/login' element={<Login />} />
                             <Route path='*' element={<ErrorPage />} />
                         </Routes>

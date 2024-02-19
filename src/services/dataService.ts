@@ -1,6 +1,6 @@
-import Axios, {AxiosProgressEvent, AxiosRequestConfig} from 'axios';
+import Axios, { AxiosProgressEvent, AxiosRequestConfig } from 'axios';
 
-import {Hike, Hiker, HikeSearchParams, Photo} from '../models/models';
+import { Hike, Hiker, HikeSearchParams, Photo, User } from '../models/models';
 
 export const getHikes = async (searchParams?: HikeSearchParams): Promise<{ rows: Hike[]; count: number }> => {
     const config = getRequestConfig();
@@ -57,6 +57,13 @@ export const getHikers = async (): Promise<string[]> => {
     return response.data;
 };
 
+export const getUsers = async (): Promise<User[]> => {
+    const config = getRequestConfig();
+    const response = await Axios.get(`${process.env.REACT_APP_API_URL}/admin/user`, config);
+
+    return response.data;
+};
+
 export const login = async (email: string, password: string) => {
     return await Axios.post(`${process.env.REACT_APP_API_URL}/auth/login`, { email, password }, getRequestConfig());
 };
@@ -69,10 +76,6 @@ export const logError = (errorData: any) => {
     Axios.post(`${process.env.REACT_APP_API_URL}/error`, { errorData }, getRequestConfig()).catch((error) => {
         console.log('Something went wrong while logging error information: %o', error.message);
     });
-};
-
-export const ping = async () => {
-    return await Axios.get(`${process.env.REACT_APP_API_URL}/?id=${new Date().getTime()}`, getRequestConfig());
 };
 
 const getRequestConfig = (multipartRequest: boolean = false): AxiosRequestConfig => {

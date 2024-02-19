@@ -4,7 +4,7 @@ import { makeStyles } from 'tss-react/mui';
 
 import {Hike} from '../../models/models';
 import * as SharedService from '../../services/sharedService';
-import {PHOTO_THUMBNAIL_SIZE} from '../../constants/constants';
+import {HOME_PAGE_FIRST_BREAKPOINT, PHOTO_THUMBNAIL_SIZE} from '../../constants/constants';
 
 const useStyles = makeStyles()((theme) => ({
     cardContent: {
@@ -16,6 +16,7 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     thumbnail: {
+        alignItems: 'start',
         display: 'flex',
         minWidth: `${PHOTO_THUMBNAIL_SIZE}px`,
         width: `${PHOTO_THUMBNAIL_SIZE}px`
@@ -33,13 +34,13 @@ const useStyles = makeStyles()((theme) => ({
             marginRight: 0
         },
 
-        [theme.breakpoints.down(700)]: {
-            marginLeft: '20px'
+        [theme.breakpoints.down(HOME_PAGE_FIRST_BREAKPOINT)]: {
+            marginLeft: '20px',
         },
 
         [theme.breakpoints.down(500)]: {
             marginLeft: 0,
-            marginTop: '8px'
+            marginTop: '8px',
         },
     },
 
@@ -47,6 +48,17 @@ const useStyles = makeStyles()((theme) => ({
         marginBottom: '5px',
         marginTop: '5px'
     },
+
+    hikerChip: {
+        height: 'auto',
+
+        '& .MuiChip-label': {
+            paddingBottom: '8px',
+            paddingTop: '8px',
+            display: 'block',
+            whiteSpace: 'normal'
+        }
+     },
 
     description: {
         fontSize: '14px',
@@ -95,7 +107,7 @@ const SearchResult: FC<SearchResultProps> = ({ hike }) => {
                             {
                                 hikers.map((hiker: string, index: number) => {
                                     return (
-                                        <Chip key={index} label={hiker.trim()} variant='outlined' color='primary' />
+                                        <Chip key={index} label={hiker.trim()} variant='outlined' color='primary' className={cx(classes.hikerChip)} />
                                     );
                                 })
                             }
