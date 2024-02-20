@@ -43,11 +43,11 @@ export interface HikeSearchParams {
 
 export interface User {
     id?: string;
-    name: string;
+    fullName: string;
     email: string;
     password: string;
     role: string;
-    lastLogin: number;
+    lastLogin?: number;
     createdAt?: Date;
     updatedAt?: Date;
 }

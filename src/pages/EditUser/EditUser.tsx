@@ -1,4 +1,4 @@
-import React, {FC, RefObject, useContext, useEffect, useState} from 'react';
+import React, { FC, RefObject, useContext, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Box, Button, CircularProgress, FormControl, FormControlLabel, Grid, TextField, Select, MenuItem } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
@@ -6,9 +6,11 @@ import Axios from 'axios';
 
 import { MainContext } from '../../contexts/MainContext';
 import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
+import ConfirmationPrompt from '../../components/ConfirmationPrompt/ConfirmationPrompt';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
 import { Colors } from '../../services/themeService';
+import { User } from '../../models/models';
 
 const useStyles = makeStyles()((theme) => ({
     mainContainer: {
@@ -95,29 +97,34 @@ interface EditUserProps {
 }
 
 const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
+    const { userId } = useParams();
+
     const { classes, cx } = useStyles();
-    const [ name, setName ] = useState<string>('');
+    const [ fullName, setFullName ] = useState<string>('');
     const [ email, setEmail ] = useState<string>('');
-    const [ password, setPassword ] = useState<string>('********');
+    const [ password, setPassword ] = useState<string>(userId ? '********' : '');
     const [ role, setRole ] = useState<string>('');
-    const [ passwordChanged, setPasswordChanged ] = useState(false);
+    const [ originalPassword, setOriginalPassword ] = useState<string>('');
+    const [ passwordChanged, setPasswordChanged ] = useState<boolean>(false);
     const [ nameInputError, setNameInputError ] = useState<boolean>(false);
     const [ emailInputError, setEmailInputError ] = useState<boolean>(false);
     const [ passwordInputError, setPasswordInputError ] = useState<boolean>(false);
     const [ loading, setLoading ] = useState<boolean>(true);
     const [ authorized, setAuthorized ] = useState<boolean>(false);
-    const { loggedIn, setBanner } = useContext(MainContext);
     const [ saving, setSaving ] = useState<boolean>(false);
-    const params = useParams();
+    const [ openDeleteConfirmation, setOpenDeleteConfirmation ] = useState<boolean>(false);
+
+    const { loggedIn, setBanner } = useContext(MainContext);
     const navigate = useNavigate();
 
     useEffect(() => {
         const getUser = async () => {
             try {
-                const response = await DataService.getUser(params.userId || '');
+                const response = await DataService.getUser(userId || '');
 
-                setName(response.name);
+                setFullName(response.fullName);
                 setEmail(response.email);
+                setOriginalPassword(response.password);
                 setRole(response.role || 'Standard');
                 setAuthorized(true);
             } catch (error) {
@@ -133,7 +140,7 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
             }
         }
 
-        if (!name) {
+        if (!fullName) {
             getUser();
         }
     });
@@ -142,7 +149,7 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
         let valid = true;
         let errorMsg = '';
 
-        if (name === '') {
+        if (fullName === '') {
             setNameInputError(true);
             errorMsg = 'A required field is empty';
             valid = false;
@@ -158,7 +165,7 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
             setEmailInputError(false);
         }
 
-        if (email === '') {
+        if (password === '') {
             setPasswordInputError(true);
             errorMsg = 'A required field is empty';
             valid = false;
@@ -181,12 +188,56 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
         setPasswordChanged(true);
     }
 
-    const handleSave = () => {
+    const handleSave = async () => {
+        try {
+            if (validInput()) {
+                const user: User = {
+                    fullName,
+                    email,
+                    password: passwordChanged ? password : originalPassword,
+                    role
+                };
 
+                if (userId) {
+                    user.id = userId;
+                    user.password = passwordChanged ? password : originalPassword;
+
+                    await DataService.updateUser(user);
+                } else {
+                    await DataService.createUser(user);
+                }
+
+                setSaving(false);
+                navigate('/admin');
+            }
+        } catch (error) {
+            if (Axios.isAxiosError(error)) {
+                if (error.response?.status === 401) {
+                    setBanner('You need to log in', 'warning');
+                } else if (error.code === 'ERR_CANCELED') {
+                    setBanner('Save was cancelled', 'warning');
+                }
+            } else {
+                setBanner('Error saving hike', 'error');
+            }
+
+            SharedService.scrollToTop(topOfPageRef);
+        } finally {
+            setSaving(false);
+        }
     };
 
-    const handleDelete = () => {
+    const handleCancel = () => {
+        navigate('/admin');
+    };
 
+    const handleDeleteConfirmation = async (value: boolean) => {
+        setOpenDeleteConfirmation(false);
+
+        if (value && userId) {
+            await DataService.deleteUser(userId);
+            navigate('/admin');
+        }
     };
 
     return (
@@ -205,13 +256,13 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
                                         name='Name'
                                         margin='none'
                                         variant='outlined'
-                                        value={name}
+                                        value={fullName}
                                         size='small'
                                         error={nameInputError}
                                         fullWidth={true}
                                         autoCorrect='off'
                                         inputProps={{ maxLength: 255 }}
-                                        onChange={(event) => setName(event.target.value)}
+                                        onChange={(event) => setFullName(event.target.value)}
                                     />
                                 }
                             />
@@ -276,7 +327,11 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
                                 classes={{ label: classes.fieldLabel }}
                                 control={
                                     <Box className={cx(classes.roleSelectorField)}>
-                                        <Select value={role} onChange={(event) => setRole(event.target.value)} className={cx(classes.roleSelector)}>
+                                        <Select
+                                            value={role}
+                                            className={cx(classes.roleSelector)}
+                                            onChange={(event) => setRole(event.target.value)}
+                                        >
                                             <MenuItem value='Standard'>Standard</MenuItem>
                                             <MenuItem value='Admin'>Admin</MenuItem>
                                         </Select>
@@ -293,11 +348,18 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
                             )}
                         </Button>
 
-                        <Button onClick={() => navigate('/admin')} variant='outlined' color='secondary' className={cx(classes.buttonSpacer)}>Cancel</Button>
-                        <Button onClick={handleDelete} variant='outlined' color='error' className={cx(classes.buttonSpacer)}>Delete</Button>
+                        <Button onClick={handleCancel} variant='outlined' color='secondary' className={cx(classes.buttonSpacer)}>Cancel</Button>
+                        <Button onClick={() => setOpenDeleteConfirmation(true)} variant='outlined' color='error' className={cx(classes.buttonSpacer)}>Delete</Button>
                     </Grid>
                 </>
             }
+
+            <ConfirmationPrompt
+                title='Delete this user?'
+                open={openDeleteConfirmation}
+                content='Are you sure you want to delete this user?'
+                onClose={handleDeleteConfirmation}
+            />
 
             <LoadingOverlay open={loading} />
         </Box>

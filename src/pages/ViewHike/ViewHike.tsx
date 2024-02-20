@@ -143,7 +143,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
     const [ hike, setHike ] = useState<Hike>({ trail: '', dateOfHike: '' });
     const [ captions, setCaptions ] = useState<Caption>({});
     const [ retrievedHike, setRetrievedHike ] = useState<boolean>(false);
-    const [ openDeleteConfirmation, setIsOpenDeleteConfirmation ] = useState<boolean>(false);
+    const [ openDeleteConfirmation, setOpenDeleteConfirmation ] = useState<boolean>(false);
     const [ loading, setLoading ] = useState<boolean>(true);
     const { searchResults, currentHike, loggedIn, setSearchResults, setCurrentHike, setBanner } = useContext(MainContext);
     const { hikeId } = useParams();
@@ -214,22 +214,17 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
     };
 
     const handleDeleteConfirmation = async (value: boolean) => {
-        setIsOpenDeleteConfirmation(false);
+        setOpenDeleteConfirmation(false);
 
-        if (value) {
-            await handleDeleteHike();
-        }
-    };
-
-    const handleDeleteHike = async () => {
-        if (hikeId) {
+        if (value && hikeId) {
             await DataService.deleteHike(hikeId);
 
             const updatedSearchResults = [...searchResults];
             const index = updatedSearchResults.findIndex((hike: Hike) => hike.id === hikeId);
             updatedSearchResults.splice(index, 1);
             setSearchResults(updatedSearchResults);
-            navigate(-1);
+
+            navigate('/');
         }
     };
 
@@ -302,7 +297,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
                         aria-label='delete hike'
                         className={cx(classes.deleteButton)}
                         title='Delete hike'
-                        onClick={() => setIsOpenDeleteConfirmation(true)}
+                        onClick={() => setOpenDeleteConfirmation(true)}
                         size='small'
                         color='error'
                     >
@@ -490,7 +485,13 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
                 </>
             }
 
-            <ConfirmationPrompt title='Delete this hike?' open={openDeleteConfirmation} content='Are you sure you want to delete this hike?' onClose={handleDeleteConfirmation} />
+            <ConfirmationPrompt
+                title='Delete this hike?'
+                open={openDeleteConfirmation}
+                content='Are you sure you want to delete this hike?'
+                onClose={handleDeleteConfirmation}
+            />
+
             <LoadingOverlay open={loading} />
         </Box>
     )

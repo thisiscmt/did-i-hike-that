@@ -726,8 +726,6 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
         }
     };
 
-    console.log('retrievedKnownHikers: %o', retrievedKnownHikers);
-
     return (
         <>
             <Grid item xs={12} className={cx(classes.row)}>

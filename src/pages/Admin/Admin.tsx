@@ -60,7 +60,7 @@ const Admin: FC = () => {
                 <Box>
                     <Typography variant='h5'>Users</Typography>
 
-                    <Paper elevation={4}>
+                    <Paper elevation={3}>
                         <TableContainer className={cx(classes.table)}>
                             <Table>
                                 <TableHead>
@@ -75,7 +75,7 @@ const Admin: FC = () => {
                                 <TableBody>
                                     {users.map((user: User) => (
                                         <TableRow key={user.id}>
-                                            <TableCell component='th' scope='row'><Link to={`/admin/user/${user.id}`}>{user.name}</Link></TableCell>
+                                            <TableCell component='th' scope='row'><Link to={`/admin/user/${user.id}`}>{user.fullName}</Link></TableCell>
                                             <TableCell>{user.email}</TableCell>
                                             <TableCell>{user.role}</TableCell>
                                             <TableCell>{user.lastLogin ? SharedService.formatEpochValue(user.lastLogin) : ''}</TableCell>
