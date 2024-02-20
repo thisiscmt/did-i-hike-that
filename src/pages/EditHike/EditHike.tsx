@@ -234,7 +234,7 @@ const useStyles = makeStyles()((theme) => ({
         marginTop: '24px'
     },
 
-    cancelButton: {
+    buttonSpacer: {
         marginLeft: '12px'
     },
 
@@ -1075,7 +1075,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                     )}
                 </Button>
 
-                <Button onClick={handleCancel} variant='outlined' color='secondary' className={cx(classes.cancelButton)}>Cancel</Button>
+                <Button onClick={handleCancel} variant='outlined' color='secondary' className={cx(classes.buttonSpacer)}>Cancel</Button>
             </Grid>
 
             <Snackbar

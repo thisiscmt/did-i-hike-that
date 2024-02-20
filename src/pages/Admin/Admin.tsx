@@ -1,62 +1,94 @@
-import React, {FC, useEffect, useState} from 'react';
-import {Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from '@mui/material';
-import { makeStyles} from 'tss-react/mui';
+import React, { FC, useContext, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Typography, Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { makeStyles } from 'tss-react/mui';
+import Axios from 'axios';
 
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
 import { User } from '../../models/models';
+import {MainContext} from '../../contexts/MainContext';
+import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
 
-const useStyles = makeStyles()((theme) => ({
-    row: {
-        '&:last-child td, &:last-child th': {
-            border: 0
-        }
+const useStyles = makeStyles()(() => ({
+    mainContainer: {
+        height: '100vh'
+    },
+
+    table: {
+        marginTop: '12px'
     }
-
 }));
 
 const Admin: FC = () => {
     const { classes, cx } = useStyles();
-    const [users, setUsers] = useState<User[]>([]);
+    const [ users, setUsers ] = useState<User[]>([]);
+    const [ retrievedUsers, setRetrievedUsers ] = useState<boolean>(false);
+    const [ loading, setLoading ] = useState<boolean>(true);
+    const [ authorized, setAuthorized ] = useState<boolean>(false);
+    const { loggedIn, setBanner } = useContext(MainContext);
 
     useEffect(() => {
         const getUsers = async () => {
-            const response = await DataService.getUsers()
-
-            setUsers(response);
+            try {
+                const response = await DataService.getUsers()
+                setUsers(response);
+                setAuthorized(true);
+            } catch (error) {
+                if (Axios.isAxiosError(error) && error.response?.status === 401) {
+                    setBanner('You need to log in', 'warning');
+                } else if (Axios.isAxiosError(error) && error.response?.status === 403) {
+                    setBanner('You are not authorized to view this page', 'warning');
+                } else {
+                    setBanner('Error occurred retrieving users', 'error');
+                }
+            } finally {
+                setRetrievedUsers(true);
+                setLoading(false);
+            }
         }
 
-        if (users.length === 0) {
+        if (!retrievedUsers) {
             getUsers();
         }
     });
 
     return (
-        <Box>
-            <TableContainer component={Paper}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Name</TableCell>
-                            <TableCell>Email</TableCell>
-                            <TableCell>Role</TableCell>
-                            <TableCell>Last Updated</TableCell>
-                        </TableRow>
-                    </TableHead>
+        <Box className={`${cx(classes.mainContainer)} loadable-container`}>
+            {
+                !loading && loggedIn && authorized &&
+                <Box>
+                    <Typography variant='h5'>Users</Typography>
 
-                    <TableBody>
-                        {users.map((user: User) => (
-                            <TableRow key={user.id} className={cx(classes.row)}>
-                                <TableCell component='th' scope='row'>{user.name}</TableCell>
-                                <TableCell>{user.email}</TableCell>
-                                <TableCell>{user.role}</TableCell>
-                                <TableCell>{SharedService.formatISODateValue(user.updatedAt)}</TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+                    <Paper elevation={4}>
+                        <TableContainer className={cx(classes.table)}>
+                            <Table>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Name</TableCell>
+                                        <TableCell>Email</TableCell>
+                                        <TableCell>Role</TableCell>
+                                        <TableCell>Last Login</TableCell>
+                                    </TableRow>
+                                </TableHead>
 
+                                <TableBody>
+                                    {users.map((user: User) => (
+                                        <TableRow key={user.id}>
+                                            <TableCell component='th' scope='row'><Link to={`/admin/user/${user.id}`}>{user.name}</Link></TableCell>
+                                            <TableCell>{user.email}</TableCell>
+                                            <TableCell>{user.role}</TableCell>
+                                            <TableCell>{user.lastLogin ? SharedService.formatEpochValue(user.lastLogin) : ''}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </Paper>
+                </Box>
+            }
+
+            <LoadingOverlay open={loading} />
         </Box>
     );
 };

@@ -53,8 +53,8 @@ const useStyles = makeStyles()((theme) => ({
         height: 'auto',
 
         '& .MuiChip-label': {
-            paddingBottom: '8px',
-            paddingTop: '8px',
+            paddingBottom: '9px',
+            paddingTop: '9px',
             display: 'block',
             whiteSpace: 'normal'
         }

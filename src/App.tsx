@@ -7,6 +7,7 @@ import Home from './pages/Home/Home';
 import ViewHike from './pages/ViewHike/ViewHike';
 import EditHike from './pages/EditHike/EditHike';
 import Admin from './pages/Admin/Admin';
+import EditUser from './pages/EditUser/EditUser';
 import Login from './pages/Login/Login';
 import ErrorPage from './pages/ErrorPage/ErrorPage';
 import Header from './components/Header/Header';
@@ -67,6 +68,7 @@ function App() {
                             <Route path='/hike/:hikeId' element={<ViewHike topOfPageRef={topOfPageRef} />} />
                             <Route path='/hike/:hikeId/edit' element={<EditHike topOfPageRef={topOfPageRef} />} />
                             <Route path='/admin' element={<Admin />} />
+                            <Route path='/admin/user/:userId' element={<EditUser topOfPageRef={topOfPageRef} />} />
                             <Route path='/login' element={<Login />} />
                             <Route path='*' element={<ErrorPage />} />
                         </Routes>

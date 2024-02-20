@@ -64,6 +64,13 @@ export const getUsers = async (): Promise<User[]> => {
     return response.data;
 };
 
+export const getUser = async (userId: string): Promise<User> => {
+    const config = getRequestConfig();
+    const response = await Axios.get(`${process.env.REACT_APP_API_URL}/admin/user/${userId}`, config);
+
+    return response.data;
+};
+
 export const login = async (email: string, password: string) => {
     return await Axios.post(`${process.env.REACT_APP_API_URL}/auth/login`, { email, password }, getRequestConfig());
 };

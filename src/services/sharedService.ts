@@ -48,6 +48,12 @@ export const formatDateValue = (date: string) => {
     return `${Number(dateParts[1])}/${Number(dateParts[2])}/${dateParts[0]}`;
 };
 
+export const formatEpochValue = (epochValue: number) => {
+    const parsedDate = DateTime.fromMillis(epochValue);
+
+    return parsedDate.toLocaleString(DateTime.DATETIME_FULL);
+};
+
 export const formatISODateValue = (date: Date | undefined) => {
     let formattedDate = '';
 
