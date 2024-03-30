@@ -9,7 +9,7 @@ import Axios from 'axios';
 import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
 import * as DataService from '../../services/dataService';
 import { MainContext } from '../../contexts/MainContext';
-import { STORAGE_EMAIL, STORAGE_LAST_LOGIN } from '../../constants/constants';
+import {STORAGE_EMAIL, STORAGE_FULL_NAME, STORAGE_LAST_LOGIN} from '../../constants/constants';
 
 const useStyles = makeStyles()((theme) => ({
     row: {
@@ -124,7 +124,7 @@ const Login = () => {
 
             setBanner('');
             setLoading(true);
-            await DataService.login(email, password);
+            const user = await DataService.login(email, password);
 
             const lastLogin = Date.now().toString();
             setLastLogin(lastLogin);
@@ -132,6 +132,7 @@ const Login = () => {
             setLoggedIn(true);
 
             localStorage.setItem(STORAGE_EMAIL, email);
+            localStorage.setItem(STORAGE_FULL_NAME, user.fullName);
             localStorage.setItem(STORAGE_LAST_LOGIN, lastLogin);
             navigate('/');
         } catch (error) {

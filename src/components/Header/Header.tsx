@@ -1,13 +1,13 @@
 import React, {useContext, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Alert, Button, Fade, IconButton, SwipeableDrawer, Typography } from '@mui/material';
-import { MenuOutlined } from '@mui/icons-material';
+import { MenuOutlined, PersonOutlineOutlined } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
 
 import MobileMenu from '../MobileMenu/MobileMenu';
 import { Colors } from '../../services/themeService';
 import { MainContext } from '../../contexts/MainContext';
-import { STORAGE_LAST_LOGIN } from '../../constants/constants';
+import {STORAGE_FULL_NAME, STORAGE_LAST_LOGIN} from '../../constants/constants';
 import * as DataService from '../../services/dataService';
 
 const useStyles = makeStyles()((theme) => ({
@@ -42,8 +42,24 @@ const useStyles = makeStyles()((theme) => ({
         }
     },
 
-    addHikeButton: {
+    actionSection: {
+        display: 'flex',
+        alignItems: 'center',
         marginLeft: 'auto',
+    },
+
+    userDetails: {
+        display: 'flex',
+        alignItems: 'center',
+
+        [theme.breakpoints.down(768)]: {
+            display: 'none'
+        }
+    },
+
+    fullName: {
+        marginLeft: '8px',
+        marginRight: '12px'
     },
 
     mobileMenuButton: {
@@ -63,6 +79,8 @@ const Header = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
+    const currentUser = localStorage.getItem(STORAGE_FULL_NAME);
+
     useEffect(() => {
         setBanner('');
     // eslint-disable-next-line
@@ -76,6 +94,7 @@ const Header = () => {
         try {
             await DataService.logout();
 
+            localStorage.removeItem(STORAGE_FULL_NAME);
             localStorage.removeItem(STORAGE_LAST_LOGIN);
             setLoggedIn(false);
             navigate('/');
@@ -117,8 +136,23 @@ const Header = () => {
                             <Button variant='text' className={cx(classes.headerButton)} component={Link} to='/login'>Login</Button>
                 }
 
-                <Button variant='contained' className={cx(classes.addHikeButton)} component={Link} to='/hike' color="primary">Add Hike</Button>
+
+                <div className={cx(classes.actionSection)}>
+                    {
+                        loggedIn
+                            ?
+                                <div className={cx(classes.userDetails)}>
+                                    <PersonOutlineOutlined color='primary' />
+                                    <Typography variant='subtitle1' className={cx(classes.fullName)}>{currentUser}</Typography>
+                                </div>
+                            :
+                                null
+                    }
+
+                    <Button variant='contained' component={Link} to='/hike' color="primary">Add Hike</Button>
+                </div>
             </header>
+
             {
                 bannerMessage &&
                 <Fade in={!!bannerMessage}>

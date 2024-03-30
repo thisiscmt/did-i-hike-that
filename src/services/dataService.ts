@@ -87,8 +87,10 @@ export const deleteUser = (userId: string) => {
     return Axios.delete(`${process.env.REACT_APP_API_URL}/admin/user/${userId}`, getRequestConfig());
 };
 
-export const login = async (email: string, password: string) => {
-    return await Axios.post(`${process.env.REACT_APP_API_URL}/auth/login`, { email, password }, getRequestConfig());
+export const login = async (email: string, password: string): Promise<{ fullName: string }> => {
+    const response = await Axios.post(`${process.env.REACT_APP_API_URL}/auth/login`, { email, password }, getRequestConfig());
+
+    return response.data;
 };
 
 export const logout = async () => {

@@ -255,7 +255,9 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
             newHike.photos![index].editCaption = false;
             newHike.photos![index].action = 'update';
 
-            await DataService.updateHike(newHike)
+            const response = await DataService.updateHike(newHike);
+            newHike.updatedAt = response.updatedAt;
+
             setCurrentHike(newHike);
             setHike(newHike);
         }
