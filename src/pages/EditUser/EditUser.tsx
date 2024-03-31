@@ -9,6 +9,7 @@ import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
 import ConfirmationPrompt from '../../components/ConfirmationPrompt/ConfirmationPrompt';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
+import * as Constants from '../../constants/constants';
 import { Colors } from '../../services/themeService';
 import { User } from '../../models/models';
 
@@ -114,22 +115,29 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
     const [ saving, setSaving ] = useState<boolean>(false);
     const [ openDeleteConfirmation, setOpenDeleteConfirmation ] = useState<boolean>(false);
 
-    const { loggedIn, setBanner } = useContext(MainContext);
+    const { loggedIn, setBanner, setLoggedIn } = useContext(MainContext);
     const navigate = useNavigate();
 
     useEffect(() => {
+        const setUserLoggedOut = () => {
+            localStorage.removeItem(Constants.STORAGE_FULL_NAME);
+            localStorage.removeItem(Constants.STORAGE_LAST_LOGIN);
+            setLoggedIn(false);
+            setBanner(Constants.LOGIN_REQUIRED_MESSAGE, 'warning');
+        }
+
         const getUser = async () => {
             try {
                 const response = await DataService.getUser(userId || '');
 
-                setFullName(response.fullName);
+                setFullName(response.fullName || '');
                 setEmail(response.email);
                 setOriginalPassword(response.password);
                 setRole(response.role || 'Standard');
                 setAuthorized(true);
             } catch (error) {
                 if (Axios.isAxiosError(error) && error.response?.status === 401) {
-                    setBanner('You need to log in', 'warning');
+                    setUserLoggedOut();
                 } else if (Axios.isAxiosError(error) && error.response?.status === 403) {
                     setBanner('You are not authorized to view this page', 'warning');
                 } else {
@@ -143,7 +151,7 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
         if (!fullName) {
             getUser();
         }
-    });
+    }, [userId, fullName, setLoggedIn, setBanner]);
 
     const validInput = () => {
         let valid = true;
@@ -214,8 +222,10 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
             if (Axios.isAxiosError(error)) {
                 if (error.response?.status === 401) {
                     setBanner('You need to log in', 'warning');
-                } else if (error.code === 'ERR_CANCELED') {
-                    setBanner('Save was cancelled', 'warning');
+                } else if (error.response?.status === 400) {
+                    setBanner(error.response?.data, 'error');
+                } else {
+                    setBanner('Error saving hike', 'error');
                 }
             } else {
                 setBanner('Error saving hike', 'error');

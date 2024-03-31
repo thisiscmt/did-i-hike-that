@@ -9,9 +9,9 @@ import SearchResult from '../../components/SearchResult/SearchResult';
 import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
+import * as Constants from '../../constants/constants';
 import { MainContext } from '../../contexts/MainContext';
 import { Hike } from '../../models/models';
-import {HOME_PAGE_FIRST_BREAKPOINT} from '../../constants/constants';
 
 const useStyles = makeStyles()((theme) => ({
     mainContainer: {
@@ -37,7 +37,7 @@ const useStyles = makeStyles()((theme) => ({
     searchInput: {
         width: '80%',
 
-        [theme.breakpoints.down(HOME_PAGE_FIRST_BREAKPOINT)]: {
+        [theme.breakpoints.down(Constants.HOME_PAGE_FIRST_BREAKPOINT)]: {
             width: '100%'
         }
     },
@@ -57,7 +57,7 @@ const useStyles = makeStyles()((theme) => ({
             marginLeft: 'auto'
         },
 
-        [theme.breakpoints.down(HOME_PAGE_FIRST_BREAKPOINT)]: {
+        [theme.breakpoints.down(Constants.HOME_PAGE_FIRST_BREAKPOINT)]: {
             width: '100%'
         }
     },
@@ -85,7 +85,7 @@ const useStyles = makeStyles()((theme) => ({
         margin: 'auto',
         width: '80%',
 
-        [theme.breakpoints.down(HOME_PAGE_FIRST_BREAKPOINT)]: {
+        [theme.breakpoints.down(Constants.HOME_PAGE_FIRST_BREAKPOINT)]: {
             width: '100%'
         }
     },
@@ -114,7 +114,7 @@ const PAGE_SIZE = 10;
 
 const Home: FC = () => {
     const { classes, cx } = useStyles();
-    const { searchText, searchResults, page, pageCount, setSearchText, setSearchResults, setPage, setPageCount, setBanner } = useContext(MainContext);
+    const { searchText, searchResults, page, pageCount, setSearchText, setSearchResults, setPage, setPageCount, setBanner, setLoggedIn } = useContext(MainContext);
     const [ loading, setLoading ] = useState<boolean>(false);
     const [ showResults, setShowResults ] = useState<boolean>(searchResults.length > 0);
     const [ anchorEl, setAnchorEl ] = React.useState<HTMLButtonElement | null>(null);
@@ -123,6 +123,13 @@ const Home: FC = () => {
     useEffect(() => {
         document.title = 'Did I Hike That?';
     })
+
+    const setUserLoggedOut = () => {
+        localStorage.removeItem(Constants.STORAGE_FULL_NAME);
+        localStorage.removeItem(Constants.STORAGE_LAST_LOGIN);
+        setLoggedIn(false);
+        setBanner(Constants.LOGIN_REQUIRED_MESSAGE, 'warning');
+    }
 
     const handleSearchTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchText(event.target.value);
@@ -152,7 +159,7 @@ const Home: FC = () => {
             setShowResults(true);
         } catch (error){
             if (Axios.isAxiosError(error) && error.response?.status === 401) {
-                setBanner('You need to log in', 'warning');
+                setUserLoggedOut();
             } else {
                 setBanner('Error occurred retrieving hikes', 'error');
             }

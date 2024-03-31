@@ -1,11 +1,12 @@
 import React, { FC, useContext, useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Typography, Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 import Axios from 'axios';
 
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
+import * as Constants from '../../constants/constants';
 import { User } from '../../models/models';
 import {MainContext} from '../../contexts/MainContext';
 import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
@@ -30,8 +31,15 @@ const Admin: FC = () => {
     const [ retrievedUsers, setRetrievedUsers ] = useState<boolean>(false);
     const [ loading, setLoading ] = useState<boolean>(true);
     const [ authorized, setAuthorized ] = useState<boolean>(false);
-    const { loggedIn, setBanner } = useContext(MainContext);
+    const { loggedIn, setBanner, setLoggedIn } = useContext(MainContext);
     const navigate = useNavigate();
+
+    const setUserLoggedOut = () => {
+        localStorage.removeItem(Constants.STORAGE_FULL_NAME);
+        localStorage.removeItem(Constants.STORAGE_LAST_LOGIN);
+        setLoggedIn(false);
+        setBanner(Constants.LOGIN_REQUIRED_MESSAGE, 'warning');
+    }
 
     useEffect(() => {
         const getUsers = async () => {
@@ -41,7 +49,7 @@ const Admin: FC = () => {
                 setAuthorized(true);
             } catch (error) {
                 if (Axios.isAxiosError(error) && error.response?.status === 401) {
-                    setBanner('You need to log in', 'warning');
+                    setUserLoggedOut();
                 } else if (Axios.isAxiosError(error) && error.response?.status === 403) {
                     setBanner('You are not authorized to view this page', 'warning');
                 } else {

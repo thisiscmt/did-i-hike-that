@@ -26,11 +26,11 @@ import { DateTime } from 'luxon';
 
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
+import * as Constants from '../../constants/constants';
 import { Colors } from '../../services/themeService';
 import { Hike, Hiker, Photo } from '../../models/models';
 import { CustomLuxonAdapter} from '../../classes/customLuxonAdapter';
 import { MainContext } from '../../contexts/MainContext';
-import {PHOTO_MAX_SIZE, PHOTO_THUMBNAIL_SIZE} from '../../constants/constants';
 
 const useStyles = makeStyles()((theme) => ({
     row: {
@@ -207,7 +207,7 @@ const useStyles = makeStyles()((theme) => ({
     photoThumbnail: {
         display: 'flex',
         justifyContent: 'center',
-        minWidth: `${PHOTO_THUMBNAIL_SIZE}px`,
+        minWidth: `${Constants.PHOTO_THUMBNAIL_SIZE}px`,
 
         [theme.breakpoints.down(1024)]: {
             flex: '0 0 100%',
@@ -255,7 +255,7 @@ const useStyles = makeStyles()((theme) => ({
 
     saveIndicator: {
         color: Colors.white,
-        position: 'absolute',
+        marginLeft: '8px'
     },
 
     snackbar: {
@@ -273,7 +273,7 @@ interface EditHikeProps {
 
 const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const { classes, cx } = useStyles();
-    const { searchResults, currentHike, setSearchResults, setCurrentHike, setBanner } = useContext(MainContext);
+    const { searchResults, currentHike, setSearchResults, setCurrentHike, setBanner, setLoggedIn } = useContext(MainContext);
     const { hikeId } = useParams();
     const navigate = useNavigate();
     const abortController = useRef<AbortController>(new AbortController());
@@ -301,30 +301,12 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const [ openSnackbar, setOpenSnackbar ] = useState<boolean>(false);
     const [ snackbarMessage, setSnackbarMessage ] = useState<string>('');
 
-    // useEffect(() => {
-    //     const getKnownHikers = async () => {
-    //         try {
-    //             console.log('about to call getHikers: %o', new Date().getTime());
-    //
-    //             const currentHikers = await DataService.getHikers();
-    //
-    //             setRetrievedKnownHikers(true);
-    //             setKnownHikers(currentHikers);
-    //         } catch(error) {
-    //             if (Axios.isAxiosError(error) && error.response?.status === 401) {
-    //                 setBanner('You need to log in', 'warning');
-    //             } else {
-    //                 setBanner('Error occurred retrieving hikers', 'error');
-    //             }
-    //
-    //             SharedService.scrollToTop(topOfPageRef);
-    //         }
-    //     };
-    //
-    //     if (!retrievedKnownHikers) {
-    //         getKnownHikers();
-    //     }
-    // }, [retrievedKnownHikers, setBanner, topOfPageRef]);
+    const setUserLoggedOut = () => {
+        localStorage.removeItem(Constants.STORAGE_FULL_NAME);
+        localStorage.removeItem(Constants.STORAGE_LAST_LOGIN);
+        setLoggedIn(false);
+        setBanner(Constants.LOGIN_REQUIRED_MESSAGE, 'warning');
+    }
 
     useEffect(() => {
         const setHikeData = (hike: Hike) => {
@@ -367,15 +349,13 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
 
         const getKnownHikers = async () => {
             try {
-                console.log('about to call getHikers: %o', new Date().getTime());
-
                 const currentHikers = await DataService.getHikers();
-                setKnownHikers(currentHikers);
 
+                setKnownHikers(currentHikers);
                 setRetrievedKnownHikers(true);
             } catch(error) {
                 if (Axios.isAxiosError(error) && error.response?.status === 401) {
-                    setBanner('You need to log in', 'warning');
+                    setUserLoggedOut();
                 } else {
                     setBanner('Error occurred retrieving hikers', 'error');
                 }
@@ -399,7 +379,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
 
             } catch(error) {
                 if (Axios.isAxiosError(error) && error.response?.status === 401) {
-                    setBanner('You need to log in', 'warning');
+                    setUserLoggedOut();
                 } else {
                     setBanner('Error occurred retrieving the hike', 'error');
                 }
@@ -429,12 +409,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 clearHikeData();
             }
         }
-
-
-        // if (!retrievedKnownHikers.current) {
-        //     getKnownHikers();
-        // }
-    });
+    }, [clearedHike, currentHike, hikeId, retrievedHike, retrievedKnownHikers, setBanner, setCurrentHike, setUserLoggedOut, topOfPageRef]);
 
     const validInput = () => {
         let valid = true;
@@ -563,7 +538,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 let newPhotos = [...photos];
 
                 for (const file of event.target.files) {
-                    if (file.size > PHOTO_MAX_SIZE) {
+                    if (file.size > Constants.PHOTO_MAX_SIZE) {
                         setSnackbarMessage(`File '${file.name}' is too big`);
                         setOpenSnackbar(true);
                         continue;
@@ -572,7 +547,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                         setOpenSnackbar(false);
                     }
 
-                    const thumbnailSrc = await SharedService.getThumbnailDataSrc(file, PHOTO_THUMBNAIL_SIZE);
+                    const thumbnailSrc = await SharedService.getThumbnailDataSrc(file, Constants.PHOTO_THUMBNAIL_SIZE);
                     const fileName = file.name;
                     const index = newPhotos.findIndex((photo: Photo) => photo.fileName.toLowerCase() === fileName.toLowerCase());
 
@@ -691,13 +666,12 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 }
 
                 setCurrentHike(response);
-                setSaving(false);
                 navigate(`/hike/${hikeIdForNav}`);
             }
         } catch (error) {
             if (Axios.isAxiosError(error)) {
                 if (error.response?.status === 401) {
-                    setBanner('You need to log in', 'warning');
+                    setUserLoggedOut();
                 } else if (error.code === 'ERR_CANCELED') {
                     setBanner('Save was cancelled', 'warning');
                 }

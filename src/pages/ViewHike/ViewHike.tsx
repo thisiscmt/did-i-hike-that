@@ -11,6 +11,7 @@ import { Hike, Hiker, Photo } from '../../models/models';
 import { MainContext } from '../../contexts/MainContext';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
+import * as Constants from '../../constants/constants';
 
 const useStyles = makeStyles()((theme) => ({
     section: {
@@ -145,11 +146,18 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
     const [ retrievedHike, setRetrievedHike ] = useState<boolean>(false);
     const [ openDeleteConfirmation, setOpenDeleteConfirmation ] = useState<boolean>(false);
     const [ loading, setLoading ] = useState<boolean>(true);
-    const { searchResults, currentHike, loggedIn, setSearchResults, setCurrentHike, setBanner } = useContext(MainContext);
+    const { searchResults, currentHike, loggedIn, setSearchResults, setCurrentHike, setBanner, setLoggedIn } = useContext(MainContext);
     const { hikeId } = useParams();
     const navigate = useNavigate();
 
     useEffect(() => {
+        const setUserLoggedOut = () => {
+            localStorage.removeItem(Constants.STORAGE_FULL_NAME);
+            localStorage.removeItem(Constants.STORAGE_LAST_LOGIN);
+            setLoggedIn(false);
+            setBanner(Constants.LOGIN_REQUIRED_MESSAGE, 'warning');
+        }
+
         const getHike = async () => {
             try {
                 if (hikeId) {
@@ -164,7 +172,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
                 }
             } catch(error) {
                 if (Axios.isAxiosError(error) && error.response?.status === 401) {
-                    setBanner('You need to log in', 'warning');
+                    setUserLoggedOut();
                 } else if (Axios.isAxiosError(error) && error.response?.status === 404) {
                     setBanner('Could not find the hike', 'warning');
                 } else {
@@ -189,7 +197,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
                 getHike();
             }
         }
-    }, [hikeId, retrievedHike, currentHike, setCurrentHike, setBanner, topOfPageRef]);
+    }, [hikeId, retrievedHike, currentHike, setCurrentHike, setLoggedIn, setBanner, topOfPageRef]);
 
     const getValidUrl = () => {
         let valueToCheck = hike.link;
