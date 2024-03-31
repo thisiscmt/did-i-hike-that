@@ -132,7 +132,7 @@ const Login = () => {
             setLoggedIn(true);
 
             localStorage.setItem(STORAGE_EMAIL, email);
-            localStorage.setItem(STORAGE_FULL_NAME, user.fullName);
+            localStorage.setItem(STORAGE_FULL_NAME, user.fullName || '');
             localStorage.setItem(STORAGE_LAST_LOGIN, lastLogin);
             navigate('/');
         } catch (error) {

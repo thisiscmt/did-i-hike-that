@@ -1,5 +1,5 @@
 import React, { FC, useContext, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Typography, Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 import Axios from 'axios';
@@ -16,7 +16,11 @@ const useStyles = makeStyles()(() => ({
     },
 
     table: {
-        marginTop: '12px'
+        marginTop: '12px',
+
+        '& .MuiTableRow-hover': {
+            cursor: 'pointer'
+        }
     }
 }));
 
@@ -27,6 +31,7 @@ const Admin: FC = () => {
     const [ loading, setLoading ] = useState<boolean>(true);
     const [ authorized, setAuthorized ] = useState<boolean>(false);
     const { loggedIn, setBanner } = useContext(MainContext);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const getUsers = async () => {
@@ -74,8 +79,8 @@ const Admin: FC = () => {
 
                                 <TableBody>
                                     {users.map((user: User) => (
-                                        <TableRow key={user.id}>
-                                            <TableCell component='th' scope='row'><Link to={`/admin/user/${user.id}`}>{user.fullName}</Link></TableCell>
+                                        <TableRow hover={true} onClick={() => navigate(`/admin/user/${user.id}`)} key={user.id}>
+                                            <TableCell>{user.fullName}</TableCell>
                                             <TableCell>{user.email}</TableCell>
                                             <TableCell>{user.role}</TableCell>
                                             <TableCell>{user.lastLogin ? SharedService.formatEpochValue(user.lastLogin) : ''}</TableCell>

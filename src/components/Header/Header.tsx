@@ -59,7 +59,7 @@ const useStyles = makeStyles()((theme) => ({
 
     fullName: {
         marginLeft: '8px',
-        marginRight: '12px'
+        marginRight: '16px'
     },
 
     mobileMenuButton: {
@@ -79,7 +79,7 @@ const Header = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const currentUser = localStorage.getItem(STORAGE_FULL_NAME);
+    const currentUser = localStorage.getItem(STORAGE_FULL_NAME) || 'User';
 
     useEffect(() => {
         setBanner('');
