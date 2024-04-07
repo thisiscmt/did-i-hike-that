@@ -231,7 +231,12 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     actions: {
-        marginTop: '24px'
+        marginLeft: '136px',
+        marginTop: '24px',
+
+        [theme.breakpoints.down(470)]: {
+            marginLeft: '0'
+        }
     },
 
     buttonSpacer: {

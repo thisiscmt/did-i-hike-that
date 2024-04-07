@@ -9,7 +9,7 @@ import Axios from 'axios';
 import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
 import * as DataService from '../../services/dataService';
 import { MainContext } from '../../contexts/MainContext';
-import {STORAGE_EMAIL, STORAGE_FULL_NAME, STORAGE_LAST_LOGIN} from '../../constants/constants';
+import * as Constants from '../../constants/constants';
 
 const useStyles = makeStyles()((theme) => ({
     row: {
@@ -75,10 +75,10 @@ const useStyles = makeStyles()((theme) => ({
 const Login = () => {
     const { classes, cx } = useStyles();
 
-    const [ email, setEmail ] = useState<string>(localStorage.getItem(STORAGE_EMAIL) || '');
+    const [ email, setEmail ] = useState<string>(localStorage.getItem(Constants.STORAGE_EMAIL) || '');
     const [ password, setPassword ] = useState<string>('');
     const [ showPassword, setShowPassword ] = useState<boolean>(false);
-    const [ lastLogin, setLastLogin ] = useState<string>(localStorage.getItem(STORAGE_LAST_LOGIN) || '');
+    const [ lastLogin, setLastLogin ] = useState<string>(localStorage.getItem(Constants.STORAGE_LAST_LOGIN) || '');
     const [ emailInputError, setEmailInputError ] = useState<boolean>(false);
     const [ passwordInputError, setPasswordInputError ] = useState<boolean>(false);
     const [ loading, setLoading ] = useState<boolean>(false);
@@ -131,9 +131,10 @@ const Login = () => {
             setPassword('');
             setLoggedIn(true);
 
-            localStorage.setItem(STORAGE_EMAIL, email);
-            localStorage.setItem(STORAGE_FULL_NAME, user.fullName || '');
-            localStorage.setItem(STORAGE_LAST_LOGIN, lastLogin);
+            localStorage.setItem(Constants.STORAGE_EMAIL, email);
+            localStorage.setItem(Constants.STORAGE_FULL_NAME, user.fullName || '');
+            localStorage.setItem(Constants.STORAGE_ROLE, user.role);
+            localStorage.setItem(Constants.STORAGE_LAST_LOGIN, lastLogin);
             navigate('/');
         } catch (error) {
             if (Axios.isAxiosError(error) && error.response?.status === 401) {

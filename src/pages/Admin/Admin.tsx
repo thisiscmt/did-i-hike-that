@@ -1,6 +1,6 @@
 import React, { FC, useContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Typography, Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import {Link, useNavigate} from 'react-router-dom';
+import {Typography, Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button} from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 import Axios from 'axios';
 
@@ -12,8 +12,9 @@ import {MainContext} from '../../contexts/MainContext';
 import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
 
 const useStyles = makeStyles()(() => ({
-    mainContainer: {
-        height: '100vh'
+    tableHeader: {
+        display: 'flex',
+        justifyContent: 'space-between'
     },
 
     table: {
@@ -67,11 +68,14 @@ const Admin: FC = () => {
     });
 
     return (
-        <Box className={`${cx(classes.mainContainer)} loadable-container`}>
+        <Box className='loadable-container'>
             {
                 !loading && loggedIn && authorized &&
                 <Box>
-                    <Typography variant='h5'>Users</Typography>
+                    <Box className={cx(classes.tableHeader)}>
+                        <Typography variant='h5'>Users</Typography>
+                        <Button variant='contained' component={Link} to='/admin/user' color="primary">Add User</Button>
+                    </Box>
 
                     <Paper elevation={3}>
                         <TableContainer className={cx(classes.table)}>

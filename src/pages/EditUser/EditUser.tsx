@@ -14,10 +14,6 @@ import { Colors } from '../../services/themeService';
 import { User } from '../../models/models';
 
 const useStyles = makeStyles()((theme) => ({
-    mainContainer: {
-        height: '100vh'
-    },
-
     row: {
         marginBottom: '24px',
 
@@ -80,7 +76,12 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     actions: {
-        marginTop: '28px'
+        marginLeft: '136px',
+        marginTop: '24px',
+
+        [theme.breakpoints.down(470)]: {
+            marginLeft: '0'
+        }
     },
 
     buttonSpacer: {
@@ -99,20 +100,22 @@ interface EditUserProps {
 
 const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
     const { userId } = useParams();
+    const dummyPassword = '********';
 
     const { classes, cx } = useStyles();
     const [ fullName, setFullName ] = useState<string>('');
     const [ email, setEmail ] = useState<string>('');
-    const [ password, setPassword ] = useState<string>(userId ? '********' : '');
+    const [ password, setPassword ] = useState<string>(userId ? dummyPassword : '');
     const [ role, setRole ] = useState<string>('');
-    const [ originalPassword, setOriginalPassword ] = useState<string>('');
     const [ passwordChanged, setPasswordChanged ] = useState<boolean>(false);
     const [ nameInputError, setNameInputError ] = useState<boolean>(false);
     const [ emailInputError, setEmailInputError ] = useState<boolean>(false);
     const [ passwordInputError, setPasswordInputError ] = useState<boolean>(false);
-    const [ loading, setLoading ] = useState<boolean>(true);
+    const [ roleInputError, setRoleInputError ] = useState<boolean>(false);
+    const [ loading, setLoading ] = useState<boolean>(false);
     const [ authorized, setAuthorized ] = useState<boolean>(false);
     const [ saving, setSaving ] = useState<boolean>(false);
+    const [ retrieveduser, setRetrievedUser ] = useState<boolean>(false);
     const [ openDeleteConfirmation, setOpenDeleteConfirmation ] = useState<boolean>(false);
 
     const { loggedIn, setBanner, setLoggedIn } = useContext(MainContext);
@@ -128,13 +131,16 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
 
         const getUser = async () => {
             try {
-                const response = await DataService.getUser(userId || '');
+                if (userId) {
+                    setLoading(false);
+                    const response = await DataService.getUser(userId);
 
-                setFullName(response.fullName || '');
-                setEmail(response.email);
-                setOriginalPassword(response.password);
-                setRole(response.role || 'Standard');
-                setAuthorized(true);
+                    setFullName(response.fullName || '');
+                    setEmail(response.email);
+                    setRole(response.role);
+                    setAuthorized(true);
+                    setRetrievedUser(true);
+                }
             } catch (error) {
                 if (Axios.isAxiosError(error) && error.response?.status === 401) {
                     setUserLoggedOut();
@@ -148,10 +154,10 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
             }
         }
 
-        if (!fullName) {
+        if (userId && !retrieveduser) {
             getUser();
         }
-    }, [userId, fullName, setLoggedIn, setBanner]);
+    }, [userId, retrieveduser, setLoggedIn, setBanner]);
 
     const validInput = () => {
         let valid = true;
@@ -181,6 +187,14 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
             setPasswordInputError(false);
         }
 
+        if (role === '') {
+            setRoleInputError(true);
+            errorMsg = 'A required field is empty';
+            valid = false;
+        } else {
+            setRoleInputError(false);
+        }
+
         if (valid) {
             setBanner('');
         } else {
@@ -202,14 +216,12 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
                 const user: User = {
                     fullName,
                     email,
-                    password: passwordChanged ? password : originalPassword,
+                    password: (passwordChanged && password !== dummyPassword) ? password : '',
                     role
                 };
 
                 if (userId) {
                     user.id = userId;
-                    user.password = passwordChanged ? password : originalPassword;
-
                     await DataService.updateUser(user);
                 } else {
                     await DataService.createUser(user);
@@ -225,10 +237,10 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
                 } else if (error.response?.status === 400) {
                     setBanner(error.response?.data, 'error');
                 } else {
-                    setBanner('Error saving hike', 'error');
+                    setBanner('Error saving user', 'error');
                 }
             } else {
-                setBanner('Error saving hike', 'error');
+                setBanner('Error saving user', 'error');
             }
 
             SharedService.scrollToTop(topOfPageRef);
@@ -251,9 +263,9 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
     };
 
     return (
-        <Box className={`${cx(classes.mainContainer)} loadable-container`}>
+        <Box className='loadable-container'>
             {
-                !loading && loggedIn && authorized &&
+                !loading && loggedIn && (userId ? authorized : true) &&
                 <>
                     <Grid item xs={12} className={cx(classes.row)}>
                         <FormControl className={cx(classes.field)}>
@@ -323,6 +335,9 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
                                         autoCorrect='off'
                                         inputProps={{ maxLength: 255 }}
                                         onChange={handleChangePassword}
+                                        onFocus={event => {
+                                            event.target.select();
+                                        }}
                                     />
                                 }
                             />
@@ -339,6 +354,7 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
                                     <Box className={cx(classes.roleSelectorField)}>
                                         <Select
                                             value={role}
+                                            error={roleInputError}
                                             className={cx(classes.roleSelector)}
                                             onChange={(event) => setRole(event.target.value)}
                                         >

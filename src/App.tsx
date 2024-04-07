@@ -68,7 +68,7 @@ function App() {
                             <Route path='/hike/:hikeId' element={<ViewHike topOfPageRef={topOfPageRef} />} />
                             <Route path='/hike/:hikeId/edit' element={<EditHike topOfPageRef={topOfPageRef} />} />
                             <Route path='/admin' element={<Admin />} />
-                            <Route path='/admin/user/:userId' element={<EditUser topOfPageRef={topOfPageRef} />} />
+                            <Route path='/admin/user/:userId?' element={<EditUser topOfPageRef={topOfPageRef} />} />
                             <Route path='/login' element={<Login />} />
                             <Route path='*' element={<ErrorPage />} />
                         </Routes>

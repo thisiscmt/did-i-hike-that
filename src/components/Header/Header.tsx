@@ -7,7 +7,7 @@ import { makeStyles } from 'tss-react/mui';
 import MobileMenu from '../MobileMenu/MobileMenu';
 import { Colors } from '../../services/themeService';
 import { MainContext } from '../../contexts/MainContext';
-import {STORAGE_FULL_NAME, STORAGE_LAST_LOGIN} from '../../constants/constants';
+import * as Constants from '../../constants/constants';
 import * as DataService from '../../services/dataService';
 
 const useStyles = makeStyles()((theme) => ({
@@ -79,7 +79,8 @@ const Header = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const currentUser = localStorage.getItem(STORAGE_FULL_NAME) || 'User';
+    const currentUserFullName = localStorage.getItem(Constants.STORAGE_FULL_NAME) || 'User';
+    const currentUserRole = localStorage.getItem(Constants.STORAGE_ROLE);
 
     useEffect(() => {
         setBanner('');
@@ -94,8 +95,9 @@ const Header = () => {
         try {
             await DataService.logout();
 
-            localStorage.removeItem(STORAGE_FULL_NAME);
-            localStorage.removeItem(STORAGE_LAST_LOGIN);
+            localStorage.removeItem(Constants.STORAGE_FULL_NAME);
+            localStorage.removeItem(Constants.STORAGE_ROLE);
+            localStorage.removeItem(Constants.STORAGE_LAST_LOGIN);
             setLoggedIn(false);
             navigate('/');
         } catch(error) {
@@ -142,8 +144,8 @@ const Header = () => {
                         loggedIn
                             ?
                                 <div className={cx(classes.userDetails)}>
-                                    <PersonOutlineOutlined color='primary' />
-                                    <Typography variant='subtitle1' className={cx(classes.fullName)}>{currentUser}</Typography>
+                                    <PersonOutlineOutlined color={currentUserRole === 'Admin' ? 'secondary' : 'primary'} />
+                                    <Typography variant='subtitle1' className={cx(classes.fullName)}>{currentUserFullName}</Typography>
                                 </div>
                             :
                                 null

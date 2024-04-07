@@ -51,3 +51,8 @@ export interface User {
     createdAt?: Date;
     updatedAt?: Date;
 }
+
+export interface LoginResponse {
+    fullName: string;
+    role: string;
+}

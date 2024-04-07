@@ -1,6 +1,6 @@
 import Axios, { AxiosProgressEvent, AxiosRequestConfig } from 'axios';
 
-import { Hike, Hiker, HikeSearchParams, Photo, User } from '../models/models';
+import { Hike, Hiker, HikeSearchParams, LoginResponse, Photo, User } from '../models/models';
 
 export const getHikes = async (searchParams?: HikeSearchParams): Promise<{ rows: Hike[]; count: number }> => {
     const config = getRequestConfig();
@@ -74,7 +74,7 @@ export const getUser = async (userId: string): Promise<User> => {
 export const createUser = async (user: User): Promise<void> => {
     const config = getRequestConfig();
 
-    return await Axios.post(`${process.env.REACT_APP_API_URL}/hike`, user, config);
+    return await Axios.post(`${process.env.REACT_APP_API_URL}/admin/user`, user, config);
 };
 
 export const updateUser = async (user: User): Promise<void> => {
@@ -87,7 +87,7 @@ export const deleteUser = (userId: string) => {
     return Axios.delete(`${process.env.REACT_APP_API_URL}/admin/user/${userId}`, getRequestConfig());
 };
 
-export const login = async (email: string, password: string): Promise<{ fullName: string }> => {
+export const login = async (email: string, password: string): Promise<LoginResponse> => {
     const response = await Axios.post(`${process.env.REACT_APP_API_URL}/auth/login`, { email, password }, getRequestConfig());
 
     return response.data;
