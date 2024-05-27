@@ -674,14 +674,18 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 navigate(`/hike/${hikeIdForNav}`);
             }
         } catch (error) {
+            let msg = 'Error saving hike';
+
             if (Axios.isAxiosError(error)) {
                 if (error.response?.status === 401) {
                     setUserLoggedOut();
                 } else if (error.code === 'ERR_CANCELED') {
                     setBanner('Save was cancelled', 'warning');
+                } else {
+                    setBanner(msg, 'error');
                 }
             } else {
-                setBanner('Error saving hike', 'error');
+                setBanner(msg, 'error');
             }
 
             SharedService.scrollToTop(topOfPageRef);
