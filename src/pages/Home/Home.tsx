@@ -114,7 +114,7 @@ const PAGE_SIZE = 10;
 
 const Home: FC = () => {
     const { classes, cx } = useStyles();
-    const { searchText, searchResults, page, pageCount, setSearchText, setSearchResults, setPage, setPageCount, setBanner, setLoggedIn } = useContext(MainContext);
+    const { searchText, searchResults, page, pageCount, loggedIn, setSearchText, setSearchResults, setPage, setPageCount, setBanner, setLoggedIn } = useContext(MainContext);
     const [ loading, setLoading ] = useState<boolean>(false);
     const [ initialLoad, setInitialLoad ] = useState<boolean>(true);
     const [ anchorEl, setAnchorEl ] = React.useState<HTMLButtonElement | null>(null);
@@ -127,7 +127,7 @@ const Home: FC = () => {
 
         document.title = 'Did I Hike That?';
 
-        if (initialLoad && searchResults.length === 0) {
+        if (initialLoad && loggedIn && searchResults.length === 0) {
             setInitialLoad(false);
             getHikes();
         }
@@ -290,7 +290,12 @@ const Home: FC = () => {
                                         <Pagination onChange={handleChangePage} page={page} count={pageCount} className={cx(classes.pagination)} />
                                     </>
                                 :
-                                    <Box className={cx(classes.noResults)}>No hikes found</Box>
+                                    <>
+                                        {
+                                            loggedIn &&
+                                            <Box className={cx(classes.noResults)}>No hikes found</Box>
+                                        }
+                                    </>
                         }
                     </Box>
                 </form>
