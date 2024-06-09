@@ -49,7 +49,7 @@ const useStyles = makeStyles()((theme) => ({
         marginTop: '5px'
     },
 
-    hikerChip: {
+    chip: {
         height: 'auto',
 
         '& .MuiChip-label': {
@@ -107,7 +107,7 @@ const SearchResult: FC<SearchResultProps> = ({ hike }) => {
                             {
                                 hikers.map((hiker: string, index: number) => {
                                     return (
-                                        <Chip key={index} label={hiker.trim()} variant='outlined' color='primary' className={cx(classes.hikerChip)} />
+                                        <Chip key={index} label={hiker.trim()} variant='outlined' color='primary' className={cx(classes.chip)} />
                                     );
                                 })
                             }

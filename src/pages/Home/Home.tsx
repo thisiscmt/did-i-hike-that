@@ -116,13 +116,22 @@ const Home: FC = () => {
     const { classes, cx } = useStyles();
     const { searchText, searchResults, page, pageCount, setSearchText, setSearchResults, setPage, setPageCount, setBanner, setLoggedIn } = useContext(MainContext);
     const [ loading, setLoading ] = useState<boolean>(false);
-    const [ showResults, setShowResults ] = useState<boolean>(searchResults.length > 0);
+    const [ initialLoad, setInitialLoad ] = useState<boolean>(true);
     const [ anchorEl, setAnchorEl ] = React.useState<HTMLButtonElement | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
+        const getHikes = async () => {
+            await handleSearch();
+        }
+
         document.title = 'Did I Hike That?';
-    })
+
+        if (initialLoad && searchResults.length === 0) {
+            setInitialLoad(false);
+            getHikes();
+        }
+    });
 
     const setUserLoggedOut = () => {
         localStorage.removeItem(Constants.STORAGE_FULL_NAME);
@@ -156,7 +165,6 @@ const Home: FC = () => {
 
             setSearchResults(hikes.rows);
             setPageCount(Math.ceil(hikes.count / PAGE_SIZE));
-            setShowResults(true);
         } catch (error){
             if (Axios.isAxiosError(error) && error.response?.status === 401) {
                 setUserLoggedOut();
@@ -264,10 +272,8 @@ const Home: FC = () => {
 
                     <Box className={`${cx(classes.searchResultsContainer)}`}>
                         {
-                            showResults
+                            searchResults.length > 0
                                 ?
-                                searchResults.length > 0
-                                    ?
                                     <>
                                         <Box className={cx(classes.searchResults)}>
                                             {
@@ -283,9 +289,8 @@ const Home: FC = () => {
 
                                         <Pagination onChange={handleChangePage} page={page} count={pageCount} className={cx(classes.pagination)} />
                                     </>
-                                    :
+                                :
                                     <Box className={cx(classes.noResults)}>No hikes found</Box>
-                                : ''
                         }
                     </Box>
                 </form>

@@ -17,9 +17,9 @@ const useStyles = makeStyles()((theme) => ({
     section: {
         marginBottom: '24px',
 
-        '&.chips': {
+        '&.chips, &.photos': {
             marginBottom: '14px'
-        }
+        },
     },
 
     field: {
@@ -34,7 +34,7 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     fieldLabel: {
-        minWidth: '100px'
+        minWidth: '90px'
     },
 
     shortFieldLabel: {
@@ -80,8 +80,16 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     chip: {
+        height: 'auto',
         marginBottom: '8px',
         marginRight: '8px',
+
+        '& .MuiChip-label': {
+            paddingBottom: '9px',
+            paddingTop: '9px',
+            display: 'block',
+            whiteSpace: 'normal'
+        },
 
         ':last-child': {
             marginRight: 0
@@ -410,7 +418,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
 
             {
                 hike.photos && hike.photos.length > 0 &&
-                <Box className={cx(classes.section)}>
+                <Box className={`${cx(classes.section)} photos`}>
                     {
                         hike.photos.map((photo: Photo, index: number) => (
                             <Box key={index} className={cx(classes.photoContainer)}>

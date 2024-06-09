@@ -278,7 +278,7 @@ interface EditHikeProps {
 
 const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const { classes, cx } = useStyles();
-    const { searchResults, currentHike, setSearchResults, setCurrentHike, setBanner, setLoggedIn } = useContext(MainContext);
+    const { currentHike, setSearchResults, setCurrentHike, setBanner, setLoggedIn } = useContext(MainContext);
     const { hikeId } = useParams();
     const navigate = useNavigate();
     const abortController = useRef<AbortController>(new AbortController());
@@ -660,16 +660,12 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 if (hikeId) {
                     hike.id = hikeId;
                     response = await DataService.updateHike(hike, abortController.current.signal, uploadProgressHandler);
-
-                    const updatedSearchResults = [...searchResults];
-                    const index = updatedSearchResults.findIndex((hike: Hike) => hike.id === hikeId);
-                    updatedSearchResults[index] = getHikeForSearchResults(response);
-                    setSearchResults(updatedSearchResults);
                 } else {
                     response = await DataService.createHike(hike, abortController.current.signal, uploadProgressHandler);
                     hikeIdForNav = response.id;
                 }
 
+                setSearchResults([]);
                 setCurrentHike(response);
                 navigate(`/hike/${hikeIdForNav}`);
             }
