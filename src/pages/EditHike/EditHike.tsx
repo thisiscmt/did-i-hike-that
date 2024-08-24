@@ -1,4 +1,4 @@
-import React, { FC, RefObject, useContext, useEffect, useRef, useState } from 'react';
+import React, {FC, RefObject, useCallback, useContext, useEffect, useRef, useState} from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
     Autocomplete,
@@ -306,12 +306,13 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const [ openSnackbar, setOpenSnackbar ] = useState<boolean>(false);
     const [ snackbarMessage, setSnackbarMessage ] = useState<string>('');
 
-    const setUserLoggedOut = () => {
+    const setUserLoggedOut = useCallback(() => {
         localStorage.removeItem(Constants.STORAGE_FULL_NAME);
         localStorage.removeItem(Constants.STORAGE_LAST_LOGIN);
+
         setLoggedIn(false);
         setBanner(Constants.LOGIN_REQUIRED_MESSAGE, 'warning');
-    }
+    }, [setLoggedIn, setBanner]);
 
     useEffect(() => {
         const setHikeData = (hike: Hike) => {
@@ -462,33 +463,6 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
         }
 
         return valid;
-    };
-
-    const getHikeForSearchResults = (hike: Hike) => {
-        let fullNames = '';
-        let filePath = '';
-        let caption = '';
-
-        if (hike.hikers && hike.hikers.length > 0) {
-            fullNames = hike.hikers.map((hiker: Hiker) => hiker.fullName).join(',');
-        }
-
-        if (hike.photos && hike.photos.length > 0) {
-            filePath = hike.photos[0].filePath;
-            caption = hike.photos[0].caption || '';
-        }
-
-        return {
-            id: hike.id,
-            trail: hike.trail,
-            dateOfHike: hike.dateOfHike,
-            endDateOfHike: hike.endDateOfHike,
-            description: hike.description,
-            tags: hike.tags,
-            fullNames,
-            filePath,
-            caption
-        }
     };
 
     const getUploadProgressHandler = (): ((progressEvent: AxiosProgressEvent) => void) | undefined => {

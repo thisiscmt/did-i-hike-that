@@ -1,4 +1,4 @@
-import React, { FC, useContext, useEffect, useState } from 'react';
+import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TextField, Box, Typography, Button, InputAdornment, IconButton, Pagination, Popover } from '@mui/material';
 import { CloseOutlined } from '@mui/icons-material';
@@ -120,36 +120,15 @@ const Home: FC = () => {
     const [ anchorEl, setAnchorEl ] = React.useState<HTMLButtonElement | null>(null);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const getHikes = async () => {
-            await handleSearch();
-        }
-
-        document.title = 'Did I Hike That?';
-
-        if (initialLoad && loggedIn && searchResults.length === 0) {
-            setInitialLoad(false);
-            getHikes();
-        }
-    });
-
-    const setUserLoggedOut = () => {
+    const setUserLoggedOut = useCallback(() => {
         localStorage.removeItem(Constants.STORAGE_FULL_NAME);
         localStorage.removeItem(Constants.STORAGE_LAST_LOGIN);
+
         setLoggedIn(false);
         setBanner(Constants.LOGIN_REQUIRED_MESSAGE, 'warning');
-    }
+    }, [setLoggedIn, setBanner]);
 
-    const handleSearchTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchText(event.target.value);
-    };
-
-    const handleClearSearchText = () => {
-        setSearchText('');
-        handleSearch(undefined, true);
-    };
-
-    const handleSearch = async (page?: number, clearSearch?: boolean) => {
+    const handleSearch = useCallback(async (page?: number, clearSearch?: boolean) => {
         try {
             setLoading(true);
             setBanner('');
@@ -174,6 +153,28 @@ const Home: FC = () => {
         } finally {
             setLoading(false);
         }
+    }, [searchText, setBanner, setPageCount, setSearchResults, setSearchText, setUserLoggedOut]);
+
+    useEffect(() => {
+        const getHikes = async () => {
+            await handleSearch();
+        }
+
+        document.title = 'Did I Hike That?';
+
+        if (initialLoad && loggedIn && searchResults.length === 0) {
+            setInitialLoad(false);
+            getHikes();
+        }
+    }, [initialLoad, loggedIn, searchResults, setInitialLoad, handleSearch]);
+
+    const handleSearchTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchText(event.target.value);
+    };
+
+    const handleClearSearchText = () => {
+        setSearchText('');
+        handleSearch(undefined, true);
     };
 
     const handleKeypress = (event: React.KeyboardEvent<unknown>) => {
