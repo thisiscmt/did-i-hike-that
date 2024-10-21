@@ -592,10 +592,14 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
         if (index > -1) {
             const newPhotos = [...photos];
 
-            if (hikeId && newPhotos[index].action === 'add') {
+            if (!hikeId) {
                 newPhotos.splice(index, 1);
             } else {
-                newPhotos[index].action = 'delete';
+                if (newPhotos[index].action === 'add') {
+                    newPhotos.splice(index, 1);
+                } else {
+                    newPhotos[index].action = 'delete';
+                }
             }
 
             setPhotos(newPhotos);
