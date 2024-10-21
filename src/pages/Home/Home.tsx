@@ -1,9 +1,8 @@
 import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { TextField, Box, Typography, Button, InputAdornment, IconButton, Pagination, Popover } from '@mui/material';
 import { CloseOutlined } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
-import Axios from 'axios';
 
 import SearchResult from '../../components/SearchResult/SearchResult';
 import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
@@ -114,59 +113,61 @@ const PAGE_SIZE = 10;
 
 const Home: FC = () => {
     const { classes, cx } = useStyles();
-    const { searchText, searchResults, page, pageCount, loggedIn, setSearchText, setSearchResults, setPage, setPageCount, setBanner, setLoggedIn } = useContext(MainContext);
+    const { searchText, searchResults, pageCount, loggedIn, setSearchText, setSearchResults, setPageCount, setBanner } = useContext(MainContext);
     const [ loading, setLoading ] = useState<boolean>(false);
     const [ initialLoad, setInitialLoad ] = useState<boolean>(true);
+    const [ needLoad, setNeedLoad ] = useState<boolean>(false);
+    const [ currentPage, setCurrentPage ] = useState<number>(1);
+    const [ currentQueryString, setCurrentQueryString ] = useState<string>('');
+    const [ noResults, setNoResults ] = useState<boolean>(false);
     const [ anchorEl, setAnchorEl ] = React.useState<HTMLButtonElement | null>(null);
     const navigate = useNavigate();
+    const [ searchParams, setSearchParams ] = useSearchParams();
 
-    const setUserLoggedOut = useCallback(() => {
-        localStorage.removeItem(Constants.STORAGE_FULL_NAME);
-        localStorage.removeItem(Constants.STORAGE_LAST_LOGIN);
-
-        setLoggedIn(false);
-        setBanner(Constants.LOGIN_REQUIRED_MESSAGE, 'warning');
-    }, [setLoggedIn, setBanner]);
-
-    const handleSearch = useCallback(async (page?: number, clearSearch?: boolean) => {
+    const handleSearch = useCallback(async (searchParamsArg: URLSearchParams) => {
         try {
             setLoading(true);
             setBanner('');
 
-            const searchParams = SharedService.getSearchParams(clearSearch ? '' : searchText);
-            searchParams.page = page || 1;
-            searchParams.pageSize = PAGE_SIZE;
+            const searchParams = SharedService.getSearchRequestParams(searchParamsArg);
             const hikes = await DataService.getHikes(searchParams);
+            const pageSizeStr = searchParamsArg.get('pageSize');
+            const pageSize = Number(pageSizeStr) === 0 ? PAGE_SIZE : Number(pageSizeStr);
 
-            if (!clearSearch) {
-                setSearchText(searchText);
+            if (searchParams.page !== undefined) {
+                setCurrentPage(searchParams.page);
             }
 
             setSearchResults(hikes.rows);
-            setPageCount(Math.ceil(hikes.count / PAGE_SIZE));
+            setCurrentQueryString(searchParamsArg.toString());
+            setPageCount(Math.ceil(hikes.count / pageSize));
+            setNoResults(hikes.rows.length === 0);
+            setNeedLoad(false);
         } catch (error){
-            if (Axios.isAxiosError(error) && error.response?.status === 401) {
-                setUserLoggedOut();
-            } else {
+//            if (Axios.isAxiosError(error) && error.response?.status === 401) {
+//                setUserLoggedOut();
+//            } else {
                 setBanner('Error occurred retrieving hikes', 'error');
-            }
+//            }
         } finally {
             setLoading(false);
         }
-    }, [searchText, setBanner, setPageCount, setSearchResults, setSearchText, setUserLoggedOut]);
+    }, [setSearchResults, setPageCount, setBanner]);
 
     useEffect(() => {
         const getHikes = async () => {
-            await handleSearch();
+            await handleSearch(searchParams);
         }
 
         document.title = 'Did I Hike That?';
 
-        if (initialLoad && loggedIn && searchResults.length === 0) {
+        const queryStringChanged = currentQueryString !== searchParams.toString();
+
+        if ((initialLoad || needLoad || queryStringChanged) && loggedIn) {
             setInitialLoad(false);
             getHikes();
         }
-    }, [initialLoad, loggedIn, searchResults, setInitialLoad, handleSearch]);
+    }, [searchParams, currentQueryString, initialLoad, needLoad, loggedIn, handleSearch]);
 
     const handleSearchTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchText(event.target.value);
@@ -174,19 +175,39 @@ const Home: FC = () => {
 
     const handleClearSearchText = () => {
         setSearchText('');
-        handleSearch(undefined, true);
+        setNeedLoad(true);
+        searchParams.delete('searchText');
+    };
+
+    const handleClickSearch = () => {
+        if (searchText) {
+            searchParams.set('searchText', encodeURIComponent(searchText));
+        } else {
+            searchParams.delete('searchText');
+        }
+
+        if (currentPage !== 1) {
+            searchParams.set('page', '1');
+            setCurrentPage(1);
+        }
+
+        setSearchParams(searchParams);
+        handleSearch(searchParams);
     };
 
     const handleKeypress = (event: React.KeyboardEvent<unknown>) => {
         if (event.key === 'Enter') {
             event.preventDefault();
-            handleSearch();
+            handleClickSearch();
         }
     };
 
     const handleChangePage = (_event: React.ChangeEvent<unknown>, value: number) => {
-        setPage(value);
-        handleSearch(value);
+        searchParams.set('page', value.toString());
+
+        setCurrentPage(value);
+        setNeedLoad(true);
+        setSearchParams(searchParams);
     }
 
     const handleOpenSearchTips = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -204,7 +225,7 @@ const Home: FC = () => {
                     Ever ask yourself if you've hiked a particular trail before?
                 </Typography>
                 <Typography variant='h5'>
-                    Well ask no more!
+                    Well ask no more.
                 </Typography>
                 <Typography variant='body1' className={cx(classes.quote)}>
                     "Not all those who wander are lost"
@@ -241,7 +262,7 @@ const Home: FC = () => {
                     </Box>
 
                     <Box className={cx(classes.searchControls)}>
-                        <Button color='primary' variant='outlined' onClick={() => handleSearch()}>Search</Button>
+                        <Button color='primary' variant='outlined' onClick={handleClickSearch}>Search</Button>
                         <Button variant='text' size='small' className={cx(classes.searchTipsButton)} onClick={handleOpenSearchTips}>Search Tips</Button>
                     </Box>
 
@@ -288,12 +309,12 @@ const Home: FC = () => {
                                             }
                                         </Box>
 
-                                        <Pagination onChange={handleChangePage} page={page} count={pageCount} className={cx(classes.pagination)} />
+                                        <Pagination onChange={handleChangePage} page={currentPage} count={pageCount} className={cx(classes.pagination)} />
                                     </>
                                 :
                                     <>
                                         {
-                                            loggedIn &&
+                                            loggedIn && noResults &&
                                             <Box className={cx(classes.noResults)}>No hikes found</Box>
                                         }
                                     </>

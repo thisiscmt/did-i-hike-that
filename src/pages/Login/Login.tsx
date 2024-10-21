@@ -135,10 +135,11 @@ const Login = () => {
             localStorage.setItem(Constants.STORAGE_FULL_NAME, user.fullName || '');
             localStorage.setItem(Constants.STORAGE_ROLE, user.role);
             localStorage.setItem(Constants.STORAGE_LAST_LOGIN, lastLogin);
+
             navigate('/');
         } catch (error) {
             if (Axios.isAxiosError(error) && error.response?.status === 401) {
-                setBanner('Email or password were invalid', 'warning');
+                setBanner('The email address or password was invalid', 'warning');
             } else {
                 setBanner('Error occurred during login', 'error');
             }

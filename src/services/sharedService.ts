@@ -4,25 +4,35 @@ import { DateTime } from 'luxon';
 
 import { HikeSearchParams } from '../models/models';
 
-export const getSearchParams = (searchText: string) => {
-    const searchParams: HikeSearchParams = {};
+// export const isUserLoggedIn = () => {
+//     return
+// }
+
+export const getSearchRequestParams = (searchParams: URLSearchParams) => {
+    const searchRequestParams: HikeSearchParams = {};
+    const searchText = searchParams.get('searchText');
 
     if (searchText) {
         if (searchText.toLowerCase().startsWith('date:')) {
             const index = searchText.indexOf('-');
 
             if (index > -1) {
-                searchParams.startDate = searchText.slice(5, index).trim();
-                searchParams.endDate = searchText.slice(index + 1).trim();
+                searchRequestParams.startDate = searchText.slice(5, index).trim();
+                searchRequestParams.endDate = searchText.slice(index + 1).trim();
             } else {
-                searchParams.startDate = searchText.slice(5).trim();
+                searchRequestParams.startDate = searchText.slice(5).trim();
             }
         } else {
-            searchParams.searchText = searchText
+            searchRequestParams.searchText = searchText
         }
     }
 
-    return searchParams;
+    const page = searchParams.get('page') || 1;
+    const pageSize = searchParams.get('pageSize') || 10;
+    searchRequestParams.page = page ? Number(page) : 1;
+    searchRequestParams.pageSize = pageSize ? Number(pageSize) : 10;
+
+    return searchRequestParams;
 };
 
 export const getThumbnailSrc = (filePath: string) => {
