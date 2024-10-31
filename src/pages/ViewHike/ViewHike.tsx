@@ -154,7 +154,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
     const [ retrievedHike, setRetrievedHike ] = useState<boolean>(false);
     const [ openDeleteConfirmation, setOpenDeleteConfirmation ] = useState<boolean>(false);
     const [ loading, setLoading ] = useState<boolean>(true);
-    const { searchResults, currentHike, loggedIn, setSearchResults, setCurrentHike, setBanner, setLoggedIn } = useContext(MainContext);
+    const { searchResults, currentHike, loggedIn, setSearchResults, setCurrentHike, setBanner } = useContext(MainContext);
     const { hikeId } = useParams();
     const navigate = useNavigate();
 
@@ -162,7 +162,6 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
         const setUserLoggedOut = () => {
             localStorage.removeItem(Constants.STORAGE_FULL_NAME);
             localStorage.removeItem(Constants.STORAGE_LAST_LOGIN);
-            setLoggedIn(false);
             setBanner(Constants.LOGIN_REQUIRED_MESSAGE, 'warning');
         }
 
@@ -205,7 +204,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
                 getHike();
             }
         }
-    }, [hikeId, retrievedHike, currentHike, setCurrentHike, setLoggedIn, setBanner, topOfPageRef]);
+    }, [hikeId, retrievedHike, currentHike, setCurrentHike, setBanner, topOfPageRef]);
 
     const getValidUrl = () => {
         let valueToCheck = hike.link;
@@ -235,7 +234,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
         if (value && hikeId) {
             await DataService.deleteHike(hikeId);
 
-            const updatedSearchResults = [...searchResults];
+            const updatedSearchResults = searchResults ? [...searchResults] : [];
             const index = updatedSearchResults.findIndex((hike: Hike) => hike.id === hikeId);
             updatedSearchResults.splice(index, 1);
             setSearchResults(updatedSearchResults);
@@ -325,7 +324,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
             }
 
             {
-                !loading && loggedIn && hasHikeBasicData &&
+                !loading && hasHikeBasicData &&
                 <Card className={cx(classes.section)}>
                     <CardContent>
                         <Box>

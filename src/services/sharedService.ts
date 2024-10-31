@@ -4,10 +4,6 @@ import { DateTime } from 'luxon';
 
 import { HikeSearchParams } from '../models/models';
 
-// export const isUserLoggedIn = () => {
-//     return
-// }
-
 export const getSearchRequestParams = (searchParams: URLSearchParams) => {
     const searchRequestParams: HikeSearchParams = {};
     const searchText = searchParams.get('searchText');

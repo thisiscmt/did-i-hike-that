@@ -1,7 +1,7 @@
-import React, {useContext, useEffect, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
-import {Button, FormControl, FormControlLabel, Grid, IconButton, InputAdornment, TextField, Typography} from '@mui/material';
-import {VisibilityOffOutlined, VisibilityOutlined} from '@mui/icons-material';
+import React, { useContext, useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Button, FormControl, FormControlLabel, Grid, IconButton, InputAdornment, TextField, Typography } from '@mui/material';
+import { VisibilityOffOutlined, VisibilityOutlined } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
 import { DateTime } from 'luxon';
 import Axios from 'axios';
@@ -82,8 +82,9 @@ const Login = () => {
     const [ emailInputError, setEmailInputError ] = useState<boolean>(false);
     const [ passwordInputError, setPasswordInputError ] = useState<boolean>(false);
     const [ loading, setLoading ] = useState<boolean>(false);
-    const { setBanner, setLoggedIn } = useContext(MainContext);
+    const { setBanner } = useContext(MainContext);
     const navigate = useNavigate();
+    const [ searchParams ] = useSearchParams();
 
     useEffect(() => {
         document.title = 'Login - Did I Hike That?';
@@ -129,14 +130,22 @@ const Login = () => {
             const lastLogin = Date.now().toString();
             setLastLogin(lastLogin);
             setPassword('');
-            setLoggedIn(true);
 
             localStorage.setItem(Constants.STORAGE_EMAIL, email);
             localStorage.setItem(Constants.STORAGE_FULL_NAME, user.fullName || '');
             localStorage.setItem(Constants.STORAGE_ROLE, user.role);
             localStorage.setItem(Constants.STORAGE_LAST_LOGIN, lastLogin);
 
-            navigate('/');
+            const returnUrlParam = searchParams.get('returnUrl');
+            let returnUrl = '/';
+
+            if (returnUrlParam) {
+                returnUrl = decodeURIComponent(returnUrlParam);
+                window.location.replace(`${window.location.origin}${returnUrl}`);
+            } else {
+                navigate(returnUrl);
+            }
+
         } catch (error) {
             if (Axios.isAxiosError(error) && error.response?.status === 401) {
                 setBanner('The email address or password was invalid', 'warning');

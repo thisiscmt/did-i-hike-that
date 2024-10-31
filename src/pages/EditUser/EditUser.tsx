@@ -118,14 +118,13 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
     const [ retrieveduser, setRetrievedUser ] = useState<boolean>(false);
     const [ openDeleteConfirmation, setOpenDeleteConfirmation ] = useState<boolean>(false);
 
-    const { loggedIn, setBanner, setLoggedIn } = useContext(MainContext);
+    const { loggedIn, setBanner } = useContext(MainContext);
     const navigate = useNavigate();
 
     useEffect(() => {
         const setUserLoggedOut = () => {
             localStorage.removeItem(Constants.STORAGE_FULL_NAME);
             localStorage.removeItem(Constants.STORAGE_LAST_LOGIN);
-            setLoggedIn(false);
             setBanner(Constants.LOGIN_REQUIRED_MESSAGE, 'warning');
         }
 
@@ -157,7 +156,7 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
         if (userId && !retrieveduser) {
             getUser();
         }
-    }, [userId, retrieveduser, setLoggedIn, setBanner]);
+    }, [userId, retrieveduser, setBanner]);
 
     const validInput = () => {
         let valid = true;

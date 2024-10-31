@@ -3,19 +3,21 @@ import Axios, { AxiosProgressEvent, AxiosRequestConfig } from 'axios';
 import { Hike, Hiker, HikeSearchParams, LoginResponse, Photo, User } from '../models/models';
 import * as Constants from '../constants/constants';
 
-// Axios.interceptors.response.use(function (response) {
-//     return response;
-// }, function (error) {
-//     if (Axios.isAxiosError(error) && error.response?.status === 401) {
-//         localStorage.removeItem(Constants.STORAGE_FULL_NAME);
-//         localStorage.removeItem(Constants.STORAGE_ROLE);
-//         localStorage.removeItem(Constants.STORAGE_LAST_LOGIN);
-//
-//         window.location.replace('/login');
-//     } else {
-//         return Promise.reject(error);
-//     }
-// });
+Axios.interceptors.response.use(function (response) {
+    return response;
+}, function (error) {
+    if (Axios.isAxiosError(error) && error.response?.status === 401) {
+        localStorage.removeItem(Constants.STORAGE_FULL_NAME);
+        localStorage.removeItem(Constants.STORAGE_ROLE);
+        localStorage.removeItem(Constants.STORAGE_LAST_LOGIN);
+
+        const returnUrl = window.location.search ? `${window.location.pathname}${window.location.search}` : window.location.pathname;
+
+        window.location.replace(`/login?returnUrl=${encodeURIComponent(returnUrl)}`);
+    } else {
+        return Promise.reject(error);
+    }
+});
 
 export const getHikes = async (searchParams?: HikeSearchParams): Promise<{ rows: Hike[]; count: number }> => {
     const config = getRequestConfig();

@@ -75,7 +75,7 @@ const useStyles = makeStyles()((theme) => ({
 const Header = () => {
     const { classes, cx } = useStyles();
     const [ mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
-    const { bannerMessage, bannerSeverity, loggedIn, setBanner, setLoggedIn } = useContext(MainContext);
+    const { bannerMessage, bannerSeverity, loggedIn, setBanner } = useContext(MainContext);
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -95,11 +95,11 @@ const Header = () => {
         try {
             await DataService.logout();
 
-            localStorage.removeItem(Constants.STORAGE_FULL_NAME);
             localStorage.removeItem(Constants.STORAGE_ROLE);
             localStorage.removeItem(Constants.STORAGE_LAST_LOGIN);
-            setLoggedIn(false);
-            navigate('/');
+            localStorage.removeItem(Constants.STORAGE_FULL_NAME);
+
+            window.location.href = '/';
         } catch(error) {
             setBanner('Error occurred during logout', 'error');
         }

@@ -278,7 +278,7 @@ interface EditHikeProps {
 
 const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const { classes, cx } = useStyles();
-    const { currentHike, setSearchResults, setCurrentHike, setBanner, setLoggedIn } = useContext(MainContext);
+    const { currentHike, setSearchResults, setCurrentHike, setBanner } = useContext(MainContext);
     const { hikeId } = useParams();
     const navigate = useNavigate();
     const abortController = useRef<AbortController>(new AbortController());
@@ -310,9 +310,8 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
         localStorage.removeItem(Constants.STORAGE_FULL_NAME);
         localStorage.removeItem(Constants.STORAGE_LAST_LOGIN);
 
-        setLoggedIn(false);
         setBanner(Constants.LOGIN_REQUIRED_MESSAGE, 'warning');
-    }, [setLoggedIn, setBanner]);
+    }, [setBanner]);
 
     useEffect(() => {
         const setHikeData = (hike: Hike) => {

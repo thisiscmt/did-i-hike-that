@@ -42,7 +42,7 @@ interface MobileMenuProps {
 
 const MobileMenu: FC<MobileMenuProps> = ({ onClose }) => {
     const { classes, cx } = useStyles();
-    const { setBanner, loggedIn, setLoggedIn } = useContext(MainContext);
+    const { setBanner, loggedIn } = useContext(MainContext);
     const navigate = useNavigate();
 
     const handleMenuClose = () => {
@@ -53,7 +53,6 @@ const MobileMenu: FC<MobileMenuProps> = ({ onClose }) => {
         try {
             await DataService.logout();
             localStorage.removeItem(STORAGE_LAST_LOGIN);
-            setLoggedIn(false);
             navigate('/');
         } catch(error) {
             setBanner('Error occurred during logout', 'error');

@@ -32,13 +32,12 @@ const Admin: FC = () => {
     const [ retrievedUsers, setRetrievedUsers ] = useState<boolean>(false);
     const [ loading, setLoading ] = useState<boolean>(true);
     const [ authorized, setAuthorized ] = useState<boolean>(false);
-    const { loggedIn, setBanner, setLoggedIn } = useContext(MainContext);
+    const { loggedIn, setBanner } = useContext(MainContext);
     const navigate = useNavigate();
 
     const setUserLoggedOut = () => {
         localStorage.removeItem(Constants.STORAGE_FULL_NAME);
         localStorage.removeItem(Constants.STORAGE_LAST_LOGIN);
-        setLoggedIn(false);
         setBanner(Constants.LOGIN_REQUIRED_MESSAGE, 'warning');
     }
 

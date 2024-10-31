@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { TextField, Box, Typography, Button, InputAdornment, IconButton, Pagination, Popover } from '@mui/material';
 import { CloseOutlined } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
+import Axios from 'axios';
 
 import SearchResult from '../../components/SearchResult/SearchResult';
 import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
@@ -121,8 +122,8 @@ const Home: FC = () => {
     const [ currentQueryString, setCurrentQueryString ] = useState<string>('');
     const [ noResults, setNoResults ] = useState<boolean>(false);
     const [ anchorEl, setAnchorEl ] = React.useState<HTMLButtonElement | null>(null);
-    const navigate = useNavigate();
     const [ searchParams, setSearchParams ] = useSearchParams();
+    const navigate = useNavigate();
 
     const handleSearch = useCallback(async (searchParamsArg: URLSearchParams) => {
         try {
@@ -144,11 +145,9 @@ const Home: FC = () => {
             setNoResults(hikes.rows.length === 0);
             setNeedLoad(false);
         } catch (error){
-//            if (Axios.isAxiosError(error) && error.response?.status === 401) {
-//                setUserLoggedOut();
-//            } else {
+           if (Axios.isAxiosError(error) && error.response?.status !== 401) {
                 setBanner('Error occurred retrieving hikes', 'error');
-//            }
+            }
         } finally {
             setLoading(false);
         }
@@ -163,11 +162,11 @@ const Home: FC = () => {
 
         const queryStringChanged = currentQueryString !== searchParams.toString();
 
-        if ((initialLoad || needLoad || queryStringChanged) && loggedIn) {
+        if (((initialLoad && !searchResults) || needLoad || queryStringChanged) && loggedIn) {
             setInitialLoad(false);
             getHikes();
         }
-    }, [searchParams, currentQueryString, initialLoad, needLoad, loggedIn, handleSearch]);
+    }, [searchParams, currentQueryString, initialLoad, searchResults, needLoad, loggedIn, handleSearch]);
 
     const handleSearchTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchText(event.target.value);
@@ -217,6 +216,8 @@ const Home: FC = () => {
     const handleCloseSearchTips = () => {
         setAnchorEl(null);
     };
+
+    const searchResultsToRender = searchResults || [];
 
     return (
         <Box className={classes.mainContainer}>
@@ -294,12 +295,12 @@ const Home: FC = () => {
 
                     <Box className={`${cx(classes.searchResultsContainer)}`}>
                         {
-                            searchResults.length > 0
+                            searchResultsToRender.length > 0
                                 ?
                                     <>
                                         <Box className={cx(classes.searchResults)}>
                                             {
-                                                searchResults.map((hike: Hike) => {
+                                                searchResultsToRender.map((hike: Hike) => {
                                                     return (
                                                         <Box key={hike.id} className={cx(classes.searchResult)} onClick={() => navigate(`/hike/${hike.id}`)}>
                                                             <SearchResult hike={hike} />
