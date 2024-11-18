@@ -144,7 +144,7 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
                 if (Axios.isAxiosError(error) && error.response?.status === 401) {
                     setUserLoggedOut();
                 } else if (Axios.isAxiosError(error) && error.response?.status === 403) {
-                    setBanner('You are not authorized to view this page', 'warning');
+                    setBanner('You are not authorized to view this page', 'error');
                 } else {
                     setBanner('Error occurred retrieving users', 'error');
                 }
@@ -232,7 +232,7 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
         } catch (error) {
             if (Axios.isAxiosError(error)) {
                 if (error.response?.status === 401) {
-                    setBanner('You need to log in', 'warning');
+                    setBanner('You need to log in', 'error');
                 } else if (error.response?.status === 400) {
                     setBanner(error.response?.data, 'error');
                 } else {

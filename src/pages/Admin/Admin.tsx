@@ -51,7 +51,7 @@ const Admin: FC = () => {
                 if (Axios.isAxiosError(error) && error.response?.status === 401) {
                     setUserLoggedOut();
                 } else if (Axios.isAxiosError(error) && error.response?.status === 403) {
-                    setBanner('You are not authorized to view this page', 'warning');
+                    setBanner('You are not authorized to view this page', 'error');
                 } else {
                     setBanner('Error occurred retrieving users', 'error');
                 }
