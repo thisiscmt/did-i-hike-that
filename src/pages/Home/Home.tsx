@@ -3,7 +3,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { TextField, Box, Typography, Button, InputAdornment, IconButton, Pagination, Popover } from '@mui/material';
 import { CloseOutlined } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
-import Axios from 'axios';
 
 import SearchResult from '../../components/SearchResult/SearchResult';
 import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
@@ -114,7 +113,7 @@ const PAGE_SIZE = 10;
 
 const Home: FC = () => {
     const { classes, cx } = useStyles();
-    const { searchText, searchResults, pageCount, loggedIn, setSearchText, setSearchResults, setPageCount, setBanner } = useContext(MainContext);
+    const { searchText, searchResults, pageCount, isLoggedIn, setSearchText, setSearchResults, setPageCount, setBanner } = useContext(MainContext);
     const [ loading, setLoading ] = useState<boolean>(false);
     const [ initialLoad, setInitialLoad ] = useState<boolean>(true);
     const [ needLoad, setNeedLoad ] = useState<boolean>(false);
@@ -145,9 +144,7 @@ const Home: FC = () => {
             setNoResults(hikes.rows.length === 0);
             setNeedLoad(false);
         } catch (error){
-           if (Axios.isAxiosError(error) && error.response?.status !== 401) {
-                setBanner('Error occurred retrieving hikes', 'error');
-            }
+            setBanner('Error occurred retrieving hikes', 'error');
         } finally {
             setLoading(false);
         }
@@ -162,11 +159,11 @@ const Home: FC = () => {
 
         const queryStringChanged = currentQueryString !== searchParams.toString();
 
-        if (((initialLoad && !searchResults) || needLoad || queryStringChanged) && loggedIn) {
+        if (((initialLoad && !searchResults) || needLoad || queryStringChanged) && isLoggedIn()) {
             setInitialLoad(false);
             getHikes();
         }
-    }, [searchParams, currentQueryString, initialLoad, searchResults, needLoad, loggedIn, handleSearch]);
+    }, [searchParams, currentQueryString, initialLoad, searchResults, needLoad, isLoggedIn, handleSearch]);
 
     const handleSearchTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchText(event.target.value);
@@ -315,7 +312,7 @@ const Home: FC = () => {
                                 :
                                     <>
                                         {
-                                            loggedIn && noResults &&
+                                            isLoggedIn() && noResults &&
                                             <Box className={cx(classes.noResults)}>No hikes found</Box>
                                         }
                                     </>

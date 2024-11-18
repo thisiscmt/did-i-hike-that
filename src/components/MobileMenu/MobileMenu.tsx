@@ -42,7 +42,7 @@ interface MobileMenuProps {
 
 const MobileMenu: FC<MobileMenuProps> = ({ onClose }) => {
     const { classes, cx } = useStyles();
-    const { setBanner, loggedIn } = useContext(MainContext);
+    const { setBanner, isLoggedIn } = useContext(MainContext);
     const navigate = useNavigate();
 
     const handleMenuClose = () => {
@@ -89,7 +89,7 @@ const MobileMenu: FC<MobileMenuProps> = ({ onClose }) => {
                 {/*</ListItem>*/}
 
                 {
-                    loggedIn
+                    isLoggedIn()
                         ?
                             <ListItem disablePadding={true}>
                                 <ListItemButton onClick={handleLogout}>

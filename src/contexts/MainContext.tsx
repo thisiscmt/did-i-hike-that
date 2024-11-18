@@ -11,7 +11,7 @@ interface MainContextProps {
     searchResults: Hike[] | undefined;
     pageCount: number;
     currentHike: Hike | null;
-    loggedIn: boolean;
+    isLoggedIn: () => boolean;
     setBanner: (message: string, severity?: AlertSeverity) => void;
     setSearchText: React.Dispatch<React.SetStateAction<string>>;
     setSearchResults: React.Dispatch<React.SetStateAction<Hike[] | undefined>>;
@@ -30,7 +30,7 @@ export const MainContext = React.createContext<MainContextProps>({
     searchResults: undefined,
     pageCount: 1,
     currentHike: null,
-    loggedIn: false,
+    isLoggedIn: () => false,
     setBanner: () => {},
     setSearchText: () => {},
     setSearchResults: () => {},
@@ -50,9 +50,9 @@ export const MainProvider = ({ children }: MainProviderProps) => {
     const [ cookies ] = useCookies([Constants.SESSION_COOKIE]);
 
     const isLoggedIn = () => {
-        return !!localStorage.getItem(Constants.STORAGE_ROLE) &&
+        return !!localStorage.getItem(Constants.STORAGE_EMAIL) &&
+            !!localStorage.getItem(Constants.STORAGE_ROLE) &&
             !!localStorage.getItem(Constants.STORAGE_LAST_LOGIN) &&
-            !!localStorage.getItem(Constants.STORAGE_FULL_NAME) &&
             !!cookies[Constants.SESSION_COOKIE];
     }
 
@@ -69,7 +69,7 @@ export const MainProvider = ({ children }: MainProviderProps) => {
             searchResults,
             pageCount,
             currentHike,
-            loggedIn: isLoggedIn(),
+            isLoggedIn,
             setBanner,
             setSearchText,
             setSearchResults,

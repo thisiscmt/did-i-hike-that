@@ -9,7 +9,6 @@ import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
 import ConfirmationPrompt from '../../components/ConfirmationPrompt/ConfirmationPrompt';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
-import * as Constants from '../../constants/constants';
 import { Colors } from '../../services/themeService';
 import { User } from '../../models/models';
 
@@ -118,16 +117,10 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
     const [ retrieveduser, setRetrievedUser ] = useState<boolean>(false);
     const [ openDeleteConfirmation, setOpenDeleteConfirmation ] = useState<boolean>(false);
 
-    const { loggedIn, setBanner } = useContext(MainContext);
+    const { isLoggedIn, setBanner } = useContext(MainContext);
     const navigate = useNavigate();
 
     useEffect(() => {
-        const setUserLoggedOut = () => {
-            localStorage.removeItem(Constants.STORAGE_FULL_NAME);
-            localStorage.removeItem(Constants.STORAGE_LAST_LOGIN);
-            setBanner(Constants.LOGIN_REQUIRED_MESSAGE, 'warning');
-        }
-
         const getUser = async () => {
             try {
                 if (userId) {
@@ -141,9 +134,7 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
                     setRetrievedUser(true);
                 }
             } catch (error) {
-                if (Axios.isAxiosError(error) && error.response?.status === 401) {
-                    setUserLoggedOut();
-                } else if (Axios.isAxiosError(error) && error.response?.status === 403) {
+                if (Axios.isAxiosError(error) && error.response?.status === 403) {
                     setBanner('You are not authorized to view this page', 'error');
                 } else {
                     setBanner('Error occurred retrieving users', 'error');
@@ -249,7 +240,7 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
     };
 
     const handleCancel = () => {
-        navigate('/admin');
+        navigate('/admin/user');
     };
 
     const handleDeleteConfirmation = async (value: boolean) => {
@@ -257,14 +248,14 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
 
         if (value && userId) {
             await DataService.deleteUser(userId);
-            navigate('/admin');
+            navigate('/admin/user');
         }
     };
 
     return (
         <Box className='loadable-container'>
             {
-                !loading && loggedIn && (userId ? authorized : true) &&
+                !loading && isLoggedIn() && authorized &&
                 <>
                     <Grid item xs={12} className={cx(classes.row)}>
                         <FormControl className={cx(classes.field)}>

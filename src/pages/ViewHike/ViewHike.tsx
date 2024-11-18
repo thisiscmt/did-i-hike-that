@@ -11,7 +11,6 @@ import { Hike, Hiker, Photo } from '../../models/models';
 import { MainContext } from '../../contexts/MainContext';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
-import * as Constants from '../../constants/constants';
 
 const useStyles = makeStyles()((theme) => ({
     section: {
@@ -154,17 +153,11 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
     const [ retrievedHike, setRetrievedHike ] = useState<boolean>(false);
     const [ openDeleteConfirmation, setOpenDeleteConfirmation ] = useState<boolean>(false);
     const [ loading, setLoading ] = useState<boolean>(true);
-    const { searchResults, currentHike, loggedIn, setSearchResults, setCurrentHike, setBanner } = useContext(MainContext);
+    const { searchResults, currentHike, isLoggedIn, setSearchResults, setCurrentHike, setBanner } = useContext(MainContext);
     const { hikeId } = useParams();
     const navigate = useNavigate();
 
     useEffect(() => {
-        const setUserLoggedOut = () => {
-            localStorage.removeItem(Constants.STORAGE_FULL_NAME);
-            localStorage.removeItem(Constants.STORAGE_LAST_LOGIN);
-            setBanner(Constants.LOGIN_REQUIRED_MESSAGE, 'warning');
-        }
-
         const getHike = async () => {
             try {
                 if (hikeId) {
@@ -178,9 +171,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
                     setBanner('Missing a hike ID', 'error');
                 }
             } catch(error) {
-                if (Axios.isAxiosError(error) && error.response?.status === 401) {
-                    setUserLoggedOut();
-                } else if (Axios.isAxiosError(error) && error.response?.status === 404) {
+                if (Axios.isAxiosError(error) && error.response?.status === 404) {
                     setBanner('Could not find the hike', 'warning');
                 } else {
                     setBanner('Error occurred retrieving the hike', 'error');
@@ -291,6 +282,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
     const linkUrl = getValidUrl();
     const hasHikeBasicData = hike.dateOfHike || hike.endDateOfHike || hike.conditions || hike.crowds;
     const formattedUpdatedAt = SharedService.formatISODateValue(hike.updatedAt);
+    const loggedIn = isLoggedIn();
 
     return (
         <Box className='loadable-container'>

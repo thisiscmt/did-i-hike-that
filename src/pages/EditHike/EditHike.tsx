@@ -1,4 +1,4 @@
-import React, {FC, RefObject, useCallback, useContext, useEffect, useRef, useState} from 'react';
+import React, {FC, RefObject, useContext, useEffect, useRef, useState} from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
     Autocomplete,
@@ -306,13 +306,6 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const [ openSnackbar, setOpenSnackbar ] = useState<boolean>(false);
     const [ snackbarMessage, setSnackbarMessage ] = useState<string>('');
 
-    const setUserLoggedOut = useCallback(() => {
-        localStorage.removeItem(Constants.STORAGE_FULL_NAME);
-        localStorage.removeItem(Constants.STORAGE_LAST_LOGIN);
-
-        setBanner(Constants.LOGIN_REQUIRED_MESSAGE, 'warning');
-    }, [setBanner]);
-
     useEffect(() => {
         const setHikeData = (hike: Hike) => {
             setTrail(hike.trail);
@@ -359,12 +352,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 setKnownHikers(currentHikers);
                 setRetrievedKnownHikers(true);
             } catch(error) {
-                if (Axios.isAxiosError(error) && error.response?.status === 401) {
-                    setUserLoggedOut();
-                } else {
-                    setBanner('Error occurred retrieving hikers', 'error');
-                }
-
+                setBanner('Error occurred retrieving hikers', 'error');
                 SharedService.scrollToTop(topOfPageRef);
             }
         };
@@ -383,12 +371,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 }
 
             } catch(error) {
-                if (Axios.isAxiosError(error) && error.response?.status === 401) {
-                    setUserLoggedOut();
-                } else {
-                    setBanner('Error occurred retrieving the hike', 'error');
-                }
-
+                setBanner('Error occurred retrieving the hike', 'error');
                 SharedService.scrollToTop(topOfPageRef);
             }
         };
@@ -414,7 +397,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 clearHikeData();
             }
         }
-    }, [clearedHike, currentHike, hikeId, retrievedHike, retrievedKnownHikers, setBanner, setCurrentHike, setUserLoggedOut, topOfPageRef]);
+    }, [clearedHike, currentHike, hikeId, retrievedHike, retrievedKnownHikers, setBanner, setCurrentHike, topOfPageRef]);
 
     const validInput = () => {
         let valid = true;
@@ -650,9 +633,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             let msg = 'Error saving hike';
 
             if (Axios.isAxiosError(error)) {
-                if (error.response?.status === 401) {
-                    setUserLoggedOut();
-                } else if (error.code === 'ERR_CANCELED') {
+                if (error.code === 'ERR_CANCELED') {
                     setBanner('Save was cancelled', 'warning');
                 } else {
                     setBanner(msg, 'error');

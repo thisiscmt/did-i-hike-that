@@ -145,7 +145,6 @@ const Login = () => {
             } else {
                 navigate(returnUrl);
             }
-
         } catch (error) {
             if (Axios.isAxiosError(error) && error.response?.status === 400) {
                 setBanner('The email address or password was invalid', 'error');

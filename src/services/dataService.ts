@@ -1,6 +1,6 @@
 import Axios, { AxiosProgressEvent, AxiosRequestConfig } from 'axios';
 
-import { Hike, Hiker, HikeSearchParams, LoginResponse, Photo, User } from '../models/models';
+import { Hike, Hiker, HikeSearchParams, LoginResponse, Photo, Session, User } from '../models/models';
 import * as Constants from '../constants/constants';
 
 Axios.interceptors.response.use(function (response) {
@@ -78,7 +78,7 @@ export const getUsers = async (): Promise<User[]> => {
     const config = getRequestConfig();
     const response = await Axios.get(`${process.env.REACT_APP_API_URL}/admin/user`, config);
 
-    return response.data;
+    return response.data.rows;
 };
 
 export const getUser = async (userId: string): Promise<User> => {
@@ -102,6 +102,17 @@ export const updateUser = async (user: User): Promise<void> => {
 
 export const deleteUser = (userId: string) => {
     return Axios.delete(`${process.env.REACT_APP_API_URL}/admin/user/${userId}`, getRequestConfig());
+};
+
+export const getSessions = async (): Promise<Session[]> => {
+    const config = getRequestConfig();
+    const response = await Axios.get(`${process.env.REACT_APP_API_URL}/admin/session`, config);
+
+    return response.data.rows;
+};
+
+export const deleteSession = (sid: string) => {
+    return Axios.delete(`${process.env.REACT_APP_API_URL}/admin/session/${sid}`, getRequestConfig());
 };
 
 export const login = async (email: string, password: string): Promise<LoginResponse> => {

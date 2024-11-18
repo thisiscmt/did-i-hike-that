@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Alert, Button, Fade, IconButton, SwipeableDrawer, Typography } from '@mui/material';
 import { MenuOutlined, PersonOutlineOutlined } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
@@ -75,9 +75,8 @@ const useStyles = makeStyles()((theme) => ({
 const Header = () => {
     const { classes, cx } = useStyles();
     const [ mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
-    const { bannerMessage, bannerSeverity, loggedIn, setBanner } = useContext(MainContext);
+    const { bannerMessage, bannerSeverity, isLoggedIn, setBanner } = useContext(MainContext);
     const location = useLocation();
-    const navigate = useNavigate();
 
     const currentUserFullName = localStorage.getItem(Constants.STORAGE_FULL_NAME) || 'User';
     const currentUserRole = localStorage.getItem(Constants.STORAGE_ROLE);
@@ -86,6 +85,8 @@ const Header = () => {
         setBanner('');
     // eslint-disable-next-line
     }, [location]);
+
+    console.log('isLoggedIn in Header: %o', isLoggedIn());
 
     const handleMobileMenuClick = (value: boolean) => {
         setMobileMenuOpen(value);
@@ -104,6 +105,8 @@ const Header = () => {
             setBanner('Error occurred during logout', 'error');
         }
     }
+
+    const loggedIn = isLoggedIn();
 
     return (
         <>

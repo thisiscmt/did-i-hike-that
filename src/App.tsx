@@ -6,12 +6,13 @@ import { makeStyles } from 'tss-react/mui';
 import Home from './pages/Home/Home';
 import ViewHike from './pages/ViewHike/ViewHike';
 import EditHike from './pages/EditHike/EditHike';
-import Admin from './pages/Admin/Admin';
+import Users from './pages/Users/Users';
+import Sessions from './pages/Sessions/Sessions';
 import EditUser from './pages/EditUser/EditUser';
 import Login from './pages/Login/Login';
 import ErrorPage from './pages/ErrorPage/ErrorPage';
 import Header from './components/Header/Header';
-import {HOME_PAGE_FIRST_BREAKPOINT} from './constants/constants';
+import { HOME_PAGE_FIRST_BREAKPOINT } from './constants/constants';
 import './App.scss';
 
 const useStyles = makeStyles()((theme) => ({
@@ -67,7 +68,8 @@ function App() {
                             <Route path='/hike' element={<EditHike topOfPageRef={topOfPageRef} />} />
                             <Route path='/hike/:hikeId' element={<ViewHike topOfPageRef={topOfPageRef} />} />
                             <Route path='/hike/:hikeId/edit' element={<EditHike topOfPageRef={topOfPageRef} />} />
-                            <Route path='/admin' element={<Admin />} />
+                            <Route path='/admin/user' element={<Users />} />
+                            <Route path='/admin/session' element={<Sessions />} />
                             <Route path='/admin/user/:userId?' element={<EditUser topOfPageRef={topOfPageRef} />} />
                             <Route path='/login' element={<Login />} />
                             <Route path='*' element={<ErrorPage />} />

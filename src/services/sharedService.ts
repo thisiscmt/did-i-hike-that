@@ -60,12 +60,12 @@ export const formatEpochValue = (epochValue: number) => {
     return parsedDate.toLocaleString(DateTime.DATETIME_FULL);
 };
 
-export const formatISODateValue = (date: Date | undefined) => {
+export const formatISODateValue = (date: Date | string | undefined, format?: Intl.DateTimeFormatOptions) => {
     let formattedDate = '';
 
     if (date) {
         const parsedDate = DateTime.fromISO(date.toString());
-        formattedDate = parsedDate.toLocaleString(DateTime.DATETIME_FULL);
+        formattedDate = parsedDate.toLocaleString(format ? format : DateTime.DATETIME_FULL);
     }
 
     return formattedDate;

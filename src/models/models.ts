@@ -48,8 +48,15 @@ export interface User {
     password: string;
     role: string;
     lastLogin?: number;
-    createdAt?: Date;
-    updatedAt?: Date;
+//    createdAt?: Date;
+//    updatedAt?: Date;
+}
+
+export interface Session {
+    sid: string;
+    expires: string;
+    data: string;
+    createdAt: string;
 }
 
 export interface LoginResponse {
