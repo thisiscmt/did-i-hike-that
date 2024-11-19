@@ -86,8 +86,6 @@ const Header = () => {
     // eslint-disable-next-line
     }, [location]);
 
-    console.log('isLoggedIn in Header: %o', isLoggedIn());
-
     const handleMobileMenuClick = (value: boolean) => {
         setMobileMenuOpen(value);
     };

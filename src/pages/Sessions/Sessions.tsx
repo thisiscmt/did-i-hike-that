@@ -2,7 +2,6 @@ import React, { FC, useContext, useEffect, useState } from 'react';
 import { Typography, Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton } from '@mui/material';
 import { DeleteOutlineOutlined } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
-import Axios from 'axios';
 import { DateTime } from 'luxon';
 
 import * as DataService from '../../services/dataService';
@@ -10,6 +9,7 @@ import * as SharedService from '../../services/sharedService';
 import { Session } from '../../models/models';
 import { MainContext } from '../../contexts/MainContext';
 import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
+import ConfirmationPrompt from '../../components/ConfirmationPrompt/ConfirmationPrompt';
 
 const useStyles = makeStyles()(() => ({
     tableHeader: {
@@ -22,12 +22,11 @@ const useStyles = makeStyles()(() => ({
     },
 
     deleteButtonColumn: {
+        paddingBottom: '8px',
         paddingLeft: '8px',
-        paddingRight: 0
-    },
-
-    deleteButton: {
-        padding: 0
+        paddingTop: '8px',
+        paddingRight: 0,
+        width: '30px'
     }
 }));
 
@@ -37,7 +36,9 @@ const Sessions: FC = () => {
     const [ retrievedSessions, setRetrievedSessions ] = useState<boolean>(false);
     const [ loading, setLoading ] = useState<boolean>(true);
     const [ authorized, setAuthorized ] = useState<boolean>(false);
-    const { isLoggedIn, setBanner } = useContext(MainContext);
+    const [ openDeleteConfirmation, setOpenDeleteConfirmation ] = useState<boolean>(false);
+    const [ sessionIdToDelete, setSessionIdToDelete ] = useState<string>('');
+    const { isLoggedIn, handleException } = useContext(MainContext);
 
     useEffect(() => {
         const getSessions = async () => {
@@ -46,11 +47,7 @@ const Sessions: FC = () => {
                 setSessions(response);
                 setAuthorized(true);
             } catch (error) {
-                if (Axios.isAxiosError(error) && error.response?.status === 403) {
-                    setBanner('You are not authorized to view this page', 'error');
-                } else {
-                    setBanner('Error occurred retrieving sessions', 'error');
-                }
+                handleException(error, 'An error occurred retrieving sessions');
             } finally {
                 setRetrievedSessions(true);
                 setLoading(false);
@@ -62,16 +59,23 @@ const Sessions: FC = () => {
         }
     });
 
-    const handleDeleteSession = async (sid: string) => {
-        try {
-            setLoading(true);
-            await DataService.deleteSession(sid);
+    const handleDeleteSessionClick = async (sid: string) => {
+        setSessionIdToDelete(sid);
+        setOpenDeleteConfirmation(true);
+    };
 
-            window.location.reload();
-        } catch (error) {
-            setBanner('Error occurred deleting the session', 'error');
-        } finally {
-            setLoading(false);
+    const handleDeleteConfirmation = async (value: boolean) => {
+        setOpenDeleteConfirmation(false);
+
+        if (value) {
+            setLoading(true);
+
+            try {
+                await DataService.deleteSession(sessionIdToDelete);
+                window.location.reload();
+            } catch (error) {
+                handleException(error, 'An error occurred deleting the session');
+            }
         }
     };
 
@@ -119,10 +123,9 @@ const Sessions: FC = () => {
                                                         <IconButton
                                                             aria-label='delete session'
                                                             title='Delete session'
-                                                            onClick={() => handleDeleteSession(session.sid)}
+                                                            onClick={() => handleDeleteSessionClick(session.sid)}
                                                             size='small'
                                                             color='error'
-                                                            className={cx(classes.deleteButton)}
                                                         >
                                                             <DeleteOutlineOutlined />
                                                         </IconButton>
@@ -141,6 +144,13 @@ const Sessions: FC = () => {
                     </Paper>
                 </Box>
             }
+
+            <ConfirmationPrompt
+                title='Delete this session?'
+                open={openDeleteConfirmation}
+                content='Are you sure you want to delete this session?'
+                onClose={handleDeleteConfirmation}
+            />
 
             <LoadingOverlay open={loading} />
         </Box>

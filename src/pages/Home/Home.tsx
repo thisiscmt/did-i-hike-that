@@ -144,7 +144,7 @@ const Home: FC = () => {
             setNoResults(hikes.rows.length === 0);
             setNeedLoad(false);
         } catch (error){
-            setBanner('Error occurred retrieving hikes', 'error');
+            setBanner('An error occurred retrieving hikes', 'error');
         } finally {
             setLoading(false);
         }

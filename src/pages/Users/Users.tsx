@@ -2,7 +2,6 @@ import React, { FC, useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Typography, Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
-import Axios from 'axios';
 
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
@@ -31,7 +30,7 @@ const Users: FC = () => {
     const [ retrievedUsers, setRetrievedUsers ] = useState<boolean>(false);
     const [ loading, setLoading ] = useState<boolean>(true);
     const [ authorized, setAuthorized ] = useState<boolean>(false);
-    const { isLoggedIn, setBanner } = useContext(MainContext);
+    const { isLoggedIn, handleException } = useContext(MainContext);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -41,11 +40,7 @@ const Users: FC = () => {
                 setUsers(response);
                 setAuthorized(true);
             } catch (error) {
-                if (Axios.isAxiosError(error) && error.response?.status === 403) {
-                    setBanner('You are not authorized to view this page', 'error');
-                } else {
-                    setBanner('Error occurred retrieving users', 'error');
-                }
+                handleException(error, 'An error occurred retrieving users');
             } finally {
                 setRetrievedUsers(true);
                 setLoading(false);

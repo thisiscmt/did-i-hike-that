@@ -3,6 +3,7 @@ import { useCookies } from 'react-cookie';
 
 import { Hike } from '../models/models';
 import * as Constants from '../constants/constants';
+import Axios, {AxiosError} from 'axios';
 
 interface MainContextProps {
     bannerMessage: string;
@@ -12,6 +13,7 @@ interface MainContextProps {
     pageCount: number;
     currentHike: Hike | null;
     isLoggedIn: () => boolean;
+    handleException: (error: unknown, msg?: string) => void;
     setBanner: (message: string, severity?: AlertSeverity) => void;
     setSearchText: React.Dispatch<React.SetStateAction<string>>;
     setSearchResults: React.Dispatch<React.SetStateAction<Hike[] | undefined>>;
@@ -31,6 +33,7 @@ export const MainContext = React.createContext<MainContextProps>({
     pageCount: 1,
     currentHike: null,
     isLoggedIn: () => false,
+    handleException: () => {},
     setBanner: () => {},
     setSearchText: () => {},
     setSearchResults: () => {},
@@ -61,6 +64,20 @@ export const MainProvider = ({ children }: MainProviderProps) => {
         setBannerSeverity(severity || 'info');
     };
 
+    const handleException = (error: unknown, msg?: string) => {
+        if (Axios.isAxiosError(error)) {
+            if (error.response?.status === 403) {
+                setBanner('You are not authorized to access this content', 'error');
+            } else {
+                setBanner(msg ? msg : (error as AxiosError).message, 'error');
+            }
+        } else if (error instanceof Error) {
+            setBanner(msg ? msg : (error as Error).message, 'error');
+        } else {
+            setBanner(msg ? msg : 'An error occurred during the request', 'error');
+        }
+    };
+
     return (
         <MainContext.Provider value={{
             bannerMessage,
@@ -70,6 +87,7 @@ export const MainProvider = ({ children }: MainProviderProps) => {
             pageCount,
             currentHike,
             isLoggedIn,
+            handleException,
             setBanner,
             setSearchText,
             setSearchResults,

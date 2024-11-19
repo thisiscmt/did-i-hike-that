@@ -117,7 +117,7 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
     const [ retrieveduser, setRetrievedUser ] = useState<boolean>(false);
     const [ openDeleteConfirmation, setOpenDeleteConfirmation ] = useState<boolean>(false);
 
-    const { isLoggedIn, setBanner } = useContext(MainContext);
+    const { isLoggedIn, handleException, setBanner } = useContext(MainContext);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -134,11 +134,7 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
                     setRetrievedUser(true);
                 }
             } catch (error) {
-                if (Axios.isAxiosError(error) && error.response?.status === 403) {
-                    setBanner('You are not authorized to view this page', 'error');
-                } else {
-                    setBanner('Error occurred retrieving users', 'error');
-                }
+                handleException(error, 'Error occurred retrieving user');
             } finally {
                 setLoading(false);
             }
@@ -147,7 +143,7 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
         if (userId && !retrieveduser) {
             getUser();
         }
-    }, [userId, retrieveduser, setBanner]);
+    }, [userId, retrieveduser, handleException]);
 
     const validInput = () => {
         let valid = true;
@@ -218,13 +214,11 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
                 }
 
                 setSaving(false);
-                navigate('/admin');
+                navigate('/admin/user');
             }
         } catch (error) {
             if (Axios.isAxiosError(error)) {
-                if (error.response?.status === 401) {
-                    setBanner('You need to log in', 'error');
-                } else if (error.response?.status === 400) {
+                if (error.response?.status === 400) {
                     setBanner(error.response?.data, 'error');
                 } else {
                     setBanner('Error saving user', 'error');
