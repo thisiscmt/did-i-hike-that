@@ -2,7 +2,6 @@ import React, { FC, useContext, useEffect, useState } from 'react';
 import { Typography, Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton } from '@mui/material';
 import { DeleteOutlineOutlined } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
-import { DateTime } from 'luxon';
 
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
@@ -105,8 +104,8 @@ const Sessions: FC = () => {
                                 <TableBody>
                                     {
                                         sessions.map((session: Session) => {
-                                            const sessionExpiration = SharedService.formatISODateValue(session.expires, DateTime.DATETIME_SHORT);
-                                            const sessionCreation = SharedService.formatISODateValue(session.createdAt, DateTime.DATETIME_SHORT);
+                                            const sessionExpiration = SharedService.formatISODateValue(session.expires, SharedService.dateFormatOptions);
+                                            const sessionCreation = SharedService.formatISODateValue(session.createdAt, SharedService.dateFormatOptions);
                                             let sessionEmail = '';
                                             let sessionRole = '';
 

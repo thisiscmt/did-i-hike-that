@@ -6,7 +6,7 @@ import { makeStyles } from 'tss-react/mui';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
 import { User } from '../../models/models';
-import {MainContext, MessageMap} from '../../contexts/MainContext';
+import { MainContext, MessageMap } from '../../contexts/MainContext';
 import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
 
 const useStyles = makeStyles()(() => ({
@@ -81,7 +81,9 @@ const Users: FC = () => {
                                             <TableCell>{user.fullName}</TableCell>
                                             <TableCell>{user.email}</TableCell>
                                             <TableCell>{user.role}</TableCell>
-                                            <TableCell>{user.lastLogin ? SharedService.formatEpochValue(user.lastLogin) : ''}</TableCell>
+                                            <TableCell>
+                                                {user.lastLogin ? SharedService.formatEpochValue(user.lastLogin, SharedService.dateFormatOptions) : ''}
+                                            </TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>

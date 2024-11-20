@@ -4,6 +4,15 @@ import { DateTime } from 'luxon';
 
 import { HikeSearchParams } from '../models/models';
 
+export const dateFormatOptions: Intl.DateTimeFormatOptions = {
+    month: 'numeric',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZoneName: 'short'
+};
+
 export const getSearchRequestParams = (searchParams: URLSearchParams) => {
     const searchRequestParams: HikeSearchParams = {};
     const searchText = searchParams.get('searchText');
@@ -54,10 +63,10 @@ export const formatDateValue = (date: string) => {
     return `${Number(dateParts[1])}/${Number(dateParts[2])}/${dateParts[0]}`;
 };
 
-export const formatEpochValue = (epochValue: number) => {
+export const formatEpochValue = (epochValue: number, format?: Intl.DateTimeFormatOptions) => {
     const parsedDate = DateTime.fromMillis(epochValue);
 
-    return parsedDate.toLocaleString(DateTime.DATETIME_FULL);
+    return parsedDate.toLocaleString(format ? format : DateTime.DATETIME_FULL);
 };
 
 export const formatISODateValue = (date: Date | string | undefined, format?: Intl.DateTimeFormatOptions) => {
