@@ -3,7 +3,6 @@ import { Link as RouteLink, useNavigate, useParams } from 'react-router-dom';
 import { Box, Button, Card, CardContent, Chip, IconButton, Link, TextField, Typography } from '@mui/material';
 import { DeleteOutlineOutlined, EditOutlined, SaveOutlined, CancelOutlined } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
-import Axios from 'axios';
 
 import ConfirmationPrompt from '../../components/ConfirmationPrompt/ConfirmationPrompt';
 import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
@@ -194,7 +193,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
                 getHike();
             }
         }
-    }, [hikeId, retrievedHike, currentHike, setCurrentHike, setBanner, topOfPageRef]);
+    }, [hikeId, retrievedHike, currentHike, setCurrentHike, setBanner, handleException, topOfPageRef]);
 
     const getValidUrl = () => {
         let valueToCheck = hike.link;

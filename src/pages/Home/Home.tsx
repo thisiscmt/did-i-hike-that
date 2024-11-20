@@ -177,7 +177,7 @@ const Home: FC = () => {
 
     const handleClickSearch = () => {
         if (searchText) {
-            searchParams.set('searchText', encodeURIComponent(searchText));
+            searchParams.set('searchText', searchText);
         } else {
             searchParams.delete('searchText');
         }

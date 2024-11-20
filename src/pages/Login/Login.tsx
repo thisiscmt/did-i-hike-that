@@ -4,7 +4,6 @@ import { Button, FormControl, FormControlLabel, Grid, IconButton, InputAdornment
 import { VisibilityOffOutlined, VisibilityOutlined } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
 import { DateTime } from 'luxon';
-import Axios from 'axios';
 
 import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
 import * as DataService from '../../services/dataService';

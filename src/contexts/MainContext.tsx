@@ -3,7 +3,7 @@ import { useCookies } from 'react-cookie';
 
 import { Hike } from '../models/models';
 import * as Constants from '../constants/constants';
-import Axios, {AxiosError} from 'axios';
+import Axios from 'axios';
 
 interface MainContextProps {
     bannerMessage: string;

@@ -21,7 +21,7 @@ import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { makeStyles } from 'tss-react/mui';
 import {DragDropContext, Droppable, Draggable, DropResult} from '@hello-pangea/dnd';
 import { arrayMoveImmutable } from 'array-move';
-import Axios, { AxiosProgressEvent } from 'axios';
+import { AxiosProgressEvent } from 'axios';
 import { DateTime } from 'luxon';
 
 import * as DataService from '../../services/dataService';
