@@ -64,7 +64,7 @@ function App() {
 
                     <Box className={cx(classes.contentColumn)}>
                         <Routes>
-                            <Route path='/' element={<Home />} />
+                            <Route path='/' element={<Home topOfPageRef={topOfPageRef} />} />
                             <Route path='/hike' element={<EditHike topOfPageRef={topOfPageRef} />} />
                             <Route path='/hike/:hikeId' element={<ViewHike topOfPageRef={topOfPageRef} />} />
                             <Route path='/hike/:hikeId/edit' element={<EditHike topOfPageRef={topOfPageRef} />} />

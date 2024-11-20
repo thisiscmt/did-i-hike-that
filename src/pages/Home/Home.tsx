@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
+import React, { FC, RefObject, useCallback, useContext, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { TextField, Box, Typography, Button, InputAdornment, IconButton, Pagination, Popover } from '@mui/material';
 import { CloseOutlined } from '@mui/icons-material';
@@ -111,7 +111,11 @@ const useStyles = makeStyles()((theme) => ({
 
 const PAGE_SIZE = 10;
 
-const Home: FC = () => {
+interface HomeProps {
+    topOfPageRef: RefObject<HTMLElement>;
+}
+
+const Home: FC<HomeProps> = ({ topOfPageRef }) => {
     const { classes, cx } = useStyles();
     const { searchText, searchResults, pageCount, isLoggedIn, setSearchText, setSearchResults, setPageCount, setBanner } = useContext(MainContext);
     const [ loading, setLoading ] = useState<boolean>(false);
@@ -160,10 +164,15 @@ const Home: FC = () => {
         const queryStringChanged = currentQueryString !== searchParams.toString();
 
         if (((initialLoad && !searchResults) || needLoad || queryStringChanged) && isLoggedIn()) {
+            if (initialLoad && searchText) {
+                setSearchText('');
+            }
+
             setInitialLoad(false);
             getHikes();
+            SharedService.scrollToTop(topOfPageRef);
         }
-    }, [searchParams, currentQueryString, initialLoad, searchResults, needLoad, isLoggedIn, handleSearch]);
+    }, [searchParams, currentQueryString, initialLoad, searchText, searchResults, needLoad, isLoggedIn, handleSearch, setSearchText, topOfPageRef]);
 
     const handleSearchTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchText(event.target.value);
