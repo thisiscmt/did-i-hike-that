@@ -8,7 +8,7 @@ import Axios from 'axios';
 import ConfirmationPrompt from '../../components/ConfirmationPrompt/ConfirmationPrompt';
 import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
 import { Hike, Hiker, Photo } from '../../models/models';
-import { MainContext } from '../../contexts/MainContext';
+import { MainContext, MessageMap } from '../../contexts/MainContext';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
 
@@ -153,7 +153,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
     const [ retrievedHike, setRetrievedHike ] = useState<boolean>(false);
     const [ openDeleteConfirmation, setOpenDeleteConfirmation ] = useState<boolean>(false);
     const [ loading, setLoading ] = useState<boolean>(true);
-    const { searchResults, currentHike, isLoggedIn, setSearchResults, setCurrentHike, setBanner } = useContext(MainContext);
+    const { searchResults, currentHike, isLoggedIn, setSearchResults, setCurrentHike, setBanner, handleException } = useContext(MainContext);
     const { hikeId } = useParams();
     const navigate = useNavigate();
 
@@ -171,12 +171,11 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
                     setBanner('Missing a hike ID', 'error');
                 }
             } catch(error) {
-                if (Axios.isAxiosError(error) && error.response?.status === 404) {
-                    setBanner('Could not find the hike', 'warning');
-                } else {
-                    setBanner('Error occurred retrieving the hike', 'error');
-                }
+                const msgMap: MessageMap = {
+                    '404': { message: 'Could not find the hike', severity: 'warning' }
+                };
 
+                handleException(error, 'An error occurred retrieving the hike', msgMap);
                 SharedService.scrollToTop(topOfPageRef);
             } finally {
                 setRetrievedHike(true);

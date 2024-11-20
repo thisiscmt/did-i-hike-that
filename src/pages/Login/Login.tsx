@@ -82,7 +82,7 @@ const Login = () => {
     const [ emailInputError, setEmailInputError ] = useState<boolean>(false);
     const [ passwordInputError, setPasswordInputError ] = useState<boolean>(false);
     const [ loading, setLoading ] = useState<boolean>(false);
-    const { setBanner } = useContext(MainContext);
+    const { setBanner, handleException } = useContext(MainContext);
     const navigate = useNavigate();
     const [ searchParams ] = useSearchParams();
 
@@ -146,11 +146,7 @@ const Login = () => {
                 navigate(returnUrl);
             }
         } catch (error) {
-            if (Axios.isAxiosError(error) && error.response?.status === 400) {
-                setBanner('The email address or password was invalid', 'error');
-            } else {
-                setBanner('Error occurred during login', 'error');
-            }
+            handleException(error, 'An error occurred during login');
         } finally {
             setLoading(false);
         }

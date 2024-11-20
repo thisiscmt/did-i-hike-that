@@ -30,7 +30,7 @@ import * as Constants from '../../constants/constants';
 import { Colors } from '../../services/themeService';
 import { Hike, Hiker, Photo } from '../../models/models';
 import { CustomLuxonAdapter} from '../../classes/customLuxonAdapter';
-import { MainContext } from '../../contexts/MainContext';
+import {MainContext, MessageMap} from '../../contexts/MainContext';
 
 const useStyles = makeStyles()((theme) => ({
     row: {
@@ -278,7 +278,7 @@ interface EditHikeProps {
 
 const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const { classes, cx } = useStyles();
-    const { currentHike, setSearchResults, setCurrentHike, setBanner } = useContext(MainContext);
+    const { currentHike, setSearchResults, setCurrentHike, setBanner, handleException } = useContext(MainContext);
     const { hikeId } = useParams();
     const navigate = useNavigate();
     const abortController = useRef<AbortController>(new AbortController());
@@ -352,7 +352,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 setKnownHikers(currentHikers);
                 setRetrievedKnownHikers(true);
             } catch(error) {
-                setBanner('Error occurred retrieving hikers', 'error');
+                setBanner('An error occurred retrieving hikers', 'error');
                 SharedService.scrollToTop(topOfPageRef);
             }
         };
@@ -371,7 +371,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 }
 
             } catch(error) {
-                setBanner('Error occurred retrieving the hike', 'error');
+                setBanner('An error occurred retrieving the hike', 'error');
                 SharedService.scrollToTop(topOfPageRef);
             }
         };
@@ -625,23 +625,16 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                     hikeIdForNav = response.id;
                 }
 
-                setSearchResults([]);
+                setSearchResults(undefined);
                 setCurrentHike(response);
                 navigate(`/hike/${hikeIdForNav}`);
             }
         } catch (error) {
-            let msg = 'Error saving hike';
+            const msgMap: MessageMap = {
+                'ERR_CANCELED': { message: 'Save was cancelled', severity: 'warning' },
+            };
 
-            if (Axios.isAxiosError(error)) {
-                if (error.code === 'ERR_CANCELED') {
-                    setBanner('Save was cancelled', 'warning');
-                } else {
-                    setBanner(msg, 'error');
-                }
-            } else {
-                setBanner(msg, 'error');
-            }
-
+            handleException(error, 'Error saving hike', msgMap);
             SharedService.scrollToTop(topOfPageRef);
         } finally {
             setSaving(false);
@@ -653,7 +646,8 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             abortController.current.abort();
             abortController.current = new AbortController();
 
-            // TODO: Tell the user that they have cancelled the request
+            setBanner('Save was cancelled', 'info');
+            SharedService.scrollToTop(topOfPageRef);
         } else {
             if (hikeId) {
                 navigate(-1);

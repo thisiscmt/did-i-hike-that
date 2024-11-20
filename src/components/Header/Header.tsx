@@ -100,7 +100,7 @@ const Header = () => {
 
             window.location.href = '/';
         } catch(error) {
-            setBanner('Error occurred during logout', 'error');
+            setBanner('An error occurred during logout', 'error');
         }
     }
 

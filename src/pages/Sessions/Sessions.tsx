@@ -7,7 +7,7 @@ import { DateTime } from 'luxon';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
 import { Session } from '../../models/models';
-import { MainContext } from '../../contexts/MainContext';
+import {MainContext, MessageMap} from '../../contexts/MainContext';
 import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
 import ConfirmationPrompt from '../../components/ConfirmationPrompt/ConfirmationPrompt';
 
@@ -47,7 +47,8 @@ const Sessions: FC = () => {
                 setSessions(response);
                 setAuthorized(true);
             } catch (error) {
-                handleException(error, 'An error occurred retrieving sessions');
+                const msgMap: MessageMap = {'403': { message: 'You are not authorized to view this page', severity: 'error' }};
+                handleException(error, 'An error occurred retrieving sessions', msgMap);
             } finally {
                 setRetrievedSessions(true);
                 setLoading(false);

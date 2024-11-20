@@ -6,7 +6,7 @@ import { makeStyles } from 'tss-react/mui';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
 import { User } from '../../models/models';
-import { MainContext } from '../../contexts/MainContext';
+import {MainContext, MessageMap} from '../../contexts/MainContext';
 import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
 
 const useStyles = makeStyles()(() => ({
@@ -40,7 +40,8 @@ const Users: FC = () => {
                 setUsers(response);
                 setAuthorized(true);
             } catch (error) {
-                handleException(error, 'An error occurred retrieving users');
+                const msgMap: MessageMap = {'403': { message: 'You are not authorized to view this page', severity: 'error' }};
+                handleException(error, 'An error occurred retrieving users', msgMap);
             } finally {
                 setRetrievedUsers(true);
                 setLoading(false);
@@ -59,7 +60,7 @@ const Users: FC = () => {
                 <Box>
                     <Box className={cx(classes.tableHeader)}>
                         <Typography variant='h5'>Users</Typography>
-                        <Button variant='contained' component={Link} to='/admin/user' color="primary">Add User</Button>
+                        <Button variant='contained' component={Link} to='/admin/user/add' color="primary">Add User</Button>
                     </Box>
 
                     <Paper elevation={3}>

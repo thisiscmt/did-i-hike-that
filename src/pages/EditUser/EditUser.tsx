@@ -2,13 +2,13 @@ import React, { FC, RefObject, useContext, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Box, Button, CircularProgress, FormControl, FormControlLabel, Grid, TextField, Select, MenuItem } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
-import Axios from 'axios';
 
-import { MainContext } from '../../contexts/MainContext';
+import { MainContext, MessageMap } from '../../contexts/MainContext';
 import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
 import ConfirmationPrompt from '../../components/ConfirmationPrompt/ConfirmationPrompt';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
+import * as Constants from '../../constants/constants';
 import { Colors } from '../../services/themeService';
 import { User } from '../../models/models';
 
@@ -134,7 +134,11 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
                     setRetrievedUser(true);
                 }
             } catch (error) {
-                handleException(error, 'Error occurred retrieving user');
+                const msgMap: MessageMap = {
+                    '403': { message: 'You are not authorized to view this page', severity: 'error' },
+                    '404': { message: 'Could not find the user', severity: 'warning' }
+                };
+                handleException(error, 'An error occurred retrieving the user', msgMap);
             } finally {
                 setLoading(false);
             }
@@ -142,6 +146,8 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
 
         if (userId && !retrieveduser) {
             getUser();
+        } else {
+
         }
     }, [userId, retrieveduser, handleException]);
 
@@ -217,16 +223,11 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
                 navigate('/admin/user');
             }
         } catch (error) {
-            if (Axios.isAxiosError(error)) {
-                if (error.response?.status === 400) {
-                    setBanner(error.response?.data, 'error');
-                } else {
-                    setBanner('Error saving user', 'error');
-                }
-            } else {
-                setBanner('Error saving user', 'error');
-            }
+            const msgMap: MessageMap = {
+                '403': { message: 'You are not authorized to create a user', severity: 'error' },
+            };
 
+            handleException(error, 'An error occurred saving the user', msgMap);
             SharedService.scrollToTop(topOfPageRef);
         } finally {
             setSaving(false);
@@ -249,7 +250,7 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
     return (
         <Box className='loadable-container'>
             {
-                !loading && isLoggedIn() && authorized &&
+                !loading && isLoggedIn() && (userId ? authorized : localStorage.getItem(Constants.STORAGE_ROLE) === 'Admin') &&
                 <>
                     <Grid item xs={12} className={cx(classes.row)}>
                         <FormControl className={cx(classes.field)}>
@@ -359,7 +360,11 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
                         </Button>
 
                         <Button onClick={handleCancel} variant='outlined' color='secondary' className={cx(classes.buttonSpacer)}>Cancel</Button>
-                        <Button onClick={() => setOpenDeleteConfirmation(true)} variant='outlined' color='error' className={cx(classes.buttonSpacer)}>Delete</Button>
+
+                        {
+                            userId &&
+                            <Button onClick={() => setOpenDeleteConfirmation(true)} variant='outlined' color='error' className={cx(classes.buttonSpacer)}>Delete</Button>
+                        }
                     </Grid>
                 </>
             }

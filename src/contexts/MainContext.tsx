@@ -13,7 +13,7 @@ interface MainContextProps {
     pageCount: number;
     currentHike: Hike | null;
     isLoggedIn: () => boolean;
-    handleException: (error: unknown, msg?: string) => void;
+    handleException: (error: unknown, msg?: string, msgMap?: MessageMap) => void;
     setBanner: (message: string, severity?: AlertSeverity) => void;
     setSearchText: React.Dispatch<React.SetStateAction<string>>;
     setSearchResults: React.Dispatch<React.SetStateAction<Hike[] | undefined>>;
@@ -43,6 +43,8 @@ export const MainContext = React.createContext<MainContextProps>({
 
 export type AlertSeverity = 'error' | 'info' | 'success' | 'warning';
 
+export type MessageMap = Record<string, { message: string, severity: AlertSeverity }>;
+
 export const MainProvider = ({ children }: MainProviderProps) => {
     const [ bannerMessage, setBannerMessage ] = useState<string>('');
     const [ bannerSeverity, setBannerSeverity ] = useState<AlertSeverity>('info');
@@ -64,18 +66,30 @@ export const MainProvider = ({ children }: MainProviderProps) => {
         setBannerSeverity(severity || 'info');
     };
 
-    const handleException = (error: unknown, msg?: string) => {
+    const handleException = (error: unknown, msg?: string, msgMap?: MessageMap) => {
+        const defaultMsg = 'An error occurred during the request';
+        let errorMsg: string;
+        let severity: AlertSeverity = 'error';
+
         if (Axios.isAxiosError(error)) {
-            if (error.response?.status === 403) {
-                setBanner('You are not authorized to access this content', 'error');
+            if (msgMap) {
+                if (error.code && error.code === 'ERR_CANCELED') {
+                    errorMsg = msgMap[error.code].message;
+                    severity = msgMap[error.code].severity;
+                } else {
+                    errorMsg = error.response?.status ? msgMap[error.response?.status.toString()].message : defaultMsg;
+                    severity = error.response?.status ? msgMap[error.response?.status.toString()].severity : 'error';
+                }
             } else {
-                setBanner(msg ? msg : (error as AxiosError).message, 'error');
+                errorMsg = error.response?.data ? error.response?.data : (msg ? msg : defaultMsg);
             }
         } else if (error instanceof Error) {
-            setBanner(msg ? msg : (error as Error).message, 'error');
+            errorMsg = msg ? msg : error.message;
         } else {
-            setBanner(msg ? msg : 'An error occurred during the request', 'error');
+            errorMsg = msg ? msg : defaultMsg;
         }
+
+        setBanner(errorMsg, severity);
     };
 
     return (
