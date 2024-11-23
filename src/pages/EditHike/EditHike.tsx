@@ -278,7 +278,7 @@ interface EditHikeProps {
 
 const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const { classes, cx } = useStyles();
-    const { currentHike, setSearchResults, setCurrentHike, setBanner, handleException } = useContext(MainContext);
+    const { currentHike, setCurrentHike, setBanner, handleException } = useContext(MainContext);
     const { hikeId } = useParams();
     const navigate = useNavigate();
     const abortController = useRef<AbortController>(new AbortController());
@@ -625,7 +625,6 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                     hikeIdForNav = response.id;
                 }
 
-                setSearchResults(undefined);
                 setCurrentHike(response);
                 navigate(`/hike/${hikeIdForNav}`);
             }
@@ -634,7 +633,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 'ERR_CANCELED': { message: 'Save was cancelled', severity: 'warning' },
             };
 
-            handleException(error, 'Error saving hike', msgMap);
+            handleException(error, 'An error occurred saving the hike', msgMap);
             SharedService.scrollToTop(topOfPageRef);
         } finally {
             setSaving(false);

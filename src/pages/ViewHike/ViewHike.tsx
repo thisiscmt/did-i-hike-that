@@ -152,7 +152,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
     const [ retrievedHike, setRetrievedHike ] = useState<boolean>(false);
     const [ openDeleteConfirmation, setOpenDeleteConfirmation ] = useState<boolean>(false);
     const [ loading, setLoading ] = useState<boolean>(true);
-    const { searchResults, currentHike, isLoggedIn, setSearchResults, setCurrentHike, setBanner, handleException } = useContext(MainContext);
+    const { currentHike, isLoggedIn, setCurrentHike, setBanner, handleException } = useContext(MainContext);
     const { hikeId } = useParams();
     const navigate = useNavigate();
 
@@ -221,14 +221,12 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
         setOpenDeleteConfirmation(false);
 
         if (value && hikeId) {
-            await DataService.deleteHike(hikeId);
-
-            const updatedSearchResults = searchResults ? [...searchResults] : [];
-            const index = updatedSearchResults.findIndex((hike: Hike) => hike.id === hikeId);
-            updatedSearchResults.splice(index, 1);
-            setSearchResults(updatedSearchResults);
-
-            navigate('/');
+            try {
+                await DataService.deleteHike(hikeId);
+                navigate('/');
+            } catch (error) {
+                handleException(error, 'An error occurred deleting the hike');
+            }
         }
     };
 
@@ -488,7 +486,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
                         </Box>
                     }
 
-                    <Button variant='contained' color='primary' onClick={() => navigate('/')}>Go to Home</Button>
+                    <Button variant='contained' color='primary' onClick={() => navigate(-1)}>Go Back</Button>
                 </>
             }
 

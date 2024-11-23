@@ -117,36 +117,36 @@ interface HomeProps {
 
 const Home: FC<HomeProps> = ({ topOfPageRef }) => {
     const { classes, cx } = useStyles();
-    const { searchText, searchResults, pageCount, isLoggedIn, setSearchText, setSearchResults, setPageCount, setBanner } = useContext(MainContext);
+    const { isLoggedIn, setBanner } = useContext(MainContext);
     const [ loading, setLoading ] = useState<boolean>(false);
     const [ initialLoad, setInitialLoad ] = useState<boolean>(true);
-    const [ needLoad, setNeedLoad ] = useState<boolean>(false);
+    const [ searchText, setSearchText ] = useState<string>('');
+    const [ searchResults, setSearchResults ] = useState<Hike[] | undefined>(undefined);
     const [ currentPage, setCurrentPage ] = useState<number>(1);
     const [ currentQueryString, setCurrentQueryString ] = useState<string>('');
+    const [ pageCount, setPageCount ] = useState<number>(1);
     const [ noResults, setNoResults ] = useState<boolean>(false);
     const [ anchorEl, setAnchorEl ] = React.useState<HTMLButtonElement | null>(null);
     const [ searchParams, setSearchParams ] = useSearchParams();
     const navigate = useNavigate();
 
-    const handleSearch = useCallback(async (searchParamsArg: URLSearchParams) => {
+    const getHikes = useCallback(async (searchParamsArg: URLSearchParams) => {
         try {
             setLoading(true);
             setBanner('');
 
-            const searchParams = SharedService.getSearchRequestParams(searchParamsArg);
-            const hikes = await DataService.getHikes(searchParams);
+            const params = SharedService.getSearchRequestParams(searchParamsArg);
+            const hikes = await DataService.getHikes(params);
             const pageSizeStr = searchParamsArg.get('pageSize');
             const pageSize = Number(pageSizeStr) === 0 ? PAGE_SIZE : Number(pageSizeStr);
 
-            if (searchParams.page !== undefined) {
-                setCurrentPage(searchParams.page);
+            if (params.page !== undefined) {
+                setCurrentPage(params.page);
             }
 
             setSearchResults(hikes.rows);
-            setCurrentQueryString(searchParamsArg.toString());
             setPageCount(Math.ceil(hikes.count / pageSize));
             setNoResults(hikes.rows.length === 0);
-            setNeedLoad(false);
         } catch (error){
             setBanner('An error occurred retrieving hikes', 'error');
         } finally {
@@ -155,24 +155,33 @@ const Home: FC<HomeProps> = ({ topOfPageRef }) => {
     }, [setSearchResults, setPageCount, setBanner]);
 
     useEffect(() => {
-        const getHikes = async () => {
-            await handleSearch(searchParams);
+        const fetchData = async () => {
+            await getHikes(searchParams);
         }
 
         document.title = 'Did I Hike That?';
 
         const queryStringChanged = currentQueryString !== searchParams.toString();
 
-        if (((initialLoad && !searchResults) || needLoad || queryStringChanged) && isLoggedIn()) {
-            if (initialLoad && searchText) {
+        // The check for whether the query string changed is to handle the user clicking the browser's Back button, so we can do a data fetch since
+        // we likely need different data.
+        if ((initialLoad || queryStringChanged) && isLoggedIn()) {
+            const searchTextQueryParam = searchParams.get('searchText');
+
+            // If the user clicked the browser's Back button and no longer has a search text query param we need to clear the text box. Or if they
+            // clicked Back and have a search text query param we need to put it in the text box.
+            if (!searchTextQueryParam && searchText) {
                 setSearchText('');
+            } else if (searchTextQueryParam && !searchText) {
+                setSearchText(searchTextQueryParam);
             }
 
             setInitialLoad(false);
-            getHikes();
+            setCurrentQueryString(searchParams.toString());
+            fetchData();
             SharedService.scrollToTop(topOfPageRef);
         }
-    }, [searchParams, currentQueryString, initialLoad, searchText, searchResults, needLoad, isLoggedIn, handleSearch, setSearchText, topOfPageRef]);
+    }, [searchParams, currentQueryString, initialLoad, searchText, isLoggedIn, getHikes, setSearchText, topOfPageRef]);
 
     const handleSearchTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchText(event.target.value);
@@ -180,8 +189,9 @@ const Home: FC<HomeProps> = ({ topOfPageRef }) => {
 
     const handleClearSearchText = () => {
         setSearchText('');
-        setNeedLoad(true);
         searchParams.delete('searchText');
+        setSearchParams(searchParams);
+        getHikes(searchParams);
     };
 
     const handleClickSearch = () => {
@@ -197,7 +207,7 @@ const Home: FC<HomeProps> = ({ topOfPageRef }) => {
         }
 
         setSearchParams(searchParams);
-        handleSearch(searchParams);
+        getHikes(searchParams);
     };
 
     const handleKeypress = (event: React.KeyboardEvent<unknown>) => {
@@ -211,8 +221,8 @@ const Home: FC<HomeProps> = ({ topOfPageRef }) => {
         searchParams.set('page', value.toString());
 
         setCurrentPage(value);
-        setNeedLoad(true);
         setSearchParams(searchParams);
+        getHikes(searchParams);
     }
 
     const handleOpenSearchTips = (event: React.MouseEvent<HTMLButtonElement>) => {

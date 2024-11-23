@@ -3,12 +3,14 @@ import {Box} from '@mui/material';
 
 const ErrorPage = () => {
     useEffect(() => {
-        document.title = 'Error - Did I Hike That?';
+        document.title = '404 - Did I Hike That?';
     });
 
     return (
         <Box>
-            <p>The page you are trying to reach can't be found</p>
+            <p>Sometimes those who wonder are indeed lost.</p>
+
+            <p>I'm afraid the page you are trying to reach is not here.</p>
         </Box>
     )
 };

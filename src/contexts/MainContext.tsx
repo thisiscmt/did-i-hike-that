@@ -8,16 +8,10 @@ import Axios from 'axios';
 interface MainContextProps {
     bannerMessage: string;
     bannerSeverity: 'error' | 'info' | 'success' | 'warning';
-    searchText: string;
-    searchResults: Hike[] | undefined;
-    pageCount: number;
     currentHike: Hike | null;
     isLoggedIn: () => boolean;
     handleException: (error: unknown, msg?: string, msgMap?: MessageMap) => void;
     setBanner: (message: string, severity?: AlertSeverity) => void;
-    setSearchText: React.Dispatch<React.SetStateAction<string>>;
-    setSearchResults: React.Dispatch<React.SetStateAction<Hike[] | undefined>>;
-    setPageCount: React.Dispatch<React.SetStateAction<number>>;
     setCurrentHike: React.Dispatch<React.SetStateAction<Hike | null>>;
 }
 
@@ -28,16 +22,10 @@ interface MainProviderProps{
 export const MainContext = React.createContext<MainContextProps>({
     bannerMessage: '',
     bannerSeverity: 'info',
-    searchText: '',
-    searchResults: undefined,
-    pageCount: 1,
     currentHike: null,
     isLoggedIn: () => false,
     handleException: () => {},
     setBanner: () => {},
-    setSearchText: () => {},
-    setSearchResults: () => {},
-    setPageCount: () => {},
     setCurrentHike: () => {},
 });
 
@@ -48,9 +36,6 @@ export type MessageMap = Record<string, { message: string, severity: AlertSeveri
 export const MainProvider = ({ children }: MainProviderProps) => {
     const [ bannerMessage, setBannerMessage ] = useState<string>('');
     const [ bannerSeverity, setBannerSeverity ] = useState<AlertSeverity>('info');
-    const [ searchText, setSearchText ] = useState<string>('');
-    const [ searchResults, setSearchResults ] = useState<Hike[] | undefined>(undefined);
-    const [ pageCount, setPageCount ] = useState<number>(1);
     const [ currentHike, setCurrentHike ] = useState<Hike | null>(null);
     const [ cookies ] = useCookies([Constants.SESSION_COOKIE]);
 
@@ -96,16 +81,10 @@ export const MainProvider = ({ children }: MainProviderProps) => {
         <MainContext.Provider value={{
             bannerMessage,
             bannerSeverity,
-            searchText,
-            searchResults,
-            pageCount,
             currentHike,
             isLoggedIn,
             handleException,
             setBanner,
-            setSearchText,
-            setSearchResults,
-            setPageCount,
             setCurrentHike,
         }}
         >
