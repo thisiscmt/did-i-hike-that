@@ -147,12 +147,14 @@ const Home: FC<HomeProps> = ({ topOfPageRef }) => {
             setSearchResults(hikes.rows);
             setPageCount(Math.ceil(hikes.count / pageSize));
             setNoResults(hikes.rows.length === 0);
+
+            SharedService.scrollToTop(topOfPageRef);
         } catch (error){
             setBanner('An error occurred retrieving hikes', 'error');
         } finally {
             setLoading(false);
         }
-    }, [setSearchResults, setPageCount, setBanner]);
+    }, [setSearchResults, setPageCount, setBanner, topOfPageRef]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -179,9 +181,8 @@ const Home: FC<HomeProps> = ({ topOfPageRef }) => {
             setInitialLoad(false);
             setCurrentQueryString(searchParams.toString());
             fetchData();
-            SharedService.scrollToTop(topOfPageRef);
         }
-    }, [searchParams, currentQueryString, initialLoad, searchText, isLoggedIn, getHikes, setSearchText, topOfPageRef]);
+    }, [searchParams, currentQueryString, initialLoad, searchText, isLoggedIn, getHikes, setSearchText]);
 
     const handleSearchTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchText(event.target.value);
