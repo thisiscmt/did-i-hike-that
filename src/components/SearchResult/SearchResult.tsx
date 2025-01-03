@@ -1,10 +1,10 @@
 import React, { FC } from 'react';
-import {Box, Typography, Chip, Card, CardContent} from '@mui/material';
+import { Box, Typography, Chip, Card, CardContent } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 
-import {Hike} from '../../models/models';
+import { Hike } from '../../models/models';
 import * as SharedService from '../../services/sharedService';
-import {HOME_PAGE_FIRST_BREAKPOINT, PHOTO_THUMBNAIL_SIZE} from '../../constants/constants';
+import { HOME_PAGE_FIRST_BREAKPOINT, PHOTO_THUMBNAIL_SIZE } from '../../constants/constants';
 
 const useStyles = makeStyles()((theme) => ({
     cardContent: {
@@ -94,7 +94,7 @@ const SearchResult: FC<SearchResultProps> = ({ hike }) => {
         <Card>
             <CardContent className={cx(classes.cardContent)}>
                 <Box className={cx(classes.thumbnail)}>
-                    <img alt='Hike pic' src={thumbnailSrc} aria-label='Hike pic' />
+                    <img src={thumbnailSrc} alt='Hike pic' aria-label='Hike pic' />
                 </Box>
 
                 <Box className={cx(classes.details)}>

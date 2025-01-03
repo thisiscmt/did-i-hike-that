@@ -1,9 +1,8 @@
-$primaryFontFamily: -apple-system, BlinkMacSystemFont, Roboto, 'Segoe UI', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans';
+$primaryFontFamily: -apple-system, BlinkMacSystemFont, Roboto, 'Segoe UI', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 
 body {
     margin: 0;
-    font-family: $primaryFontFamily,
-    'Helvetica Neue', sans-serif;
+    font-family: $primaryFontFamily;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }

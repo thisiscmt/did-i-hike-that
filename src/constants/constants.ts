@@ -7,5 +7,4 @@ export const PHOTO_THUMBNAIL_SIZE = 250;
 export const PHOTO_MAX_SIZE = 10485760;
 
 export const HOME_PAGE_FIRST_BREAKPOINT = 801;
-export const LOGIN_REQUIRED_MESSAGE = 'Please log in to continue';
 export const SESSION_COOKIE = 'sid';
