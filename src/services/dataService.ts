@@ -69,6 +69,17 @@ export const deleteHike = (hikeId: string) => {
     return Axios.delete(`${process.env.REACT_APP_API_URL}/hike/${hikeId}`, getRequestConfig());
 };
 
+export const deleteHikePermanently = (hikeId: string) => {
+    return Axios.delete(`${process.env.REACT_APP_API_URL}/hike/deleted/${hikeId}`, getRequestConfig());
+};
+
+export const getDeletedHikes = async (): Promise<Hike[]> => {
+    const config = getRequestConfig();
+
+    const response = await Axios.get(`${process.env.REACT_APP_API_URL}/hike/deleted`, config);
+    return response.data.rows;
+};
+
 export const getHikers = async (): Promise<string[]> => {
     const response = await Axios.get(`${process.env.REACT_APP_API_URL}/hiker`, getRequestConfig());
     return response.data;

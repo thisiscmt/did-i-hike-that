@@ -27,7 +27,7 @@ const useStyles = makeStyles()(() => ({
 const Users: FC = () => {
     const { classes, cx } = useStyles();
     const [ users, setUsers ] = useState<User[]>([]);
-    const [ retrievedUsers, setRetrievedUsers ] = useState<boolean>(false);
+    const [ retrievedData, setRetrievedData ] = useState<boolean>(false);
     const [ loading, setLoading ] = useState<boolean>(true);
     const [ authorized, setAuthorized ] = useState<boolean>(false);
     const { isLoggedIn, handleException } = useContext(MainContext);
@@ -43,12 +43,14 @@ const Users: FC = () => {
                 const msgMap: MessageMap = {'403': { message: 'You are not authorized to view this page', severity: 'error' }};
                 handleException(error, 'An error occurred retrieving users', msgMap);
             } finally {
-                setRetrievedUsers(true);
+                setRetrievedData(true);
                 setLoading(false);
             }
         }
 
-        if (!retrievedUsers) {
+        document.title = 'Users - Did I Hike That?';
+
+        if (!retrievedData) {
             getUsers();
         }
     });
@@ -76,16 +78,18 @@ const Users: FC = () => {
                                 </TableHead>
 
                                 <TableBody>
-                                    {users.map((user: User) => (
-                                        <TableRow hover={true} onClick={() => navigate(`/admin/user/${user.id}`)} key={user.id}>
-                                            <TableCell>{user.fullName}</TableCell>
-                                            <TableCell>{user.email}</TableCell>
-                                            <TableCell>{user.role}</TableCell>
-                                            <TableCell>
-                                                {user.lastLogin ? SharedService.formatEpochValue(user.lastLogin, SharedService.dateFormatOptions) : ''}
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
+                                    {
+                                        users.map((user: User) => (
+                                            <TableRow hover={true} onClick={() => navigate(`/admin/user/${user.id}`)} key={user.id}>
+                                                <TableCell>{user.fullName}</TableCell>
+                                                <TableCell>{user.email}</TableCell>
+                                                <TableCell>{user.role}</TableCell>
+                                                <TableCell>
+                                                    {user.lastLogin ? SharedService.formatEpochValue(user.lastLogin, SharedService.dateFormatOptions) : ''}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    }
                                 </TableBody>
                             </Table>
                         </TableContainer>

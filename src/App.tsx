@@ -6,9 +6,10 @@ import { makeStyles } from 'tss-react/mui';
 import Home from './pages/Home/Home';
 import ViewHike from './pages/ViewHike/ViewHike';
 import EditHike from './pages/EditHike/EditHike';
-import Users from './pages/Users/Users';
 import Sessions from './pages/Sessions/Sessions';
+import Users from './pages/Users/Users';
 import EditUser from './pages/EditUser/EditUser';
+import DeletedHikes from './pages/DeletedHikes/DeletedHikes';
 import Login from './pages/Login/Login';
 import ErrorPage from './pages/ErrorPage/ErrorPage';
 import Header from './components/Header/Header';
@@ -72,6 +73,7 @@ function App() {
                             <Route path='/admin/user' element={<Users />} />
                             <Route path='/admin/user/:userId' element={<EditUser topOfPageRef={topOfPageRef} />} />
                             <Route path='/admin/user/add' element={<EditUser topOfPageRef={topOfPageRef} />} />
+                            <Route path='/admin/deleted-hikes' element={<DeletedHikes />} />
                             <Route path='/login' element={<Login />} />
                             <Route path='*' element={<ErrorPage />} />
                         </Routes>

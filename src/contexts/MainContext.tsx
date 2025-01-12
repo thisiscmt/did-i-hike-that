@@ -62,8 +62,8 @@ export const MainProvider = ({ children }: MainProviderProps) => {
                     errorMsg = msgMap[error.code].message;
                     severity = msgMap[error.code].severity;
                 } else {
-                    errorMsg = error.response?.status ? msgMap[error.response?.status.toString()].message : defaultMsg;
-                    severity = error.response?.status ? msgMap[error.response?.status.toString()].severity : 'error';
+                    errorMsg = error.response?.status && msgMap[error.response?.status.toString()] ? msgMap[error.response?.status.toString()].message : (msg ? msg : defaultMsg);
+                    severity = error.response?.status && msgMap[error.response?.status.toString()] ? msgMap[error.response?.status.toString()].severity : 'error';
                 }
             } else {
                 errorMsg = error.response?.data ? error.response?.data : (msg ? msg : defaultMsg);

@@ -11,9 +11,11 @@ export interface Hike {
     description?: string;
     tags?: string;
     photos?: Photo[];
+    user?: User;
     fullNames?: string;
     filePath?: string;
     caption?: string;
+    createdAt?: Date;
     updatedAt?: Date;
 }
 
