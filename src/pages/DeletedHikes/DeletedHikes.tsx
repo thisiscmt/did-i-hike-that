@@ -1,4 +1,5 @@
 import React, { FC, useContext, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Typography, Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton } from '@mui/material';
 import { DeleteOutlineOutlined } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
@@ -133,7 +134,7 @@ const DeletedHikes: FC = () => {
                                                                     <DeleteOutlineOutlined />
                                                                 </IconButton>
                                                             </TableCell>
-                                                            <TableCell>{hike.trail}</TableCell>
+                                                            <TableCell><Link to={`/hike/${hike.id}`}>{hike.trail}</Link></TableCell>
                                                             <TableCell>{SharedService.formatDateValue(hike.dateOfHike)}</TableCell>
                                                             <TableCell>{getHikersAsString(hike.hikers || [])}</TableCell>
                                                             <TableCell>{hike.user?.email}</TableCell>

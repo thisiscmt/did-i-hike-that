@@ -294,6 +294,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
                         to={`/hike/${hike.id}/edit`}
                         size='small'
                         color='primary'
+                        disabled={hike.deleted}
                     >
                         <EditOutlined />
                     </IconButton>
@@ -305,6 +306,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
                         onClick={() => setOpenDeleteConfirmation(true)}
                         size='small'
                         color='error'
+                        disabled={hike.deleted}
                     >
                         <DeleteOutlineOutlined />
                     </IconButton>
@@ -407,50 +409,59 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
                 hike.photos && hike.photos.length > 0 &&
                 <Box className={`${cx(classes.section)} photos`}>
                     {
-                        hike.photos.map((photo: Photo, index: number) => (
-                            <Box key={index} className={cx(classes.photoContainer)}>
-                                <img src={process.env.REACT_APP_API_URL + '/images/' + photo.filePath} className={cx(classes.photo)} alt='Hike pic' />
+                        hike.photos.map((photo: Photo, index: number) => {
+                            let imgSource = `${process.env.REACT_APP_API_URL}/images/`;
 
-                                {
-                                    photo.editCaption ?
-                                        <Box className={cx(classes.photoCaptionEditContainer)}>
-                                            <TextField
-                                                name='Caption'
-                                                margin='none'
-                                                variant='outlined'
-                                                value={captions[photo.fileName]}
-                                                size='small'
-                                                className={cx(classes.photoCaptionInput)}
-                                                autoCorrect='off'
-                                                inputProps={{ maxLength: 255 }}
-                                                onChange={(event) => handlePhotoCaptionChange(event.target.value, photo.fileName)}
-                                            />
+                            if (hike.deleted) {
+                                imgSource += photo.filePath.replace('/', '_deleted/');
+                            } else {
+                                imgSource += photo.filePath;
+                            }
 
-                                            <IconButton
-                                                aria-label='save caption'
-                                                title='Save caption'
-                                                size='small'
-                                                color='primary'
-                                                onClick={() => handleSavePhotoCaption(photo.fileName)}
-                                            >
-                                                <SaveOutlined />
-                                            </IconButton>
+                            return (
+                                <Box key={index} className={cx(classes.photoContainer)}>
+                                    <img src={imgSource} className={cx(classes.photo)} alt='Hike pic'/>
 
-                                            <IconButton
-                                                aria-label='cancel save caption'
-                                                title='Cancel'
-                                                size='small'
-                                                color='default'
-                                                onClick={() => handleCancelSavePhotoCaption(photo.fileName)}
-                                            >
-                                                <CancelOutlined />
-                                            </IconButton>
-                                        </Box> :
+                                    {
+                                        photo.editCaption ?
+                                            <Box className={cx(classes.photoCaptionEditContainer)}>
+                                                <TextField
+                                                    name='Caption'
+                                                    margin='none'
+                                                    variant='outlined'
+                                                    value={captions[photo.fileName]}
+                                                    size='small'
+                                                    className={cx(classes.photoCaptionInput)}
+                                                    autoCorrect='off'
+                                                    inputProps={{maxLength: 255}}
+                                                    onChange={(event) => handlePhotoCaptionChange(event.target.value, photo.fileName)}
+                                                />
 
-                                        <>
-                                            {
-                                                photo.caption
-                                                    ?
+                                                <IconButton
+                                                    aria-label='save caption'
+                                                    title='Save caption'
+                                                    size='small'
+                                                    color='primary'
+                                                    onClick={() => handleSavePhotoCaption(photo.fileName)}
+                                                >
+                                                    <SaveOutlined/>
+                                                </IconButton>
+
+                                                <IconButton
+                                                    aria-label='cancel save caption'
+                                                    title='Cancel'
+                                                    size='small'
+                                                    color='default'
+                                                    onClick={() => handleCancelSavePhotoCaption(photo.fileName)}
+                                                >
+                                                    <CancelOutlined/>
+                                                </IconButton>
+                                            </Box> :
+
+                                            <>
+                                                {
+                                                    photo.caption
+                                                        ?
                                                         <Box>
                                                             <Button variant='text' title='Change caption' className={cx(classes.photoCaptionEdit)}
                                                                     onClick={() => handlePhotoCaptionEdit(photo.fileName)}>
@@ -459,19 +470,21 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
                                                                 </Typography>
                                                             </Button>
                                                         </Box>
-                                                    :
+                                                        :
                                                         <Box>
                                                             <Button variant='text' onClick={() => handlePhotoCaptionEdit(photo.fileName)}>
-                                                                <Typography variant='body2' className={`${cx(classes.photoCaption)} ${cx(classes.noCaption)}`}>
+                                                                <Typography variant='body2'
+                                                                            className={`${cx(classes.photoCaption)} ${cx(classes.noCaption)}`}>
                                                                     Add a caption
                                                                 </Typography>
                                                             </Button>
                                                         </Box>
-                                            }
-                                        </>
-                                }
-                            </Box>
-                        ))
+                                                }
+                                            </>
+                                    }
+                                </Box>
+                            );
+                        })
                     }
                 </Box>
             }

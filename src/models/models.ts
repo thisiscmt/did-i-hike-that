@@ -15,6 +15,7 @@ export interface Hike {
     fullNames?: string;
     filePath?: string;
     caption?: string;
+    deleted?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
 }
