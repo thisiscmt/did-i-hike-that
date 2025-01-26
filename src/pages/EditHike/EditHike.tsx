@@ -630,7 +630,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             }
         } catch (error) {
             const msgMap: MessageMap = {
-                'ERR_CANCELED': { message: 'Save was cancelled', severity: 'warning' },
+                'ERR_CANCELED': { message: 'Save was cancelled', severity: 'warning' }
             };
 
             handleException(error, 'An error occurred saving the hike', msgMap);
