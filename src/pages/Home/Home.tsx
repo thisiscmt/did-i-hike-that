@@ -5,12 +5,12 @@ import { CloseOutlined } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
 
 import SearchResult from '../../components/SearchResult/SearchResult';
-import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
+import SearchResultLoader from '../../components/SearchResultLoader/SearchResultLoader';
+import { MainContext } from '../../contexts/MainContext';
+import { Hike } from '../../models/models';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
 import * as Constants from '../../constants/constants';
-import { MainContext } from '../../contexts/MainContext';
-import { Hike } from '../../models/models';
 
 const useStyles = makeStyles()((theme) => ({
     mainContainer: {
@@ -100,6 +100,15 @@ const useStyles = makeStyles()((theme) => ({
 
     noResults: {
         textAlign: 'center'
+    },
+
+    loader: {
+        margin: '24px auto 12px auto' ,
+        width: '80%',
+
+        '&:last-child': {
+            marginBottom: 0
+        }
     },
 
     pagination: {
@@ -250,7 +259,7 @@ const Home: FC<HomeProps> = ({ topOfPageRef }) => {
                 </Typography>
             </Box>
 
-            <Box className='loadable-container'>
+            <Box>
                 <form>
                     <Box className={cx(classes.searchInputContainer)}>
                         <TextField
@@ -310,38 +319,51 @@ const Home: FC<HomeProps> = ({ topOfPageRef }) => {
                         </Box>
                     </Popover>
 
-                    <Box className={`${cx(classes.searchResultsContainer)}`}>
-                        {
-                            searchResultsToRender.length > 0
-                                ?
-                                    <>
-                                        <Box className={cx(classes.searchResults)}>
-                                            {
-                                                searchResultsToRender.map((hike: Hike) => {
-                                                    return (
-                                                        <Box key={hike.id} className={cx(classes.searchResult)} onClick={() => navigate(`/hike/${hike.id}`)}>
-                                                            <SearchResult hike={hike} />
-                                                        </Box>
-                                                    )
-                                                })
-                                            }
-                                        </Box>
+                    {
+                        loading
+                            ?
+                                <>
+                                    {
+                                        [1, 2, 3].map((item: number) => {
+                                            return (
+                                                <Box key={item} className={cx(classes.loader)}><SearchResultLoader /></Box>
+                                            );
+                                        })
+                                    }
 
-                                        <Pagination onChange={handleChangePage} page={currentPage} count={pageCount} className={cx(classes.pagination)}
-                                                    showFirstButton={true} showLastButton={true} />
-                                    </>
-                                :
-                                    <>
-                                        {
-                                            isLoggedIn() && noResults &&
-                                            <Box className={cx(classes.noResults)}>No hikes found</Box>
-                                        }
-                                    </>
-                        }
-                    </Box>
+                                </>
+                            :
+                                <Box className={`${cx(classes.searchResultsContainer)}`}>
+                                    {
+                                        searchResultsToRender.length > 0
+                                            ?
+                                            <>
+                                                <Box className={cx(classes.searchResults)}>
+                                                    {
+                                                        searchResultsToRender.map((hike: Hike) => {
+                                                            return (
+                                                                <Box key={hike.id} className={cx(classes.searchResult)} onClick={() => navigate(`/hike/${hike.id}`)}>
+                                                                    <SearchResult hike={hike} />
+                                                                </Box>
+                                                            )
+                                                        })
+                                                    }
+                                                </Box>
+
+                                                <Pagination onChange={handleChangePage} page={currentPage} count={pageCount} className={cx(classes.pagination)}
+                                                            showFirstButton={true} showLastButton={true} />
+                                            </>
+                                            :
+                                            <>
+                                                {
+                                                    isLoggedIn() && noResults &&
+                                                    <Box className={cx(classes.noResults)}>No hikes found</Box>
+                                                }
+                                            </>
+                                    }
+                                </Box>
+                    }
                 </form>
-
-                <LoadingOverlay open={loading} />
             </Box>
         </Box>
     )

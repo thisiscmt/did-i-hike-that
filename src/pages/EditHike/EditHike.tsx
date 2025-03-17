@@ -1,4 +1,4 @@
-import React, {FC, RefObject, useContext, useEffect, useRef, useState} from 'react';
+import React, { FC, RefObject, useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
     Autocomplete,
@@ -14,23 +14,25 @@ import {
     LinearProgress,
     ListItem,
     TextField,
-    List as MuiList, Snackbar, Fade
+    List as MuiList,
+    Snackbar,
+    Fade
 } from '@mui/material';
 import { DeleteOutlineOutlined } from '@mui/icons-material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { makeStyles } from 'tss-react/mui';
-import {DragDropContext, Droppable, Draggable, DropResult} from '@hello-pangea/dnd';
+import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { arrayMoveImmutable } from 'array-move';
 import { AxiosProgressEvent } from 'axios';
 import { DateTime } from 'luxon';
 
-import * as DataService from '../../services/dataService';
-import * as SharedService from '../../services/sharedService';
-import * as Constants from '../../constants/constants';
 import { Colors } from '../../services/themeService';
 import { Hike, Hiker, Photo } from '../../models/models';
 import { CustomLuxonAdapter} from '../../classes/customLuxonAdapter';
-import {MainContext, MessageMap} from '../../contexts/MainContext';
+import { MainContext, MessageMap } from '../../contexts/MainContext';
+import * as DataService from '../../services/dataService';
+import * as SharedService from '../../services/sharedService';
+import * as Constants from '../../constants/constants';
 
 const useStyles = makeStyles()((theme) => ({
     row: {
@@ -302,6 +304,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const [ dateOfHikeInputError, setDateOfHikeInputError ] = useState<boolean>(false);
     const [ endDateOfHikeInputError, setEndDateOfHikeInputError ] = useState<boolean>(false);
     const [ saving, setSaving ] = useState<boolean>(false);
+    const [ savingPhoto, setSavingPhoto ] = useState<boolean>(false);
     const [ uploadProgress, setUploadProgress ] = useState<number>(0);
     const [ openSnackbar, setOpenSnackbar ] = useState<boolean>(false);
     const [ snackbarMessage, setSnackbarMessage ] = useState<string>('');
@@ -595,6 +598,14 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const handleSave = async () => {
         try {
             if (validInput()) {
+                setSaving(true);
+
+                const uploadProgressHandler = getUploadProgressHandler();
+
+                if (uploadProgressHandler) {
+                    setSavingPhoto(true);
+                }
+
                 const hikersToSave = hikers.map((hiker: string) => ({ fullName: hiker }))
                 const hike: Hike = {
                     trail,
@@ -609,13 +620,8 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                     tags: tags.join(','),
                     photos
                 };
-                const uploadProgressHandler = getUploadProgressHandler();
                 let hikeIdForNav = hikeId;
                 let response: Hike;
-
-                if (uploadProgressHandler) {
-                    setSaving(true);
-                }
 
                 if (hikeId) {
                     hike.id = hikeId;
@@ -637,6 +643,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             SharedService.scrollToTop(topOfPageRef);
         } finally {
             setSaving(false);
+            setSavingPhoto(false);
         }
     };
 
@@ -989,7 +996,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 </DragDropContext>
 
                 {
-                    saving &&
+                    savingPhoto &&
                     <Box className={cx(classes.progressIndicator)}>
                         <LinearProgress variant="determinate" value={uploadProgress} />
                     </Box>
