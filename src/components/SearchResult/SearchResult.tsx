@@ -84,7 +84,7 @@ const SearchResult: FC<SearchResultProps> = ({ hike }) => {
         let dateValue = SharedService.formatDateValue(hike.dateOfHike);
 
         if (hike.endDateOfHike) {
-            dateValue += ` - ${SharedService.formatDateValue(hike.endDateOfHike)}`;
+            dateValue += ` to ${SharedService.formatDateValue(hike.endDateOfHike)}`;
         }
 
         return dateValue;

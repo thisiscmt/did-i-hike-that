@@ -59,8 +59,9 @@ export const getThumbnailDataSrc = (file: File, maxSize: number) => new Promise<
 });
 
 export const formatDateValue = (date: string) => {
-    const dateParts = date.split('-');
-    return `${Number(dateParts[1])}/${Number(dateParts[2])}/${dateParts[0]}`;
+    const dateObj = DateTime.fromSQL(date);
+
+    return `${dateObj.weekdayLong}, ${dateObj.toLocaleString(DateTime.DATE_FULL)}`;
 };
 
 export const formatEpochValue = (epochValue: number, format?: Intl.DateTimeFormatOptions) => {

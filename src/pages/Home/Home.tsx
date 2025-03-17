@@ -327,7 +327,8 @@ const Home: FC<HomeProps> = ({ topOfPageRef }) => {
                                             }
                                         </Box>
 
-                                        <Pagination onChange={handleChangePage} page={currentPage} count={pageCount} className={cx(classes.pagination)} />
+                                        <Pagination onChange={handleChangePage} page={currentPage} count={pageCount} className={cx(classes.pagination)}
+                                                    showFirstButton={true} showLastButton={true} />
                                     </>
                                 :
                                     <>
