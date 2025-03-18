@@ -108,6 +108,10 @@ const useStyles = makeStyles()((theme) => ({
 
         '&:last-child': {
             marginBottom: 0
+        },
+
+        [theme.breakpoints.down(Constants.HOME_PAGE_FIRST_BREAKPOINT)]: {
+            width: '100%'
         }
     },
 

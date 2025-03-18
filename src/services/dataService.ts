@@ -6,7 +6,7 @@ import * as Constants from '../constants/constants';
 Axios.interceptors.response.use(function (response) {
     return response;
 }, function (error) {
-    if (Axios.isAxiosError(error) && error.response?.status === 401) {
+    if (Axios.isAxiosError(error) && error.response?.status === 401 && !error.response?.request?.responseURL.includes('/auth/login')) {
         localStorage.removeItem(Constants.STORAGE_FULL_NAME);
         localStorage.removeItem(Constants.STORAGE_ROLE);
         localStorage.removeItem(Constants.STORAGE_LAST_LOGIN);

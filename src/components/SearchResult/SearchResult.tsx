@@ -4,7 +4,7 @@ import { makeStyles } from 'tss-react/mui';
 
 import { Hike } from '../../models/models';
 import * as SharedService from '../../services/sharedService';
-import { HOME_PAGE_FIRST_BREAKPOINT, PHOTO_THUMBNAIL_SIZE } from '../../constants/constants';
+import * as Constants from '../../constants/constants';
 
 const useStyles = makeStyles()((theme) => ({
     cardContent: {
@@ -18,8 +18,8 @@ const useStyles = makeStyles()((theme) => ({
     thumbnail: {
         alignItems: 'start',
         display: 'flex',
-        minWidth: `${PHOTO_THUMBNAIL_SIZE}px`,
-        width: `${PHOTO_THUMBNAIL_SIZE}px`
+        minWidth: `${Constants.PHOTO_THUMBNAIL_SIZE}px`,
+        width: `${Constants.PHOTO_THUMBNAIL_SIZE}px`
     },
 
     details: {
@@ -34,7 +34,7 @@ const useStyles = makeStyles()((theme) => ({
             marginRight: 0
         },
 
-        [theme.breakpoints.down(HOME_PAGE_FIRST_BREAKPOINT)]: {
+        [theme.breakpoints.down(Constants.HOME_PAGE_SECOND_BREAKPOINT)]: {
             marginLeft: '20px',
         },
 

@@ -13,7 +13,7 @@ import DeletedHikes from './pages/DeletedHikes/DeletedHikes';
 import Login from './pages/Login/Login';
 import ErrorPage from './pages/ErrorPage/ErrorPage';
 import Header from './components/Header/Header';
-import { HOME_PAGE_FIRST_BREAKPOINT } from './constants/constants';
+import * as Constants from './constants/constants';
 import './App.scss';
 
 const useStyles = makeStyles()((theme) => ({
@@ -25,7 +25,7 @@ const useStyles = makeStyles()((theme) => ({
     leftColumn: {
         width: '20%',
 
-        [theme.breakpoints.down(HOME_PAGE_FIRST_BREAKPOINT)]: {
+        [theme.breakpoints.down(Constants.HOME_PAGE_SECOND_BREAKPOINT)]: {
             width: '8%'
         }
     },
@@ -35,7 +35,7 @@ const useStyles = makeStyles()((theme) => ({
         marginTop: '30px',
         width: '60%',
 
-        [theme.breakpoints.down(HOME_PAGE_FIRST_BREAKPOINT)]: {
+        [theme.breakpoints.down(Constants.HOME_PAGE_SECOND_BREAKPOINT)]: {
             width: '84%'
         }
     },
@@ -43,7 +43,7 @@ const useStyles = makeStyles()((theme) => ({
     rightColumn: {
         width: '20%',
 
-        [theme.breakpoints.down(HOME_PAGE_FIRST_BREAKPOINT)]: {
+        [theme.breakpoints.down(Constants.HOME_PAGE_SECOND_BREAKPOINT)]: {
             width: '8%'
         }
     }
