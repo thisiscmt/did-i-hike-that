@@ -6,8 +6,8 @@ import { makeStyles } from 'tss-react/mui';
 import { DateTime } from 'luxon';
 
 import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
-import * as DataService from '../../services/dataService';
 import { MainContext } from '../../contexts/MainContext';
+import * as DataService from '../../services/dataService';
 import * as Constants from '../../constants/constants';
 
 const useStyles = makeStyles()((theme) => ({
@@ -206,8 +206,6 @@ const Login = () => {
                                                 aria-label="toggle password visibility"
                                                 onClick={handleShowPassword}
                                                 size='small'
-                                                // className={classes.passwordVisibility}
-                                                // onMouseDown={handleMouseDownPassword}
                                             >
                                                 {showPassword ? <VisibilityOutlined /> : <VisibilityOffOutlined />}
                                             </IconButton>

@@ -6,6 +6,7 @@ import * as Constants from '../constants/constants';
 Axios.interceptors.response.use(function (response) {
     return response;
 }, function (error) {
+    // We skip the redirect if the user is actually trying to log in
     if (Axios.isAxiosError(error) && error.response?.status === 401 && !error.response?.request?.responseURL.includes('/auth/login')) {
         localStorage.removeItem(Constants.STORAGE_FULL_NAME);
         localStorage.removeItem(Constants.STORAGE_ROLE);

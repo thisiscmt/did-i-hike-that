@@ -4,7 +4,6 @@ import { Box, Button, CircularProgress, FormControl, FormControlLabel, Grid, Tex
 import { makeStyles } from 'tss-react/mui';
 
 import { MainContext, MessageMap } from '../../contexts/MainContext';
-import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
 import ConfirmationPrompt from '../../components/ConfirmationPrompt/ConfirmationPrompt';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
@@ -111,7 +110,6 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
     const [ emailInputError, setEmailInputError ] = useState<boolean>(false);
     const [ passwordInputError, setPasswordInputError ] = useState<boolean>(false);
     const [ roleInputError, setRoleInputError ] = useState<boolean>(false);
-    const [ loading, setLoading ] = useState<boolean>(false);
     const [ authorized, setAuthorized ] = useState<boolean>(false);
     const [ saving, setSaving ] = useState<boolean>(false);
     const [ retrieveduser, setRetrievedUser ] = useState<boolean>(false);
@@ -124,7 +122,6 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
         const getUser = async () => {
             try {
                 if (userId) {
-                    setLoading(false);
                     const response = await DataService.getUser(userId);
 
                     setFullName(response.fullName || '');
@@ -139,8 +136,6 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
                     '404': { message: 'Could not find the user', severity: 'warning' }
                 };
                 handleException(error, 'An error occurred retrieving the user', msgMap);
-            } finally {
-                setLoading(false);
             }
         }
 
@@ -248,9 +243,9 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
     };
 
     return (
-        <Box className='loadable-container'>
+        <>
             {
-                !loading && isLoggedIn() && (userId ? authorized : localStorage.getItem(Constants.STORAGE_ROLE) === 'Admin') &&
+                isLoggedIn() && (userId ? authorized : localStorage.getItem(Constants.STORAGE_ROLE) === 'Admin') &&
                 <>
                     <Grid item xs={12} className={cx(classes.row)}>
                         <FormControl className={cx(classes.field)}>
@@ -375,9 +370,7 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
                 content='Are you sure you want to delete this user?'
                 onClose={handleDeleteConfirmation}
             />
-
-            <LoadingOverlay open={loading} />
-        </Box>
+        </>
     );
 };
 

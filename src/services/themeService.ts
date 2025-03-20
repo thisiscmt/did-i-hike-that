@@ -1,5 +1,5 @@
 import { createTheme } from '@mui/material/styles';
-import {grey} from '@mui/material/colors';
+import { grey } from '@mui/material/colors';
 
 export const Colors = {
     primaryText: grey[800],
@@ -7,7 +7,7 @@ export const Colors = {
     white: '#FFFFFF'
 };
 
-export const buildTheme = (overrides?: Record<string, string>) => {
+export const buildTheme = (_overrides?: Record<string, string>) => {
     return createTheme({
         typography: {
             allVariants: {
@@ -42,7 +42,14 @@ export const buildTheme = (overrides?: Record<string, string>) => {
                         }
                     }
                 }
-            }
+            },
+            MuiSkeleton: {
+                styleOverrides: {
+                    root: {
+                        borderRadius: '4px'
+                    }
+                }
+            },
         },
         palette: {
             text: {
