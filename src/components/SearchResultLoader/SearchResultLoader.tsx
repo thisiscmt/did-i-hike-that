@@ -4,7 +4,6 @@ import { makeStyles } from 'tss-react/mui';
 
 const useStyles = makeStyles()((theme) => ({
     mainContainer: {
-        backgroundColor: 'rgb(255, 255, 255)',
         borderRadius: '6px',
         boxShadow: 'rgba(0, 0, 0, 0.2) 0px 3px 1px -2px, rgba(0, 0, 0, 0.14) 0px 2px 2px 0px, rgba(0, 0, 0, 0.12) 0px 1px 5px 0px',
         display: 'flex',
@@ -12,6 +11,7 @@ const useStyles = makeStyles()((theme) => ({
         padding: '16px',
         transition: 'box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1)',
 
+        // Adjustments for making the image be above the other content
         [theme.breakpoints.down(600)]: {
             flexDirection: 'column',
             gap: '18px'

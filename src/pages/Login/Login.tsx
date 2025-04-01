@@ -6,6 +6,7 @@ import { makeStyles } from 'tss-react/mui';
 import { DateTime } from 'luxon';
 
 import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
+import useDocumentTitle from '../../hooks/useDocumentTitle';
 import { MainContext } from '../../contexts/MainContext';
 import * as DataService from '../../services/dataService';
 import * as Constants from '../../constants/constants';
@@ -85,8 +86,9 @@ const Login = () => {
     const navigate = useNavigate();
     const [ searchParams ] = useSearchParams();
 
+    useDocumentTitle('Login - Did I Hike That?');
+
     useEffect(() => {
-        document.title = 'Login - Did I Hike That?';
         document.addEventListener('keydown', handleKeyDown);
 
         return () => {

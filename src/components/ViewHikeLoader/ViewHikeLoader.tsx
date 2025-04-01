@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Skeleton } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 
-const useStyles = makeStyles()((theme) => ({
+const useStyles = makeStyles()(() => ({
     mainContainer: {
         display: 'flex',
         flexDirection: 'column',
@@ -10,7 +10,6 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     infoLoaderContainer: {
-        backgroundColor: 'rgb(255, 255, 255)',
         borderRadius: '6px',
         boxShadow: 'rgba(0, 0, 0, 0.2) 0px 3px 1px -2px, rgba(0, 0, 0, 0.14) 0px 2px 2px 0px, rgba(0, 0, 0, 0.12) 0px 1px 5px 0px',
         display: 'flex',

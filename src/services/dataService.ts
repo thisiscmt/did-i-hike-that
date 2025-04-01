@@ -13,8 +13,10 @@ Axios.interceptors.response.use(function (response) {
         localStorage.removeItem(Constants.STORAGE_LAST_LOGIN);
 
         const returnUrl = window.location.search ? `${window.location.pathname}${window.location.search}` : window.location.pathname;
-
         window.location.replace(`/login?returnUrl=${encodeURIComponent(returnUrl)}`);
+
+        // This prevents any error message from briefly being shown before the redirect completes
+        return Promise.resolve();
     } else {
         return Promise.reject(error);
     }
@@ -72,6 +74,10 @@ export const deleteHike = (hikeId: string) => {
 
 export const deleteHikePermanently = (hikeId: string) => {
     return Axios.delete(`${process.env.REACT_APP_API_URL}/hike/deleted/${hikeId}`, getRequestConfig());
+};
+
+export const undeleteHike = (hikeId: string) => {
+    return Axios.put(`${process.env.REACT_APP_API_URL}/hike/deleted/${hikeId}`, undefined, getRequestConfig());
 };
 
 export const getDeletedHikes = async (): Promise<Hike[]> => {

@@ -3,12 +3,13 @@ import { Typography, Box, Paper, Table, TableBody, TableCell, TableContainer, Ta
 import { DeleteOutlineOutlined } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
 
+import ConfirmationPrompt from '../../components/ConfirmationPrompt/ConfirmationPrompt';
+import TableLoader from '../../components/TableLoader/TableLoader';
+import useDocumentTitle from '../../hooks/useDocumentTitle';
+import { Session } from '../../models/models';
+import { MainContext, MessageMap } from '../../contexts/MainContext';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
-import { Session } from '../../models/models';
-import {MainContext, MessageMap} from '../../contexts/MainContext';
-import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
-import ConfirmationPrompt from '../../components/ConfirmationPrompt/ConfirmationPrompt';
 
 const useStyles = makeStyles()(() => ({
     tableHeader: {
@@ -34,17 +35,17 @@ const Sessions: FC = () => {
     const [ sessions, setSessions ] = useState<Session[]>([]);
     const [ retrievedData, setRetrievedData ] = useState<boolean>(false);
     const [ loading, setLoading ] = useState<boolean>(true);
-    const [ authorized, setAuthorized ] = useState<boolean>(false);
     const [ openDeleteConfirmation, setOpenDeleteConfirmation ] = useState<boolean>(false);
     const [ sessionIdToDelete, setSessionIdToDelete ] = useState<string>('');
-    const { isLoggedIn, handleException } = useContext(MainContext);
+    const { handleException } = useContext(MainContext);
+
+    useDocumentTitle('Sessions - Did I Hike That?');
 
     useEffect(() => {
         const getSessions = async () => {
             try {
                 const response = await DataService.getSessions();
                 setSessions(response);
-                setAuthorized(true);
             } catch (error) {
                 const msgMap: MessageMap = {'403': { message: 'You are not authorized to view this page', severity: 'error' }};
                 handleException(error, 'An error occurred retrieving sessions', msgMap);
@@ -53,8 +54,6 @@ const Sessions: FC = () => {
                 setLoading(false);
             }
         }
-
-        document.title = 'Sessions - Did I Hike That?';
 
         if (!retrievedData) {
             getSessions();
@@ -82,75 +81,78 @@ const Sessions: FC = () => {
     };
 
     return (
-        <Box className='loadable-container'>
+        <>
             {
-                !loading && isLoggedIn() && authorized &&
-                <Box>
-                    <Box className={cx(classes.tableHeader)}>
-                        <Typography variant='h5'>Sessions</Typography>
-                    </Box>
+                loading
+                    ?
+                        <TableLoader />
+                    :
+                        <Box>
+                            <Box className={cx(classes.tableHeader)}>
+                                <Typography variant='h5'>Sessions</Typography>
+                            </Box>
 
-                    <Paper elevation={3}>
-                        <TableContainer className={cx(classes.table)}>
-                            <Table>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell></TableCell>
-                                        <TableCell>Email</TableCell>
-                                        <TableCell>Role</TableCell>
-                                        <TableCell>Created</TableCell>
-                                        <TableCell>Expires</TableCell>
-                                    </TableRow>
-                                </TableHead>
+                            <Paper elevation={3}>
+                                <TableContainer className={cx(classes.table)}>
+                                    <Table>
+                                        <TableHead>
+                                            <TableRow>
+                                                <TableCell></TableCell>
+                                                <TableCell>Email</TableCell>
+                                                <TableCell>Role</TableCell>
+                                                <TableCell>Created</TableCell>
+                                                <TableCell>Expires</TableCell>
+                                            </TableRow>
+                                        </TableHead>
 
-                                <TableBody>
-                                    {
-                                        sessions.length > 0
-                                            ?
-                                                sessions.map((session: Session) => {
-                                                    const sessionExpiration = SharedService.formatISODateValue(session.expires, SharedService.dateFormatOptions);
-                                                    const sessionCreation = SharedService.formatISODateValue(session.createdAt, SharedService.dateFormatOptions);
-                                                    let sessionEmail = '';
-                                                    let sessionRole = '';
+                                        <TableBody>
+                                            {
+                                                sessions.length > 0
+                                                    ?
+                                                        sessions.map((session: Session) => {
+                                                            const sessionExpiration = SharedService.formatISODateValue(session.expires, SharedService.dateFormatOptions);
+                                                            const sessionCreation = SharedService.formatISODateValue(session.createdAt, SharedService.dateFormatOptions);
+                                                            let sessionEmail = '';
+                                                            let sessionRole = '';
 
-                                                    try {
-                                                        const data = JSON.parse(session.data);
-                                                        sessionEmail = data.email;
-                                                        sessionRole = data.role;
-                                                    } catch (error) {
-                                                        // An error is unlikely here, but we catch it just to make sure it doesn't crash everything
-                                                    }
+                                                            try {
+                                                                const data = JSON.parse(session.data);
+                                                                sessionEmail = data.email;
+                                                                sessionRole = data.role;
+                                                            } catch (error) {
+                                                                // An error is unlikely here, but we catch it just to make sure it doesn't crash everything
+                                                            }
 
-                                                    return (
-                                                        <TableRow hover={false} key={session.sid}>
-                                                            <TableCell align='center' className={cx(classes.deleteButtonColumn)}>
-                                                                <IconButton
-                                                                    aria-label='delete session'
-                                                                    title='Delete session'
-                                                                    onClick={() => handleDeleteSessionClick(session.sid)}
-                                                                    size='small'
-                                                                    color='error'
-                                                                >
-                                                                    <DeleteOutlineOutlined />
-                                                                </IconButton>
-                                                            </TableCell>
-                                                            <TableCell>{sessionEmail}</TableCell>
-                                                            <TableCell>{sessionRole}</TableCell>
-                                                            <TableCell>{sessionCreation}</TableCell>
-                                                            <TableCell>{sessionExpiration}</TableCell>
+                                                            return (
+                                                                <TableRow hover={false} key={session.sid}>
+                                                                    <TableCell align='center' className={cx(classes.deleteButtonColumn)}>
+                                                                        <IconButton
+                                                                            aria-label='delete session'
+                                                                            title='Delete session'
+                                                                            onClick={() => handleDeleteSessionClick(session.sid)}
+                                                                            size='small'
+                                                                            color='error'
+                                                                        >
+                                                                            <DeleteOutlineOutlined />
+                                                                        </IconButton>
+                                                                    </TableCell>
+                                                                    <TableCell>{sessionEmail}</TableCell>
+                                                                    <TableCell>{sessionRole}</TableCell>
+                                                                    <TableCell>{sessionCreation}</TableCell>
+                                                                    <TableCell>{sessionExpiration}</TableCell>
+                                                                </TableRow>
+                                                            );
+                                                        })
+                                                    :
+                                                        <TableRow>
+                                                            <TableCell align='center' colSpan={6}>No sessions found</TableCell>
                                                         </TableRow>
-                                                    );
-                                                })
-                                            :
-                                                <TableRow>
-                                                    <TableCell align='center' colSpan={6}>No sessions found</TableCell>
-                                                </TableRow>
-                                    }
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                    </Paper>
-                </Box>
+                                            }
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </Paper>
+                        </Box>
             }
 
             <ConfirmationPrompt
@@ -159,9 +161,7 @@ const Sessions: FC = () => {
                 content='Are you sure you want to delete this session?'
                 onClose={handleDeleteConfirmation}
             />
-
-            <LoadingOverlay open={loading} />
-        </Box>
+        </>
     );
 };
 

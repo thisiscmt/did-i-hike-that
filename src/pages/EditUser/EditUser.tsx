@@ -3,13 +3,14 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Box, Button, CircularProgress, FormControl, FormControlLabel, Grid, TextField, Select, MenuItem } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 
-import { MainContext, MessageMap } from '../../contexts/MainContext';
+import useDocumentTitle from '../../hooks/useDocumentTitle';
 import ConfirmationPrompt from '../../components/ConfirmationPrompt/ConfirmationPrompt';
+import { MainContext, MessageMap } from '../../contexts/MainContext';
+import { Colors } from '../../services/themeService';
+import { User } from '../../models/models';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
 import * as Constants from '../../constants/constants';
-import { Colors } from '../../services/themeService';
-import { User } from '../../models/models';
 
 const useStyles = makeStyles()((theme) => ({
     row: {
@@ -117,6 +118,8 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
 
     const { isLoggedIn, handleException, setBanner } = useContext(MainContext);
     const navigate = useNavigate();
+
+    useDocumentTitle('Login - Did I Hike That?');
 
     useEffect(() => {
         const getUser = async () => {

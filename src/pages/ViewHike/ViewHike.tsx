@@ -5,12 +5,12 @@ import { DeleteOutlineOutlined, EditOutlined, SaveOutlined, CancelOutlined } fro
 import { makeStyles } from 'tss-react/mui';
 
 import ConfirmationPrompt from '../../components/ConfirmationPrompt/ConfirmationPrompt';
-import LoadingOverlay from '../../components/LoadingOverlay/LoadingOverlay';
+import ViewHikeLoader from '../../components/ViewHikeLoader/ViewHikeLoader';
+import useDocumentTitle from '../../hooks/useDocumentTitle';
 import { Hike, Hiker, Photo } from '../../models/models';
 import { MainContext, MessageMap } from '../../contexts/MainContext';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
-import ViewHikeLoader from '../../components/ViewHikeLoader/ViewHikeLoader';
 
 const useStyles = makeStyles()((theme) => ({
     section: {
@@ -157,6 +157,8 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
     const { hikeId } = useParams();
     const navigate = useNavigate();
 
+    useDocumentTitle('View Hike - Did I Hike That?');
+
     useEffect(() => {
         const getHike = async () => {
             try {
@@ -182,8 +184,6 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
                 setLoading(false);
             }
         }
-
-        document.title = 'View Hike - Did I Hike That?';
 
         if (!retrievedHike) {
             if (currentHike && currentHike.id === hikeId) {
@@ -223,7 +223,13 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
 
         if (value && hikeId) {
             try {
-                await DataService.deleteHike(hikeId);
+                if (hike.deleted) {
+                    await DataService.undeleteHike(hikeId);
+                } else {
+                    await DataService.deleteHike(hikeId);
+                }
+
+                setCurrentHike(null);
                 navigate('/');
             } catch (error) {
                 handleException(error, 'An error occurred deleting the hike');
@@ -311,11 +317,10 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
                             <IconButton
                                 aria-label='delete hike'
                                 className={cx(classes.deleteButton)}
-                                title='Delete hike'
+                                title={hike.deleted ? 'Un-delete hike' : 'Delete hike'}
                                 onClick={() => setOpenDeleteConfirmation(true)}
                                 size='small'
                                 color='error'
-                                disabled={hike.deleted}
                             >
                                 <DeleteOutlineOutlined />
                             </IconButton>
@@ -513,9 +518,9 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
                     }
 
                     <ConfirmationPrompt
-                        title='Delete this hike?'
+                        title={hike.deleted ? 'Un-delete this hike?' : 'Delete this hike?'}
                         open={openDeleteConfirmation}
-                        content='Are you sure you want to delete this hike?'
+                        content={hike.deleted ? 'Are you sure you want to un-delete this hike?' : 'Are you sure you want to delete this hike?'}
                         onClose={handleDeleteConfirmation}
                     />
                 </>

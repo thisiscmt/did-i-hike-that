@@ -6,6 +6,7 @@ import { makeStyles } from 'tss-react/mui';
 
 import SearchResult from '../../components/SearchResult/SearchResult';
 import SearchResultLoader from '../../components/SearchResultLoader/SearchResultLoader';
+import useDocumentTitle from '../../hooks/useDocumentTitle';
 import { MainContext } from '../../contexts/MainContext';
 import { Hike } from '../../models/models';
 import * as DataService from '../../services/dataService';
@@ -169,12 +170,12 @@ const Home: FC<HomeProps> = ({ topOfPageRef }) => {
         }
     }, [setSearchResults, setPageCount, setBanner, topOfPageRef]);
 
+    useDocumentTitle('Did I Hike That?');
+
     useEffect(() => {
         const fetchData = async () => {
             await getHikes(searchParams);
         }
-
-        document.title = 'Did I Hike That?';
 
         const queryStringChanged = currentQueryString !== searchParams.toString();
 

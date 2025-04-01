@@ -26,6 +26,7 @@ import { arrayMoveImmutable } from 'array-move';
 import { AxiosProgressEvent } from 'axios';
 import { DateTime } from 'luxon';
 
+import useDocumentTitle from '../../hooks/useDocumentTitle';
 import { Colors } from '../../services/themeService';
 import { Hike, Hiker, Photo } from '../../models/models';
 import { CustomLuxonAdapter} from '../../classes/customLuxonAdapter';
@@ -65,16 +66,16 @@ const useStyles = makeStyles()((theme) => ({
             paddingRight: 0
         },
 
-        [theme.breakpoints.down(700)]: {
-            width: 'unset'
-        },
-
         '&.shortField': {
             width: '350px',
 
             [theme.breakpoints.down(500)]: {
                 width: 'unset'
             }
+        },
+
+        [theme.breakpoints.down(700)]: {
+            width: 'unset'
         }
     },
 
@@ -309,6 +310,8 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
     const [ openSnackbar, setOpenSnackbar ] = useState<boolean>(false);
     const [ snackbarMessage, setSnackbarMessage ] = useState<string>('');
 
+    useDocumentTitle(hikeId ? 'Edit Hike - Did I Hike That?' : 'Create Hike - Did I Hike That?');
+
     useEffect(() => {
         const setHikeData = (hike: Hike) => {
             setTrail(hike.trail);
@@ -378,8 +381,6 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 SharedService.scrollToTop(topOfPageRef);
             }
         };
-
-        document.title = hikeId ? 'Edit Hike - Did I Hike That?' : 'Create Hike - Did I Hike That?';
 
         if (!retrievedKnownHikers) {
             getKnownHikers();

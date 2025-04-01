@@ -1,10 +1,10 @@
-import React, {useEffect} from 'react';
-import {Box} from '@mui/material';
+import React from 'react';
+import { Box } from '@mui/material';
+
+import useDocumentTitle from '../../hooks/useDocumentTitle';
 
 const ErrorPage = () => {
-    useEffect(() => {
-        document.title = '404 - Did I Hike That?';
-    });
+    useDocumentTitle('Error - Did I Hike That?');
 
     return (
         <Box>
