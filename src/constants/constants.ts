@@ -2,6 +2,7 @@ export const STORAGE_EMAIL = 'DIHT_User_Email';
 export const STORAGE_FULL_NAME = 'DIHT_User_Full_Name';
 export const STORAGE_ROLE = 'DIHT_User_Role';
 export const STORAGE_LAST_LOGIN = 'DIHT_Last_Login';
+export const STORAGE_DEFAULT_PAGE_SIZE = 'DIHT_Default_Page_Size';
 
 export const PHOTO_THUMBNAIL_SIZE = 250;
 export const PHOTO_MAX_SIZE = 15728640;  // 15 MB

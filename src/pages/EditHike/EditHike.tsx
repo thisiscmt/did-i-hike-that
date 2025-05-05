@@ -1,4 +1,4 @@
-import React, { FC, RefObject, useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
     Autocomplete,
@@ -275,11 +275,7 @@ const useStyles = makeStyles()((theme) => ({
 
 const MAX_PHOTOS_FOR_UPLOAD = 10;
 
-interface EditHikeProps {
-    topOfPageRef: RefObject<HTMLElement>;
-}
-
-const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
+const EditHike = () => {
     const { classes, cx } = useStyles();
     const { currentHike, setCurrentHike, setBanner, handleException } = useContext(MainContext);
     const { hikeId } = useParams();
@@ -359,7 +355,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 setRetrievedKnownHikers(true);
             } catch(error) {
                 setBanner('An error occurred retrieving hikers', 'error');
-                SharedService.scrollToTop(topOfPageRef);
+                window.scrollTo({ top: 0, behavior: 'smooth'});
             }
         };
 
@@ -378,7 +374,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
 
             } catch(error) {
                 setBanner('An error occurred retrieving the hike', 'error');
-                SharedService.scrollToTop(topOfPageRef);
+                window.scrollTo({ top: 0, behavior: 'smooth'});
             }
         };
 
@@ -401,7 +397,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
                 clearHikeData();
             }
         }
-    }, [clearedHike, currentHike, hikeId, retrievedHike, retrievedKnownHikers, setBanner, setCurrentHike, topOfPageRef]);
+    }, [clearedHike, currentHike, hikeId, retrievedHike, retrievedKnownHikers, setBanner, setCurrentHike]);
 
     const validInput = () => {
         let valid = true;
@@ -445,7 +441,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             setBanner('');
         } else {
             setBanner(errorMsg, 'error');
-            SharedService.scrollToTop(topOfPageRef);
+            window.scrollTo({ top: 0, behavior: 'smooth'});
         }
 
         return valid;
@@ -641,7 +637,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             };
 
             handleException(error, 'An error occurred saving the hike', msgMap);
-            SharedService.scrollToTop(topOfPageRef);
+            window.scrollTo({ top: 0, behavior: 'smooth'});
         } finally {
             setSaving(false);
             setSavingPhoto(false);
@@ -654,7 +650,7 @@ const EditHike: FC<EditHikeProps> = ({ topOfPageRef }) => {
             abortController.current = new AbortController();
 
             setBanner('Save was cancelled', 'info');
-            SharedService.scrollToTop(topOfPageRef);
+            window.scrollTo({ top: 0, behavior: 'smooth'});
         } else {
             if (hikeId) {
                 navigate(-1);

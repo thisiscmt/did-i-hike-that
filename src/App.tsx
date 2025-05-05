@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Box } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
@@ -6,6 +6,7 @@ import { makeStyles } from 'tss-react/mui';
 import Home from './pages/Home/Home';
 import ViewHike from './pages/ViewHike/ViewHike';
 import EditHike from './pages/EditHike/EditHike';
+import Preferences from './pages/Preferences/Preferences';
 import Sessions from './pages/Sessions/Sessions';
 import Users from './pages/Users/Users';
 import EditUser from './pages/EditUser/EditUser';
@@ -52,37 +53,33 @@ const useStyles = makeStyles()((theme) => ({
 function App() {
     const { classes, cx } = useStyles();
 
-    // This ref is used by child components to scroll to the top of the page, if needed
-    const topOfPageRef = useRef<HTMLElement>(null);
-
     return (
-        <main ref={topOfPageRef}>
-            <BrowserRouter>
-                <Header />
+        <BrowserRouter>
+            <Header />
 
-                <Box className={cx(classes.mainContainer)}>
-                    <Box className={cx(classes.leftColumn)} />
+            <Box className={cx(classes.mainContainer)}>
+                <Box className={cx(classes.leftColumn)} />
 
-                    <Box className={cx(classes.contentColumn)}>
-                        <Routes>
-                            <Route path='/' element={<Home topOfPageRef={topOfPageRef} />} />
-                            <Route path='/hike' element={<EditHike topOfPageRef={topOfPageRef} />} />
-                            <Route path='/hike/:hikeId' element={<ViewHike topOfPageRef={topOfPageRef} />} />
-                            <Route path='/hike/:hikeId/edit' element={<EditHike topOfPageRef={topOfPageRef} />} />
-                            <Route path='/admin/session' element={<Sessions />} />
-                            <Route path='/admin/user' element={<Users />} />
-                            <Route path='/admin/user/:userId' element={<EditUser topOfPageRef={topOfPageRef} />} />
-                            <Route path='/admin/user/add' element={<EditUser topOfPageRef={topOfPageRef} />} />
-                            <Route path='/admin/deleted-hikes' element={<DeletedHikes />} />
-                            <Route path='/login' element={<Login />} />
-                            <Route path='*' element={<ErrorPage />} />
-                        </Routes>
-                    </Box>
-
-                    <Box className={cx(classes.rightColumn)} />
+                <Box className={cx(classes.contentColumn)}>
+                    <Routes>
+                        <Route path='/' element={<Home />} />
+                        <Route path='/hike' element={<EditHike />} />
+                        <Route path='/hike/:hikeId' element={<ViewHike />} />
+                        <Route path='/hike/:hikeId/edit' element={<EditHike />} />
+                        <Route path='/preferences' element={<Preferences />} />
+                        <Route path='/admin/session' element={<Sessions />} />
+                        <Route path='/admin/user' element={<Users />} />
+                        <Route path='/admin/user/:userId' element={<EditUser />} />
+                        <Route path='/admin/user/add' element={<EditUser />} />
+                        <Route path='/admin/deleted-hikes' element={<DeletedHikes />} />
+                        <Route path='/login' element={<Login />} />
+                        <Route path='*' element={<ErrorPage />} />
+                    </Routes>
                 </Box>
-            </BrowserRouter>
-        </main>
+
+                <Box className={cx(classes.rightColumn)} />
+            </Box>
+        </BrowserRouter>
     );
 }
 

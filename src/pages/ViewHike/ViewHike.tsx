@@ -1,4 +1,4 @@
-import React, { FC, RefObject, useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link as RouteLink, useNavigate, useParams } from 'react-router-dom';
 import { Box, Button, Card, CardContent, Chip, IconButton, Link, TextField, Typography } from '@mui/material';
 import { DeleteOutlineOutlined, EditOutlined, SaveOutlined, CancelOutlined } from '@mui/icons-material';
@@ -138,15 +138,11 @@ const useStyles = makeStyles()((theme) => ({
     }
 }));
 
-interface ViewHikeProps {
-    topOfPageRef: RefObject<HTMLElement>;
-}
-
 interface Caption {
     [id: string]: string
 }
 
-const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
+const ViewHike = () => {
     const { classes, cx } = useStyles();
     const [ hike, setHike ] = useState<Hike>({ trail: '', dateOfHike: '' });
     const [ captions, setCaptions ] = useState<Caption>({});
@@ -178,7 +174,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
                 };
 
                 handleException(error, 'An error occurred retrieving the hike', msgMap);
-                SharedService.scrollToTop(topOfPageRef);
+                window.scrollTo({ top: 0, behavior: 'smooth'});
             } finally {
                 setRetrievedHike(true);
                 setLoading(false);
@@ -194,7 +190,7 @@ const ViewHike: FC<ViewHikeProps> = ({ topOfPageRef }) => {
                 getHike();
             }
         }
-    }, [hikeId, retrievedHike, currentHike, setCurrentHike, setBanner, handleException, topOfPageRef]);
+    }, [hikeId, retrievedHike, currentHike, setCurrentHike, setBanner, handleException]);
 
     const getValidUrl = () => {
         let valueToCheck = hike.link;

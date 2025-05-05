@@ -1,13 +1,13 @@
 import React, { FC, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Box, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { CloseOutlined, HomeOutlined, LoginOutlined, LogoutOutlined } from '@mui/icons-material';
+import { CloseOutlined, HomeOutlined, LoginOutlined, LogoutOutlined, SettingsOutlined } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
 
 import { Colors } from '../../services/themeService';
 import { MainContext } from '../../contexts/MainContext';
 import * as DataService from '../../services/dataService';
-import { STORAGE_LAST_LOGIN } from '../../constants/constants';
+import * as Constants from '../../constants/constants';
 
 const useStyles = makeStyles()(() => ({
     mainContainer: {
@@ -52,7 +52,7 @@ const MobileMenu: FC<MobileMenuProps> = ({ onClose }) => {
     const handleLogout = async () => {
         try {
             await DataService.logout();
-            localStorage.removeItem(STORAGE_LAST_LOGIN);
+            localStorage.removeItem(Constants.STORAGE_LAST_LOGIN);
             navigate('/');
         } catch(error) {
             setBanner('An error occurred during logout', 'error');
@@ -80,13 +80,12 @@ const MobileMenu: FC<MobileMenuProps> = ({ onClose }) => {
                     </ListItemButton>
                 </ListItem>
 
-                {/*TODO*/}
-                {/*<ListItem disablePadding={true}>*/}
-                {/*    <ListItemButton to='/preferences' component={Link} onClick={handleMenuClose}>*/}
-                {/*        <ListItemIcon><SettingsOutlined /></ListItemIcon>*/}
-                {/*        <ListItemText primary='Preferences' />*/}
-                {/*    </ListItemButton>*/}
-                {/*</ListItem>*/}
+                <ListItem disablePadding={true}>
+                    <ListItemButton to='/preferences' component={Link} onClick={handleMenuClose}>
+                        <ListItemIcon><SettingsOutlined /></ListItemIcon>
+                        <ListItemText primary='Preferences' />
+                    </ListItemButton>
+                </ListItem>
 
                 {
                     isLoggedIn()

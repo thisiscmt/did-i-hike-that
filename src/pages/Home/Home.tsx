@@ -1,4 +1,4 @@
-import React, { FC, RefObject, useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { TextField, Box, Typography, Button, InputAdornment, IconButton, Pagination, Popover } from '@mui/material';
 import { CloseOutlined } from '@mui/icons-material';
@@ -36,6 +36,10 @@ const useStyles = makeStyles()((theme) => ({
 
     searchInput: {
         width: '80%',
+
+        '& .MuiIconButton-root': {
+            padding: '4px'
+        },
 
         [theme.breakpoints.down(Constants.HOME_PAGE_FIRST_BREAKPOINT)]: {
             width: '100%'
@@ -123,13 +127,7 @@ const useStyles = makeStyles()((theme) => ({
     }
 }));
 
-const PAGE_SIZE = 10;
-
-interface HomeProps {
-    topOfPageRef: RefObject<HTMLElement>;
-}
-
-const Home: FC<HomeProps> = ({ topOfPageRef }) => {
+const Home = () => {
     const { classes, cx } = useStyles();
     const { isLoggedIn, setBanner } = useContext(MainContext);
     const [ loading, setLoading ] = useState<boolean>(false);
@@ -144,15 +142,21 @@ const Home: FC<HomeProps> = ({ topOfPageRef }) => {
     const [ searchParams, setSearchParams ] = useSearchParams();
     const navigate = useNavigate();
 
+    const defaultPageSize = SharedService.getDefaultPageSize();
+
     const getHikes = useCallback(async (searchParamsArg: URLSearchParams) => {
         try {
             setLoading(true);
             setBanner('');
 
+            console.log('defaultPageSize: %o', defaultPageSize);
+
             const params = SharedService.getSearchRequestParams(searchParamsArg);
-            const hikes = await DataService.getHikes(params);
             const pageSizeStr = searchParamsArg.get('pageSize');
-            const pageSize = Number(pageSizeStr) === 0 ? PAGE_SIZE : Number(pageSizeStr);
+            const pageSize = Number(pageSizeStr) === 0 ? defaultPageSize : Number(pageSizeStr);
+            params.pageSize = pageSize;
+
+            const hikes = await DataService.getHikes(params);
 
             if (params.page !== undefined) {
                 setCurrentPage(params.page);
@@ -162,13 +166,13 @@ const Home: FC<HomeProps> = ({ topOfPageRef }) => {
             setPageCount(Math.ceil(hikes.count / pageSize));
             setNoResults(hikes.rows.length === 0);
 
-            SharedService.scrollToTop(topOfPageRef);
+            window.scrollTo({ top: 0, behavior: 'smooth'});
         } catch (error){
             setBanner('An error occurred retrieving hikes', 'error');
         } finally {
             setLoading(false);
         }
-    }, [setSearchResults, setPageCount, setBanner, topOfPageRef]);
+    }, [setSearchResults, setPageCount, setBanner]);
 
     useDocumentTitle('Did I Hike That?');
 
@@ -204,9 +208,6 @@ const Home: FC<HomeProps> = ({ topOfPageRef }) => {
 
     const handleClearSearchText = () => {
         setSearchText('');
-        searchParams.delete('searchText');
-        setSearchParams(searchParams);
-        getHikes(searchParams);
     };
 
     const handleClickSearch = () => {
@@ -270,6 +271,7 @@ const Home: FC<HomeProps> = ({ topOfPageRef }) => {
                         <TextField
                             onChange={handleSearchTextChange}
                             value={searchText}
+                            size='small'
                             className={cx(classes.searchInput)}
                             fullWidth={true}
                             inputProps={{

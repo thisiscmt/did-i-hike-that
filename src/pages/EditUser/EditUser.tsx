@@ -1,4 +1,4 @@
-import React, { FC, RefObject, useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Box, Button, CircularProgress, FormControl, FormControlLabel, Grid, TextField, Select, MenuItem } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
@@ -9,7 +9,6 @@ import { MainContext, MessageMap } from '../../contexts/MainContext';
 import { Colors } from '../../services/themeService';
 import { User } from '../../models/models';
 import * as DataService from '../../services/dataService';
-import * as SharedService from '../../services/sharedService';
 import * as Constants from '../../constants/constants';
 
 const useStyles = makeStyles()((theme) => ({
@@ -93,11 +92,7 @@ const useStyles = makeStyles()((theme) => ({
     }
 }));
 
-interface EditUserProps {
-    topOfPageRef: RefObject<HTMLElement>;
-}
-
-const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
+const EditUser = () => {
     const { userId } = useParams();
     const dummyPassword = '********';
 
@@ -189,7 +184,7 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
             setBanner('');
         } else {
             setBanner(errorMsg, 'error');
-            SharedService.scrollToTop(topOfPageRef);
+            window.scrollTo({ top: 0, behavior: 'smooth'});
         }
 
         return valid;
@@ -226,7 +221,7 @@ const EditUser: FC<EditUserProps> = ({ topOfPageRef }) => {
             };
 
             handleException(error, 'An error occurred saving the user', msgMap);
-            SharedService.scrollToTop(topOfPageRef);
+            window.scrollTo({ top: 0, behavior: 'smooth'});
         } finally {
             setSaving(false);
         }

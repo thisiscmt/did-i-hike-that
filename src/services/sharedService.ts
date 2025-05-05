@@ -1,8 +1,8 @@
-import { RefObject } from 'react';
 import Resizer from 'react-image-file-resizer';
 import { DateTime } from 'luxon';
 
 import { HikeSearchParams } from '../models/models';
+import * as Constants from '../constants/constants';
 
 export const dateFormatOptions: Intl.DateTimeFormatOptions = {
     month: 'numeric',
@@ -81,8 +81,18 @@ export const formatISODateValue = (date: Date | string | undefined, format?: Int
     return formattedDate;
 }
 
-export const scrollToTop = (ref: RefObject<HTMLElement>) => {
-    if (ref && ref.current) {
-        ref.current.scrollIntoView();
+export const getDefaultPageSize = () => {
+    const pageSizeStr = localStorage.getItem(Constants.STORAGE_DEFAULT_PAGE_SIZE);
+    const defaultPageSize = 10;
+    let pageSize = defaultPageSize;
+
+    if (pageSizeStr) {
+        pageSize = Number(pageSizeStr);
+
+        if (isNaN(pageSize)) {
+            pageSize = defaultPageSize;
+        }
     }
-}
+
+    return pageSize;
+};

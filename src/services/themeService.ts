@@ -4,7 +4,18 @@ import { grey } from '@mui/material/colors';
 export const Colors = {
     primaryText: grey[800],
     backgroundGray: '#F3F3F3',
+    primaryLinkColor: '#1976d2',
+    secondaryLinkColor: 'rgba(25, 118, 210, 0.60)',
     white: '#FFFFFF'
+};
+
+export const BlueAnchorStyles = {
+    color: Colors.primaryLinkColor,
+    textDecoration: 'none',
+
+    '&:hover': {
+        color: Colors.secondaryLinkColor
+    }
 };
 
 export const buildTheme = (_overrides?: Record<string, string>) => {
