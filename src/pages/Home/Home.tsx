@@ -142,15 +142,12 @@ const Home = () => {
     const [ searchParams, setSearchParams ] = useSearchParams();
     const navigate = useNavigate();
 
-    const defaultPageSize = SharedService.getDefaultPageSize();
-
     const getHikes = useCallback(async (searchParamsArg: URLSearchParams) => {
         try {
             setLoading(true);
             setBanner('');
 
-            console.log('defaultPageSize: %o', defaultPageSize);
-
+            const defaultPageSize = SharedService.getDefaultPageSize();
             const params = SharedService.getSearchRequestParams(searchParamsArg);
             const pageSizeStr = searchParamsArg.get('pageSize');
             const pageSize = Number(pageSizeStr) === 0 ? defaultPageSize : Number(pageSizeStr);

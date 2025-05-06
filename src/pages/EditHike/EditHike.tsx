@@ -67,7 +67,7 @@ const useStyles = makeStyles()((theme) => ({
         },
 
         '&.shortField': {
-            width: '350px',
+            width: '400px',
 
             [theme.breakpoints.down(500)]: {
                 width: 'unset'
@@ -465,12 +465,19 @@ const EditHike = () => {
                 return;
             }
 
+            if (details?.option?.trim() === '') {
+                return;
+            }
+
             // We make sure if the user specified an existing hiker, we use that exact name rather than create a duplicate record
-           const knownHikerIndex = knownHikers.findIndex((item: string) => details?.option?.toLowerCase() === item.toLowerCase());
+            const knownHikerIndex = knownHikers.findIndex((item: string) => details?.option?.toLowerCase() === item.toLowerCase());
 
             if (knownHikerIndex > -1) {
                 const hikerIndex = value.indexOf(details?.option || '');
                 newValue[hikerIndex] = knownHikers[knownHikerIndex];
+            } else {
+                const newHiker = newValue[newValue.length - 1];
+                newValue[newValue.length - 1] = newHiker[0].toUpperCase() + newHiker.slice(1);
             }
         }
 
@@ -848,35 +855,11 @@ const EditHike = () => {
                 </FormControl>
             </Grid>
 
-            <Grid item xs={12} className={`${cx(classes.row)} linkLabelField`}>
-                <FormControl className={`${cx(classes.field)} shortField`}>
-                    <FormControlLabel
-                        labelPlacement='start'
-                        label='Link'
-                        classes={{ label: classes.fieldLabel }}
-                        control={
-                            <TextField
-                                name='LinkLabel'
-                                margin='none'
-                                variant='outlined'
-                                value={linkLabel}
-                                size='small'
-                                placeholder='Add label'
-                                fullWidth={true}
-                                autoCorrect='off'
-                                inputProps={{ maxLength: 255 }}
-                                onChange={(event) => setLinkLabel(event.target.value)}
-                            />
-                        }
-                    />
-                </FormControl>
-            </Grid>
-
             <Grid item xs={12} className={cx(classes.row)}>
                 <FormControl className={cx(classes.wideField)}>
                     <FormControlLabel
                         labelPlacement='start'
-                        label=''
+                        label='Link'
                         classes={{ label: classes.fieldLabel }}
                         control={
                             <TextField
@@ -892,6 +875,30 @@ const EditHike = () => {
                                 autoCorrect='off'
                                 inputProps={{ maxLength: 255 }}
                                 onChange={(event) => setLink(event.target.value)}
+                            />
+                        }
+                    />
+                </FormControl>
+            </Grid>
+
+            <Grid item xs={12} className={`${cx(classes.row)} linkLabelField`}>
+                <FormControl className={`${cx(classes.field)} shortField`}>
+                    <FormControlLabel
+                        labelPlacement='start'
+                        label=''
+                        classes={{ label: classes.fieldLabel }}
+                        control={
+                            <TextField
+                                name='LinkLabel'
+                                margin='none'
+                                variant='outlined'
+                                value={linkLabel}
+                                size='small'
+                                placeholder='Add label for link'
+                                fullWidth={true}
+                                autoCorrect='off'
+                                inputProps={{ maxLength: 255 }}
+                                onChange={(event) => setLinkLabel(event.target.value)}
                             />
                         }
                     />
