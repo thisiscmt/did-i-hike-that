@@ -31,7 +31,7 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     searchInputContainer: {
-        marginBottom: '10px'
+        marginBottom: '20px'
     },
 
     searchInput: {
