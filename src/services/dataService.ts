@@ -1,6 +1,6 @@
 import Axios, { AxiosProgressEvent, AxiosRequestConfig } from 'axios';
 
-import { Hike, Hiker, HikeSearchParams, LoginResponse, Photo, Session, User } from '../models/models';
+import { Hike, Hiker, HikeSearchParams, HikeSearchResults, LoginResponse, Photo, Session, User } from '../models/models';
 import * as Constants from '../constants/constants';
 
 Axios.interceptors.response.use(function (response) {
@@ -22,7 +22,7 @@ Axios.interceptors.response.use(function (response) {
     }
 });
 
-export const getHikes = async (searchParams?: HikeSearchParams): Promise<{ rows: Hike[]; count: number }> => {
+export const getHikes = async (searchParams?: HikeSearchParams): Promise<HikeSearchResults> => {
     const config = getRequestConfig();
 
     if (searchParams) {

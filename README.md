@@ -8,4 +8,4 @@ It allows you to record the trail name, a description, a roster of people who we
 photos, plus things like the conditions, crowd size, etc. Useful on desktop and mobile browsers.
 
 The front end is based on [React.js](https://reactjs.org) and uses a Node.js [back end service](https://github.com/thisiscmt/did-i-hike-that-api), 
-all written in TypeScript. Both are currently works in progress.
+all written in TypeScript.

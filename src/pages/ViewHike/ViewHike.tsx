@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Link as RouteLink, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Box, Button, Card, CardContent, Chip, IconButton, Link, TextField, Typography } from '@mui/material';
-import { DeleteOutlineOutlined, EditOutlined, SaveOutlined, CancelOutlined } from '@mui/icons-material';
+import { DeleteOutlineOutlined, EditOutlined, SaveOutlined, CancelOutlined, HomeOutlined } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
 
 import ConfirmationPrompt from '../../components/ConfirmationPrompt/ConfirmationPrompt';
@@ -69,7 +69,7 @@ const useStyles = makeStyles()((theme) => ({
         whiteSpace: 'pre-wrap'
     },
 
-    deleteButton: {
+    buttonSpacer: {
         marginLeft: '4px'
     },
 
@@ -152,6 +152,7 @@ const ViewHike = () => {
     const { currentHike, isLoggedIn, setCurrentHike, setBanner, handleException } = useContext(MainContext);
     const { hikeId } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
 
     useDocumentTitle('View Hike - Did I Hike That?');
 
@@ -174,10 +175,10 @@ const ViewHike = () => {
                 };
 
                 handleException(error, 'An error occurred retrieving the hike', msgMap);
-                window.scrollTo({ top: 0, behavior: 'smooth'});
             } finally {
                 setRetrievedHike(true);
                 setLoading(false);
+                window.scrollTo({ top: 0, behavior: 'smooth'});
             }
         }
 
@@ -301,8 +302,7 @@ const ViewHike = () => {
                             <IconButton
                                 aria-label='edit hike'
                                 title='Edit hike'
-                                component={RouteLink}
-                                to={`/hike/${hike.id}/edit`}
+                                onClick={() => navigate(`/hike/${hike.id}/edit`, { state: location.state })}
                                 size='small'
                                 color='primary'
                                 disabled={hike.deleted}
@@ -312,7 +312,7 @@ const ViewHike = () => {
 
                             <IconButton
                                 aria-label='delete hike'
-                                className={cx(classes.deleteButton)}
+                                className={cx(classes.buttonSpacer)}
                                 title={hike.deleted ? 'Un-delete hike' : 'Delete hike'}
                                 onClick={() => setOpenDeleteConfirmation(true)}
                                 size='small'
@@ -320,6 +320,20 @@ const ViewHike = () => {
                             >
                                 <DeleteOutlineOutlined />
                             </IconButton>
+
+                            {
+                                location.state &&
+                                <IconButton
+                                    aria-label='go back home'
+                                    className={cx(classes.buttonSpacer)}
+                                    title='Go back home'
+                                    onClick={() => navigate(`/?${location.state}`)}
+                                    size='small'
+                                    color='secondary'
+                                >
+                                    <HomeOutlined />
+                                </IconButton>
+                            }
                         </Box>
                     }
 

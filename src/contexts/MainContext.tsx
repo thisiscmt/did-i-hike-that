@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
 import { useCookies } from 'react-cookie';
 
-import { Hike } from '../models/models';
+import { Hike, HikeSearchResults, SearchResultsCache } from '../models/models';
 import * as Constants from '../constants/constants';
 import Axios from 'axios';
 
 interface MainContextProps {
     bannerMessage: string;
     bannerSeverity: 'error' | 'info' | 'success' | 'warning';
+    searchResultsCache: SearchResultsCache;
     currentHike: Hike | null;
     isLoggedIn: () => boolean;
     handleException: (error: unknown, msg?: string, msgMap?: MessageMap) => void;
     setBanner: (message: string, severity?: AlertSeverity) => void;
+    storeSearchResults: (hikes: HikeSearchResults, key: string) => void;
     setCurrentHike: React.Dispatch<React.SetStateAction<Hike | null>>;
 }
 
@@ -22,10 +24,12 @@ interface MainProviderProps{
 export const MainContext = React.createContext<MainContextProps>({
     bannerMessage: '',
     bannerSeverity: 'info',
+    searchResultsCache: {},
     currentHike: null,
     isLoggedIn: () => false,
     handleException: () => {},
     setBanner: () => {},
+    storeSearchResults: () => {},
     setCurrentHike: () => {},
 });
 
@@ -36,6 +40,7 @@ export type MessageMap = Record<string, { message: string, severity: AlertSeveri
 export const MainProvider = ({ children }: MainProviderProps) => {
     const [ bannerMessage, setBannerMessage ] = useState<string>('');
     const [ bannerSeverity, setBannerSeverity ] = useState<AlertSeverity>('info');
+    const [ searchResultsCache, setSearchResultsCache ] = useState<SearchResultsCache>({});
     const [ currentHike, setCurrentHike ] = useState<Hike | null>(null);
     const [ cookies ] = useCookies([Constants.SESSION_COOKIE]);
 
@@ -49,6 +54,13 @@ export const MainProvider = ({ children }: MainProviderProps) => {
     const setBanner = (message: string, severity?: AlertSeverity) => {
         setBannerMessage(message);
         setBannerSeverity(severity || 'info');
+    };
+
+    const storeSearchResults = (hikes: HikeSearchResults, key: string) => {
+        const newCache = {...searchResultsCache};
+        newCache[key] = hikes;
+
+        setSearchResultsCache(newCache);
     };
 
     const handleException = (error: unknown, msg?: string, msgMap?: MessageMap) => {
@@ -81,10 +93,12 @@ export const MainProvider = ({ children }: MainProviderProps) => {
         <MainContext.Provider value={{
             bannerMessage,
             bannerSeverity,
+            searchResultsCache,
             currentHike,
             isLoggedIn,
             handleException,
             setBanner,
+            storeSearchResults,
             setCurrentHike,
         }}
         >

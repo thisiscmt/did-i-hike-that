@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import {
     Autocomplete,
     AutocompleteChangeDetails,
@@ -280,6 +280,7 @@ const EditHike = () => {
     const { currentHike, setCurrentHike, setBanner, handleException } = useContext(MainContext);
     const { hikeId } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const abortController = useRef<AbortController>(new AbortController());
 
     const [ trail, setTrail ] = useState<string>('');
@@ -636,7 +637,7 @@ const EditHike = () => {
                 }
 
                 setCurrentHike(response);
-                navigate(`/hike/${hikeIdForNav}`);
+                navigate(`/hike/${hikeIdForNav}`, { state: location.state });
             }
         } catch (error) {
             const msgMap: MessageMap = {
@@ -644,10 +645,10 @@ const EditHike = () => {
             };
 
             handleException(error, 'An error occurred saving the hike', msgMap);
-            window.scrollTo({ top: 0, behavior: 'smooth'});
         } finally {
             setSaving(false);
             setSavingPhoto(false);
+            window.scrollTo({ top: 0, behavior: 'smooth'});
         }
     };
 

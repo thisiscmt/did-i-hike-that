@@ -44,6 +44,15 @@ export interface HikeSearchParams {
     searchText?: string;
 }
 
+export interface HikeSearchResults {
+    rows: Hike[];
+    count: number;
+}
+
+export interface SearchResultsCache {
+    [key: string]: HikeSearchResults;
+}
+
 export interface User {
     id?: string;
     fullName: string;

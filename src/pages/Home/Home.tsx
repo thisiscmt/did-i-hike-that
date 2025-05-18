@@ -8,7 +8,7 @@ import SearchResult from '../../components/SearchResult/SearchResult';
 import SearchResultLoader from '../../components/SearchResultLoader/SearchResultLoader';
 import useDocumentTitle from '../../hooks/useDocumentTitle';
 import { MainContext } from '../../contexts/MainContext';
-import { Hike } from '../../models/models';
+import {Hike, HikeSearchResults} from '../../models/models';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
 import * as Constants from '../../constants/constants';
@@ -129,7 +129,7 @@ const useStyles = makeStyles()((theme) => ({
 
 const Home = () => {
     const { classes, cx } = useStyles();
-    const { isLoggedIn, setBanner } = useContext(MainContext);
+    const { isLoggedIn, searchResultsCache, setBanner, storeSearchResults } = useContext(MainContext);
     const [ loading, setLoading ] = useState<boolean>(false);
     const [ initialLoad, setInitialLoad ] = useState<boolean>(true);
     const [ searchText, setSearchText ] = useState<string>('');
@@ -153,7 +153,19 @@ const Home = () => {
             const pageSize = Number(pageSizeStr) === 0 ? defaultPageSize : Number(pageSizeStr);
             params.pageSize = pageSize;
 
-            const hikes = await DataService.getHikes(params);
+            let queryString = searchParamsArg.toString();
+            let hikes: HikeSearchResults;
+
+            if (queryString === '') {
+                queryString = '/';
+            }
+
+            if (searchResultsCache[queryString]) {
+                hikes = searchResultsCache[queryString];
+            } else {
+                hikes = await DataService.getHikes(params);
+                storeSearchResults(hikes, queryString);
+            }
 
             if (params.page !== undefined) {
                 setCurrentPage(params.page);
@@ -169,7 +181,7 @@ const Home = () => {
         } finally {
             setLoading(false);
         }
-    }, [setSearchResults, setPageCount, setBanner]);
+    }, [searchResultsCache, setSearchResults, storeSearchResults, setPageCount, setBanner]);
 
     useDocumentTitle('Did I Hike That?');
 
@@ -346,7 +358,9 @@ const Home = () => {
                                                     {
                                                         searchResultsToRender.map((hike: Hike) => {
                                                             return (
-                                                                <Box key={hike.id} className={cx(classes.searchResult)} onClick={() => navigate(`/hike/${hike.id}`)}>
+                                                                <Box key={hike.id} className={cx(classes.searchResult)} onClick={() =>
+                                                                    navigate(`/hike/${hike.id}`, { state: searchParams.toString() })}
+                                                                >
                                                                     <SearchResult hike={hike} />
                                                                 </Box>
                                                             )
