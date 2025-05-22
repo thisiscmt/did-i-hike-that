@@ -277,7 +277,7 @@ const MAX_PHOTOS_FOR_UPLOAD = 10;
 
 const EditHike = () => {
     const { classes, cx } = useStyles();
-    const { currentHike, setCurrentHike, setBanner, handleException } = useContext(MainContext);
+    const { currentHike, searchResultsCache, setCurrentHike, setBanner, storeSearchResults, handleException } = useContext(MainContext);
     const { hikeId } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
@@ -631,6 +631,31 @@ const EditHike = () => {
                 if (hikeId) {
                     hike.id = hikeId;
                     response = await DataService.updateHike(hike, abortController.current.signal, uploadProgressHandler);
+
+                    if (searchResultsCache && location.state && searchResultsCache[location.state]) {
+                        // If this hike is in the cache, update its properties with the latest values
+                        const hikeIndex = searchResultsCache[location.state].rows.findIndex((item: Hike) => {
+                            return item.id === hikeId;
+                        });
+
+                        if (hikeIndex > -1) {
+                            const newHikes = {...searchResultsCache[location.state]};
+
+                            newHikes.rows[hikeIndex] = {
+                                id: hikeId,
+                                caption: '',
+                                dateOfHike: response.dateOfHike,
+                                description: response.description,
+                                endDateOfHike: response.endDateOfHike,
+                                filePath: response.photos && response.photos.length > 0 ? response.photos[0].filePath : '',
+                                fullNames: response.hikers?.map((hiker: Hiker) => hiker.fullName).join(','),
+                                tags: response.tags,
+                                trail: response.trail,
+                            };
+
+                            storeSearchResults(newHikes, location.state);
+                        }
+                    }
                 } else {
                     response = await DataService.createHike(hike, abortController.current.signal, uploadProgressHandler);
                     hikeIdForNav = response.id;
@@ -938,7 +963,7 @@ const EditHike = () => {
                                                 draggableId={photo.fileName}
                                                 shouldRespectForcePress={true}
                                             >
-                                                {(provided, _snapshot) => {
+                                                {(provided) => {
                                                     const otherProps = {
                                                         ...provided.draggableProps,
                                                         ...provided.dragHandleProps,
@@ -950,7 +975,8 @@ const EditHike = () => {
                                                     return (
                                                         <>
                                                             {
-                                                                photo.action !== 'delete' &&
+                                                                photo.action !== 'delete' ?
+
                                                                 <div key={photo.fileName}
                                                                      ref={provided.innerRef}
                                                                      {...otherProps}
@@ -984,7 +1010,9 @@ const EditHike = () => {
                                                                             </IconButton>
                                                                         </Box>
                                                                     </ListItem>
-                                                                </div>
+                                                                </div> :
+
+                                                                <div key={photo.fileName} ref={provided.innerRef} {...otherProps}></div>
                                                             }
                                                         </>
                                                     );
