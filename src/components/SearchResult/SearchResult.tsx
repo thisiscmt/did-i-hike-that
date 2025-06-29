@@ -105,7 +105,7 @@ const SearchResult: FC<SearchResultProps> = ({ hike }) => {
                         hikers && hikers.length > 0 &&
                         <Box className={cx(classes.hikers)}>
                             {
-                                hikers.map((hiker: string, index: number) => {
+                                hikers.sort().map((hiker: string, index: number) => {
                                     return (
                                         <Chip key={index} label={hiker.trim()} variant='outlined' color='primary' className={cx(classes.chip)} />
                                     );
