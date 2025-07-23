@@ -666,7 +666,8 @@ const EditHike = () => {
             }
         } catch (error) {
             const msgMap: MessageMap = {
-                'ERR_CANCELED': { message: 'Save was cancelled', severity: 'warning' }
+                'ERR_CANCELED': { message: 'Save was cancelled', severity: 'warning' },
+                '400': { message: 'One of the picture files is too large', severity: 'error' }
             };
 
             handleException(error, 'An error occurred saving the hike', msgMap);
