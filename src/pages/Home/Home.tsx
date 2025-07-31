@@ -8,7 +8,8 @@ import SearchResult from '../../components/SearchResult/SearchResult';
 import SearchResultLoader from '../../components/SearchResultLoader/SearchResultLoader';
 import useDocumentTitle from '../../hooks/useDocumentTitle';
 import { MainContext } from '../../contexts/MainContext';
-import {Hike, HikeSearchResults} from '../../models/models';
+import { Hike, HikeSearchResults } from '../../models/models';
+import { Colors } from '../../services/themeService';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
 import * as Constants from '../../constants/constants';
@@ -124,6 +125,13 @@ const useStyles = makeStyles()((theme) => ({
         '& .MuiPagination-ul': {
             justifyContent: 'center'
         }
+    },
+
+    totalCount: {
+        color: Colors.primaryText,
+        fontSize: '14px',
+        marginTop: '10px',
+        textAlign: 'center'
     }
 }));
 
@@ -136,6 +144,7 @@ const Home = () => {
     const [ searchResults, setSearchResults ] = useState<Hike[] | undefined>(undefined);
     const [ currentPage, setCurrentPage ] = useState<number>(1);
     const [ currentQueryString, setCurrentQueryString ] = useState<string>('');
+    const [ totalCount, setTotalCount ] = useState<number>(0);
     const [ pageCount, setPageCount ] = useState<number>(1);
     const [ noResults, setNoResults ] = useState<boolean>(false);
     const [ anchorEl, setAnchorEl ] = React.useState<HTMLButtonElement | null>(null);
@@ -172,6 +181,7 @@ const Home = () => {
             }
 
             setSearchResults(hikes.rows);
+            setTotalCount(hikes.count);
             setPageCount(Math.ceil(hikes.count / pageSize));
             setNoResults(hikes.rows.length === 0);
 
@@ -370,6 +380,10 @@ const Home = () => {
 
                                                 <Pagination onChange={handleChangePage} page={currentPage} count={pageCount} className={cx(classes.pagination)}
                                                             showFirstButton={true} showLastButton={true} />
+
+                                                <Box className={`${cx(classes.searchResults)} ${cx(classes.totalCount)}`}>
+                                                    Count: {totalCount}
+                                                </Box>
                                             </>
                                             :
                                             <>

@@ -4,7 +4,6 @@ import { makeStyles } from 'tss-react/mui';
 
 import useDocumentTitle from '../../hooks/useDocumentTitle';
 import { MainContext } from '../../contexts/MainContext';
-import { Colors } from '../../services/themeService';
 import * as Constants from '../../constants/constants';
 
 const useStyles = makeStyles()((theme) => ({
