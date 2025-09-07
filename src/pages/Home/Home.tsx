@@ -54,11 +54,11 @@ const useStyles = makeStyles()((theme) => ({
         margin: 'auto',
         width: '80%',
 
-        '& button:nth-child(1)': {
+        '& button:nth-of-type(1)': {
             gridColumnStart: 2
         },
 
-        '& button:nth-child(2)': {
+        '& button:nth-of-type(2)': {
             marginLeft: 'auto'
         },
 
