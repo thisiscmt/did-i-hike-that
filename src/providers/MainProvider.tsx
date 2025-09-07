@@ -36,6 +36,10 @@ export const MainProvider = ({ children }: MainProviderProps) => {
         setSearchResultsCache(newCache);
     };
 
+    const clearSearchResults = () => {
+        setSearchResultsCache({});
+    };
+
     const handleException = (error: unknown, msg?: string, msgMap?: MessageMap) => {
         const defaultMsg = 'An error occurred during the request';
         let errorMsg: string;
@@ -72,6 +76,7 @@ export const MainProvider = ({ children }: MainProviderProps) => {
             handleException,
             setBanner,
             storeSearchResults,
+            clearSearchResults,
             setCurrentHike,
         }}
         >

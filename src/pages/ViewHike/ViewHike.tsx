@@ -149,7 +149,7 @@ const ViewHike = () => {
     const [ retrievedHike, setRetrievedHike ] = useState<boolean>(false);
     const [ openDeleteConfirmation, setOpenDeleteConfirmation ] = useState<boolean>(false);
     const [ loading, setLoading ] = useState<boolean>(true);
-    const { currentHike, isLoggedIn, setCurrentHike, setBanner, handleException } = useContext(MainContext);
+    const { currentHike, isLoggedIn, setCurrentHike, clearSearchResults, setBanner, handleException } = useContext(MainContext);
     const { hikeId } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
@@ -224,6 +224,7 @@ const ViewHike = () => {
                     await DataService.undeleteHike(hikeId);
                 } else {
                     await DataService.deleteHike(hikeId);
+                    clearSearchResults();
                 }
 
                 setCurrentHike(null);
@@ -434,7 +435,7 @@ const ViewHike = () => {
                         <Box className={`${cx(classes.section)} photos`}>
                             {
                                 hike.photos.map((photo: Photo, index: number) => {
-                                    let imgSource = `${process.env.REACT_APP_API_URL}/images/`;
+                                    let imgSource = `${import.meta.env.VITE_API_URL}/images/`;
 
                                     if (hike.deleted) {
                                         imgSource += photo.filePath.replace('/', '_deleted/');

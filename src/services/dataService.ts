@@ -29,12 +29,12 @@ export const getHikes = async (searchParams?: HikeSearchParams): Promise<HikeSea
         config.params = { ...searchParams };
     }
 
-    const response = await Axios.get(`${process.env.REACT_APP_API_URL}/hike`, config);
+    const response = await Axios.get(`${import.meta.env.VITE_API_URL}/hike`, config);
     return response.data;
 };
 
 export const getHike = async (hikeId: string): Promise<Hike> => {
-    const response = await Axios.get(`${process.env.REACT_APP_API_URL}/hike/${hikeId}`, getRequestConfig());
+    const response = await Axios.get(`${import.meta.env.VITE_API_URL}/hike/${hikeId}`, getRequestConfig());
     return response.data;
 };
 
@@ -49,7 +49,7 @@ export const createHike = async (hike: Hike, signal: AbortSignal, onUploadProgre
         config.onUploadProgress = onUploadProgress;
     }
 
-    const response = await Axios.post(`${process.env.REACT_APP_API_URL}/hike`, formData, config);
+    const response = await Axios.post(`${import.meta.env.VITE_API_URL}/hike`, formData, config);
     return response.data;
 };
 
@@ -64,44 +64,44 @@ export const updateHike = async (hike: Hike, signal?: AbortSignal, onUploadProgr
         config.onUploadProgress = onUploadProgress;
     }
 
-    const response = await Axios.put(`${process.env.REACT_APP_API_URL}/hike/${hike.id}`, formData, config);
+    const response = await Axios.put(`${import.meta.env.VITE_API_URL}/hike/${hike.id}`, formData, config);
     return response.data;
 };
 
 export const deleteHike = (hikeId: string) => {
-    return Axios.delete(`${process.env.REACT_APP_API_URL}/hike/${hikeId}`, getRequestConfig());
+    return Axios.delete(`${import.meta.env.VITE_API_URL}/hike/${hikeId}`, getRequestConfig());
 };
 
 export const deleteHikePermanently = (hikeId: string) => {
-    return Axios.delete(`${process.env.REACT_APP_API_URL}/hike/deleted/${hikeId}`, getRequestConfig());
+    return Axios.delete(`${import.meta.env.VITE_API_URL}/hike/deleted/${hikeId}`, getRequestConfig());
 };
 
 export const undeleteHike = (hikeId: string) => {
-    return Axios.put(`${process.env.REACT_APP_API_URL}/hike/deleted/${hikeId}`, undefined, getRequestConfig());
+    return Axios.put(`${import.meta.env.VITE_API_URL}/hike/deleted/${hikeId}`, undefined, getRequestConfig());
 };
 
 export const getDeletedHikes = async (): Promise<Hike[]> => {
     const config = getRequestConfig();
 
-    const response = await Axios.get(`${process.env.REACT_APP_API_URL}/hike/deleted`, config);
+    const response = await Axios.get(`${import.meta.env.VITE_API_URL}/hike/deleted`, config);
     return response.data.rows;
 };
 
 export const getHikers = async (): Promise<string[]> => {
-    const response = await Axios.get(`${process.env.REACT_APP_API_URL}/hiker`, getRequestConfig());
+    const response = await Axios.get(`${import.meta.env.VITE_API_URL}/hiker`, getRequestConfig());
     return response.data;
 };
 
 export const getUsers = async (): Promise<User[]> => {
     const config = getRequestConfig();
-    const response = await Axios.get(`${process.env.REACT_APP_API_URL}/admin/user`, config);
+    const response = await Axios.get(`${import.meta.env.VITE_API_URL}/admin/user`, config);
 
     return response.data.rows;
 };
 
 export const getUser = async (userId: string): Promise<User> => {
     const config = getRequestConfig();
-    const response = await Axios.get(`${process.env.REACT_APP_API_URL}/admin/user/${userId}`, config);
+    const response = await Axios.get(`${import.meta.env.VITE_API_URL}/admin/user/${userId}`, config);
 
     return response.data;
 };
@@ -109,43 +109,43 @@ export const getUser = async (userId: string): Promise<User> => {
 export const createUser = async (user: User): Promise<void> => {
     const config = getRequestConfig();
 
-    return await Axios.post(`${process.env.REACT_APP_API_URL}/admin/user`, user, config);
+    return await Axios.post(`${import.meta.env.VITE_API_URL}/admin/user`, user, config);
 };
 
 export const updateUser = async (user: User): Promise<void> => {
     const config = getRequestConfig();
 
-    return await Axios.put(`${process.env.REACT_APP_API_URL}/admin/user/${user.id}`, user, config);
+    return await Axios.put(`${import.meta.env.VITE_API_URL}/admin/user/${user.id}`, user, config);
 };
 
 export const deleteUser = (userId: string) => {
-    return Axios.delete(`${process.env.REACT_APP_API_URL}/admin/user/${userId}`, getRequestConfig());
+    return Axios.delete(`${import.meta.env.VITE_API_URL}/admin/user/${userId}`, getRequestConfig());
 };
 
 export const getSessions = async (): Promise<Session[]> => {
     const config = getRequestConfig();
-    const response = await Axios.get(`${process.env.REACT_APP_API_URL}/admin/session`, config);
+    const response = await Axios.get(`${import.meta.env.VITE_API_URL}/admin/session`, config);
 
     return response.data.rows;
 };
 
 export const deleteSession = (sid: string) => {
-    return Axios.delete(`${process.env.REACT_APP_API_URL}/admin/session/${sid}`, getRequestConfig());
+    return Axios.delete(`${import.meta.env.VITE_API_URL}/admin/session/${sid}`, getRequestConfig());
 };
 
 export const login = async (email: string, password: string): Promise<LoginResponse> => {
-    const response = await Axios.post(`${process.env.REACT_APP_API_URL}/auth/login`, { email, password }, getRequestConfig());
+    const response = await Axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, { email, password }, getRequestConfig());
 
     return response.data;
 };
 
 export const logout = async () => {
-    return await Axios.delete(`${process.env.REACT_APP_API_URL}/auth`, getRequestConfig());
+    return await Axios.delete(`${import.meta.env.VITE_API_URL}/auth`, getRequestConfig());
 };
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export const logError = (errorData: any) => {
-    Axios.post(`${process.env.REACT_APP_API_URL}/error`, { errorData }, getRequestConfig()).catch((error) => {
+    Axios.post(`${import.meta.env.VITE_API_URL}/error`, { errorData }, getRequestConfig()).catch((error) => {
         console.log('Something went wrong while logging error information: %o', error.message);
     });
 };

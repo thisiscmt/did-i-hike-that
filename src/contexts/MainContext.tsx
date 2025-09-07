@@ -11,6 +11,7 @@ interface MainContextProps {
     handleException: (error: unknown, msg?: string, msgMap?: MessageMap) => void;
     setBanner: (message: string, severity?: AlertSeverity) => void;
     storeSearchResults: (hikes: HikeSearchResults, key: string) => void;
+    clearSearchResults: () => void;
     setCurrentHike: React.Dispatch<React.SetStateAction<Hike | null>>;
 }
 
@@ -23,6 +24,7 @@ export const MainContext = React.createContext<MainContextProps>({
     handleException: () => {},
     setBanner: () => {},
     storeSearchResults: () => {},
+    clearSearchResults: () => {},
     setCurrentHike: () => {},
 });
 

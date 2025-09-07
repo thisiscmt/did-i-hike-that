@@ -45,7 +45,7 @@ export const getThumbnailSrc = (filePath: string) => {
 
     if (filePath) {
         const photoExt = filePath.split('.').pop() || '';
-        thumbnailSrc = `${process.env.REACT_APP_API_URL}/images/` + filePath.replace(`.${photoExt}`, `_thumbnail.${photoExt}`);
+        thumbnailSrc = `${import.meta.env.VITE_API_URL}/images/` + filePath.replace(`.${photoExt}`, `_thumbnail.${photoExt}`);
     }
 
     return thumbnailSrc;
