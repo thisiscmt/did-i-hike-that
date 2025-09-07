@@ -55,6 +55,7 @@ const MobileMenu: FC<MobileMenuProps> = ({ onClose }) => {
             localStorage.removeItem(Constants.STORAGE_LAST_LOGIN);
             navigate('/');
         } catch(error) {
+            DataService.logError(error);
             setBanner('An error occurred during logout', 'error');
         }
 

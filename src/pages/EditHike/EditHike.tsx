@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import {
     Autocomplete,
-    AutocompleteChangeDetails,
+    type AutocompleteChangeDetails,
     Box,
     Button,
     CircularProgress,
@@ -21,16 +21,16 @@ import {
 import { DeleteOutlineOutlined } from '@mui/icons-material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { makeStyles } from 'tss-react/mui';
-import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
+import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd';
 import { arrayMoveImmutable } from 'array-move';
-import { AxiosProgressEvent } from 'axios';
+import { type AxiosProgressEvent } from 'axios';
 import { DateTime } from 'luxon';
 
 import useDocumentTitle from '../../hooks/useDocumentTitle';
 import { Colors } from '../../services/themeService';
-import { Hike, Hiker, Photo } from '../../models/models';
+import { type Hike, type Hiker, type Photo } from '../../models/models';
 import { CustomLuxonAdapter} from '../../classes/customLuxonAdapter';
-import { MainContext, MessageMap } from '../../contexts/MainContext';
+import { MainContext, type MessageMap } from '../../contexts/MainContext';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
 import * as Constants from '../../constants/constants';
@@ -355,6 +355,7 @@ const EditHike = () => {
                 setKnownHikers(currentHikers);
                 setRetrievedKnownHikers(true);
             } catch(error) {
+                DataService.logError(error);
                 setBanner('An error occurred retrieving hikers', 'error');
                 window.scrollTo({ top: 0, behavior: 'smooth'});
             }
@@ -374,6 +375,7 @@ const EditHike = () => {
                 }
 
             } catch(error) {
+                DataService.logError(error);
                 setBanner('An error occurred retrieving the hike', 'error');
                 window.scrollTo({ top: 0, behavior: 'smooth'});
             }
@@ -504,7 +506,7 @@ const EditHike = () => {
             }
 
             try {
-                let newPhotos = [...photos];
+                const newPhotos = [...photos];
 
                 for (const file of event.target.files) {
                     if (file.size > Constants.PHOTO_MAX_SIZE) {
@@ -731,9 +733,7 @@ const EditHike = () => {
                                 <DatePicker
                                     value={dateOfHike}
                                     onChange={(newValue) => setDateOfHike(newValue || null) }
-                                    renderInput={(params) => (
-                                        <TextField {...params} size='small' error={dateOfHikeInputError} inputProps={{ ...params.inputProps, maxLength: 10 }} />
-                                    )}
+                                    slotProps={{ textField: { size: 'small', error: dateOfHikeInputError, inputProps: {maxLength: 10} } }}
                                 />
                             </LocalizationProvider>
                         }
@@ -750,9 +750,7 @@ const EditHike = () => {
                                 <DatePicker
                                     value={endDateOfHike}
                                     onChange={(newValue) => setEndDateOfHike(newValue || null) }
-                                    renderInput={(params) => (
-                                        <TextField {...params} size='small' error={endDateOfHikeInputError} inputProps={{ ...params.inputProps, maxLength: 10 }} />
-                                    )}
+                                    slotProps={{ textField: { size: 'small', error: endDateOfHikeInputError, inputProps: {maxLength: 10} } }}
                                 />
                             </LocalizationProvider>
                         }

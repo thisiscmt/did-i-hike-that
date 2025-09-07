@@ -143,6 +143,7 @@ export const logout = async () => {
     return await Axios.delete(`${process.env.REACT_APP_API_URL}/auth`, getRequestConfig());
 };
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export const logError = (errorData: any) => {
     Axios.post(`${process.env.REACT_APP_API_URL}/error`, { errorData }, getRequestConfig()).catch((error) => {
         console.log('Something went wrong while logging error information: %o', error.message);

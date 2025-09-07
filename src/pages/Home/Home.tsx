@@ -8,7 +8,7 @@ import SearchResult from '../../components/SearchResult/SearchResult';
 import SearchResultLoader from '../../components/SearchResultLoader/SearchResultLoader';
 import useDocumentTitle from '../../hooks/useDocumentTitle';
 import { MainContext } from '../../contexts/MainContext';
-import { Hike, HikeSearchResults } from '../../models/models';
+import { type Hike, type HikeSearchResults } from '../../models/models';
 import { Colors } from '../../services/themeService';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
@@ -187,6 +187,7 @@ const Home = () => {
 
             window.scrollTo({ top: 0, behavior: 'smooth'});
         } catch (error){
+            DataService.logError(error);
             setBanner('An error occurred retrieving hikes', 'error');
         } finally {
             setLoading(false);

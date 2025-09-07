@@ -15,7 +15,6 @@ import Login from './pages/Login/Login';
 import ErrorPage from './pages/ErrorPage/ErrorPage';
 import Header from './components/Header/Header';
 import * as Constants from './constants/constants';
-import './App.scss';
 
 const useStyles = makeStyles()((theme) => ({
     mainContainer: {

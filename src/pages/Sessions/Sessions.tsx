@@ -120,7 +120,7 @@ const Sessions: FC = () => {
                                                                 sessionEmail = data.email;
                                                                 sessionRole = data.role;
                                                             } catch (error) {
-                                                                // An error is unlikely here, but we catch it just to make sure it doesn't crash everything
+                                                                DataService.logError(error);
                                                             }
 
                                                             return (

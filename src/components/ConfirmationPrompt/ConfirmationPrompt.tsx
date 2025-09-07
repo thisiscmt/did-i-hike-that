@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import {Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle} from '@mui/material';
 import {makeStyles} from 'tss-react/mui';
 
-const useStyles = makeStyles()((theme) => ({
+const useStyles = makeStyles()(() => ({
     dialogActions: {
         padding: '4px 16px 16px 16px'
     }
@@ -18,7 +18,7 @@ interface ConfirmationPromptProps {
 const ConfirmationPrompt: FC<ConfirmationPromptProps> = ({ open, title, content, onClose}) => {
     const { classes, cx } = useStyles();
 
-    const handleClose = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, reason: string) => {
+    const handleClose = (_event: React.MouseEvent<HTMLButtonElement, MouseEvent>, reason: string) => {
         if (reason === 'backdropClick') {
             return;
         }

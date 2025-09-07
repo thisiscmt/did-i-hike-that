@@ -100,6 +100,7 @@ const Header = () => {
 
             window.location.href = '/';
         } catch(error) {
+            DataService.logError(error);
             setBanner('An error occurred during logout', 'error');
         }
     }

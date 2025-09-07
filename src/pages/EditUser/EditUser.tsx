@@ -139,8 +139,6 @@ const EditUser = () => {
 
         if (userId && !retrieveduser) {
             getUser();
-        } else {
-
         }
     }, [userId, retrieveduser, handleException]);
 

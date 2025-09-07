@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { Box, FormControl, FormControlLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import { Box, FormControl, FormControlLabel, MenuItem, Select, type SelectChangeEvent } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 
 import useDocumentTitle from '../../hooks/useDocumentTitle';
