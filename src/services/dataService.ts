@@ -92,6 +92,11 @@ export const getHikers = async (): Promise<string[]> => {
     return response.data;
 };
 
+export const getTags = async (): Promise<string[]> => {
+    const response = await Axios.get(`${import.meta.env.VITE_API_URL}/tag`, getRequestConfig());
+    return response.data;
+};
+
 export const getUsers = async (): Promise<User[]> => {
     const config = getRequestConfig();
     const response = await Axios.get(`${import.meta.env.VITE_API_URL}/admin/user`, config);

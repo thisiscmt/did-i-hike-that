@@ -290,14 +290,16 @@ const EditHike = () => {
     const [ crowds, setCrowds ] = useState<string>('');
     const [ description, setDescription ] = useState<string>('');
     const [ knownHikers, setKnownHikers ] = useState<string[]>([]);
+    const [ knownTags, setKnownTags ] = useState<string[]>([]);
     const [ hikers, setHikers ] = useState<string[]>([]);
     const [ link, setLink ] = useState<string>('');
     const [ linkLabel, setLinkLabel ] = useState<string>('');
     const [ tags, setTags ] = useState<string[]>([]);
     const [ photos, setPhotos ] = useState<Photo[]>([]);
-    const [ retrievedKnownHikers, setRetrievedKnownHikers ] = useState<boolean>(false);
     const [ retrievedHike, setRetrievedHike ] = useState<boolean>(false);
     const [ clearedHike, setClearedHike ] = useState<boolean>(false);
+    const [ retrievedKnownHikers, setRetrievedKnownHikers ] = useState<boolean>(false);
+    const [ retrievedKnownTags, setRetrievedKnownTags ] = useState<boolean>(false);
     const [ trailInputError, setTrailInputError ] = useState<boolean>(false);
     const [ dateOfHikeInputError, setDateOfHikeInputError ] = useState<boolean>(false);
     const [ endDateOfHikeInputError, setEndDateOfHikeInputError ] = useState<boolean>(false);
@@ -348,19 +350,6 @@ const EditHike = () => {
             setClearedHike(true);
         };
 
-        const getKnownHikers = async () => {
-            try {
-                const currentHikers = await DataService.getHikers();
-
-                setKnownHikers(currentHikers);
-                setRetrievedKnownHikers(true);
-            } catch(error) {
-                DataService.logError(error);
-                setBanner('An error occurred retrieving hikers', 'error');
-                window.scrollTo({ top: 0, behavior: 'smooth'});
-            }
-        };
-
         const getHike = async () => {
             try {
                 if (hikeId) {
@@ -373,17 +362,12 @@ const EditHike = () => {
                 } else {
                     setBanner('Missing a hike ID', 'error');
                 }
-
             } catch(error) {
                 DataService.logError(error);
                 setBanner('An error occurred retrieving the hike', 'error');
                 window.scrollTo({ top: 0, behavior: 'smooth'});
             }
         };
-
-        if (!retrievedKnownHikers) {
-            getKnownHikers();
-        }
 
         if (hikeId) {
             if (!retrievedHike) {
@@ -401,6 +385,44 @@ const EditHike = () => {
             }
         }
     }, [clearedHike, currentHike, hikeId, retrievedHike, retrievedKnownHikers, setBanner, setCurrentHike]);
+
+    useEffect(() => {
+        const getKnownHikers = async () => {
+            try {
+                const currentHikers = await DataService.getHikers();
+
+                setKnownHikers(currentHikers);
+                setRetrievedKnownHikers(true);
+            } catch(error) {
+                DataService.logError(error);
+                setBanner('An error occurred retrieving hikers', 'error');
+                window.scrollTo({ top: 0, behavior: 'smooth'});
+            }
+        };
+
+        if (!retrievedKnownHikers) {
+            getKnownHikers();
+        }
+    }, []);
+
+    useEffect(() => {
+        const getKnownTags = async () => {
+            try {
+                const currentTags = await DataService.getTags();
+
+                setKnownTags(currentTags);
+                setRetrievedKnownTags(true);
+            } catch(error) {
+                DataService.logError(error);
+                setBanner('An error occurred retrieving hikers', 'error');
+                window.scrollTo({ top: 0, behavior: 'smooth'});
+            }
+        };
+
+        if (!retrievedKnownTags) {
+            getKnownTags();
+        }
+    }, []);
 
     const validInput = () => {
         let valid = true;
@@ -838,7 +860,7 @@ const EditHike = () => {
                             <Autocomplete
                                 multiple={true}
                                 freeSolo={true}
-                                options={knownHikers || []}
+                                options={knownHikers}
                                 getOptionLabel={(option) => option}
                                 value={hikers}
                                 fullWidth={true}
@@ -864,7 +886,7 @@ const EditHike = () => {
                             <Autocomplete
                                 multiple={true}
                                 freeSolo={true}
-                                options={[]}
+                                options={knownTags}
                                 getOptionLabel={(option) => option}
                                 value={tags}
                                 fullWidth={true}
