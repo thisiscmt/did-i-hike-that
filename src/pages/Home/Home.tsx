@@ -294,6 +294,7 @@ const Home = () => {
                             size='small'
                             className={cx(classes.searchInput)}
                             fullWidth={true}
+                            autoComplete='on'
                             inputProps={{
                                 onKeyPress: handleKeypress
                             }}
