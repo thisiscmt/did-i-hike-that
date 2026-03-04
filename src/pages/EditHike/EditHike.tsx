@@ -111,7 +111,7 @@ const useStyles = makeStyles()((theme) => ({
         width: 'initial',
 
         '& .MuiTextField-root': {
-            width: '150px'
+            width: '170px'
         },
 
         // Prevents the picker button from being too far to the right
