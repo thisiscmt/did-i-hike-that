@@ -18,6 +18,7 @@ const useStyles = makeStyles()((theme) => ({
     thumbnail: {
         alignItems: 'start',
         display: 'flex',
+        justifyContent: 'center',
         minWidth: `${Constants.PHOTO_THUMBNAIL_SIZE}px`,
         width: `${Constants.PHOTO_THUMBNAIL_SIZE}px`
     },
