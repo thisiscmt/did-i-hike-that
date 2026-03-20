@@ -52,7 +52,7 @@ const TableLoader = () => {
                     {
                         [1, 2, 3, 4, 5].map((item: number) => {
                             return (
-                                <Box className={cx(classes.tableRowLoaderContainer)} key={item}>
+                                <Box key={item} className={cx(classes.tableRowLoaderContainer)}>
                                     <Skeleton key={item} variant='rectangular' height='24px' width='200px' />
                                     <Skeleton key={item} variant='rectangular' height='24px' width='200px' />
                                     <Skeleton key={item} variant='rectangular' height='24px' width='200px' />

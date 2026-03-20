@@ -6,6 +6,9 @@ export const Colors = {
     backgroundGray: '#F3F3F3',
     primaryLinkColor: '#1976d2',
     secondaryLinkColor: 'rgba(25, 118, 210, 0.60)',
+    infoLogEntry: 'rgba(3, 169, 244, 0.50)',
+    warnLogEntry: 'rgba(255, 152, 0, 0.50)',
+    errorLogEntry: 'rgba(239, 83, 80, 0.50)',
     white: '#FFFFFF'
 };
 

@@ -73,3 +73,11 @@ export interface LoginResponse {
     fullName: string;
     role: string;
 }
+
+export interface LogEntry {
+    level: string;
+    message: string;
+    service: string;
+    timestamp: string;
+    stack: string;
+}

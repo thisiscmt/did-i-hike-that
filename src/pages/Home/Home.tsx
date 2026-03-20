@@ -295,6 +295,7 @@ const Home = () => {
                             className={cx(classes.searchInput)}
                             fullWidth={true}
                             autoComplete='on'
+                            placeholder='Enter a search term'
                             inputProps={{
                                 onKeyPress: handleKeypress
                             }}
@@ -384,7 +385,7 @@ const Home = () => {
                                                             showFirstButton={true} showLastButton={true} />
 
                                                 <Box className={`${cx(classes.searchResults)} ${cx(classes.totalCount)}`}>
-                                                    Count: {totalCount}
+                                                    Adventures: {totalCount}
                                                 </Box>
                                             </>
                                             :

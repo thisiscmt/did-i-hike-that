@@ -1,6 +1,6 @@
 import Axios, { AxiosProgressEvent, AxiosRequestConfig } from 'axios';
 
-import { Hike, Hiker, HikeSearchParams, HikeSearchResults, LoginResponse, Photo, Session, User } from '../models/models';
+import { Hike, Hiker, HikeSearchParams, HikeSearchResults, LogEntry, LoginResponse, Photo, Session, User } from '../models/models';
 import * as Constants from '../constants/constants';
 
 Axios.interceptors.response.use(function (response) {
@@ -138,6 +138,20 @@ export const deleteSession = (sid: string) => {
     return Axios.delete(`${import.meta.env.VITE_API_URL}/admin/session/${sid}`, getRequestConfig());
 };
 
+export const getLogData = async (): Promise<LogEntry[]> => {
+    const config = getRequestConfig();
+    const response = await Axios.get(`${import.meta.env.VITE_API_URL}/admin/log`, config);
+
+    return response.data.rows;
+};
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export const logError = (errorData: any) => {
+    Axios.post(`${import.meta.env.VITE_API_URL}/admin/log`, { errorData }, getRequestConfig()).catch((error) => {
+        console.log('Something went wrong while logging error information: %o', error.message);
+    });
+};
+
 export const login = async (email: string, password: string): Promise<LoginResponse> => {
     const response = await Axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, { email, password }, getRequestConfig());
 
@@ -146,13 +160,6 @@ export const login = async (email: string, password: string): Promise<LoginRespo
 
 export const logout = async () => {
     return await Axios.delete(`${import.meta.env.VITE_API_URL}/auth`, getRequestConfig());
-};
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
-export const logError = (errorData: any) => {
-    Axios.post(`${import.meta.env.VITE_API_URL}/error`, { errorData }, getRequestConfig()).catch((error) => {
-        console.log('Something went wrong while logging error information: %o', error.message);
-    });
 };
 
 const getRequestConfig = (multipartRequest: boolean = false): AxiosRequestConfig => {

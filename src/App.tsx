@@ -11,6 +11,7 @@ import Sessions from './pages/Sessions/Sessions';
 import Users from './pages/Users/Users';
 import EditUser from './pages/EditUser/EditUser';
 import DeletedHikes from './pages/DeletedHikes/DeletedHikes';
+import ErrorLog from './pages/ErrorLog/ErrorLog.tsx';
 import Login from './pages/Login/Login';
 import ErrorPage from './pages/ErrorPage/ErrorPage';
 import Header from './components/Header/Header';
@@ -71,6 +72,7 @@ function App() {
                         <Route path='/admin/user/:userId' element={<EditUser />} />
                         <Route path='/admin/user/add' element={<EditUser />} />
                         <Route path='/admin/deleted-hikes' element={<DeletedHikes />} />
+                        <Route path='/admin/log' element={<ErrorLog />} />
                         <Route path='/login' element={<Login />} />
                         <Route path='*' element={<ErrorPage />} />
                     </Routes>
