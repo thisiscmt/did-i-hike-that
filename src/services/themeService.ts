@@ -21,6 +21,11 @@ export const BlueAnchorStyles = {
     }
 };
 
+export const SaveIndicatorStyles = {
+    color: Colors.white,
+    marginLeft: '8px'
+};
+
 export const buildTheme = (_overrides?: Record<string, string>) => {
     return createTheme({
         typography: {

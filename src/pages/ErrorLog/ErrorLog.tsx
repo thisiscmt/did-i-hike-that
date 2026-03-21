@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import {Box, Card, CardContent} from '@mui/material';
-import { useNavigate } from 'react-router';
+import { Box, Button, Card, CardContent, CircularProgress } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 
 import { LogEntry } from '../../models/models.ts';
 import TableLoader from '../../components/TableLoader/TableLoader.tsx';
 import useDocumentTitle from '../../hooks/useDocumentTitle';
-import { Colors } from '../../services/themeService.ts';
+import { Colors, SaveIndicatorStyles } from '../../services/themeService.ts';
 import * as DataService from '../../services/dataService.ts';
 import * as SharedService from '../../services/sharedService.ts';
-import {dateFormatOptions} from '../../services/sharedService.ts';
+import {getDefaultPageSize} from '../../services/sharedService.ts';
 
 const useStyles = makeStyles()(() => ({
     mainContainer: {
@@ -53,7 +52,9 @@ const useStyles = makeStyles()(() => ({
 
     logContent: {
         display: 'inline-flex',
-        gap: '16px'
+        columnGap: '16px',
+        flexWrap: 'wrap',
+        rowGap: '4px'
     },
 
     timestamp: {
@@ -66,7 +67,20 @@ const useStyles = makeStyles()(() => ({
     },
 
     service: {
-        width: '56px'
+        width: '56px',
+
+        '@media (max-width: 450px)': {
+            display: 'none'
+        }
+    },
+
+    serviceMobile: {
+        display: 'none',
+
+        '@media (max-width: 450px)': {
+            display: 'block',
+            marginTop: '4px'
+        }
     },
 
     message: {
@@ -74,23 +88,35 @@ const useStyles = makeStyles()(() => ({
     },
 
     stack: {
-        whiteSpace: 'pre'
+        whiteSpace: 'pre-wrap',
+        overflowX: 'auto'
+    },
+
+    loadMoreButton: {
+        marginTop: '12px',
+        textAlign: 'center'
+    },
+
+    loadIndicator: {
+        ...SaveIndicatorStyles
     }
 }));
 
 const ErrorLog = () => {
-    const { classes, cx } = useStyles();
+    const { classes } = useStyles();
     const [ logData, setLogData ] = useState<LogEntry[]>([]);
+    const [ page, setPage ] = useState<number>(1);
     const [ loading, setLoading ] = useState<boolean>(true);
+    const [ loadingMore, setLoadingMore ] = useState<boolean>(false);
     const [ retrievedData, setRetrievedData ] = useState<boolean>(false);
-    const navigate = useNavigate();
+    const pageSize = SharedService.getDefaultPageSize();
 
     useDocumentTitle('Error Log - Did I Hike That?');
 
     useEffect(() => {
         const getLogData = async () => {
             try {
-                const response = await DataService.getLogData();
+                const response = await DataService.getLogData(page, pageSize);
                 setLogData(response);
             } catch (error) {
                 // TODO
@@ -105,6 +131,22 @@ const ErrorLog = () => {
         }
     });
 
+    const handleLoadMore = async () => {
+        try {
+            setLoadingMore(true);
+
+            const newPage = page + 1;
+            const response = await DataService.getLogData(newPage, pageSize);
+
+            setLogData(logData.concat(response));
+            setPage(newPage);
+        } catch (error) {
+            // TODO
+        } finally {
+            setLoadingMore(false);
+        }
+    };
+
     return (
         <>
             {
@@ -112,57 +154,73 @@ const ErrorLog = () => {
                     ?
                         <TableLoader />
                     :
-                        <Box className={classes.mainContainer}>
-                            {
-                                logData.map((logEntry: LogEntry, index: number) => {
-                                    let className = classes.infoLevel;
+                        logData.length > 0
+                            ?
+                                <Box className={classes.mainContainer}>
+                                    {
+                                        logData.map((logEntry: LogEntry, index: number) => {
+                                            let className = classes.infoLevel;
 
-                                    switch (logEntry.level) {
-                                        case 'warn':
-                                            className = classes.warnLevel;
-                                            break;
-                                        case 'error':
-                                            className = classes.errorLevel;
-                                            break;
+                                            switch (logEntry.level) {
+                                                case 'warn':
+                                                    className = classes.warnLevel;
+                                                    break;
+                                                case 'error':
+                                                    className = classes.errorLevel;
+                                                    break;
+                                            }
+
+                                            return (
+                                                <Card key={index}>
+                                                    <CardContent className={`${className} ${classes.cardContent}`}>
+                                                        <details className={classes.logEntry}>
+                                                            <summary>
+                                                                <Box className={classes.logContent}>
+                                                                    <Box className={classes.timestamp}>
+                                                                        {SharedService.formatISODateValue(logEntry.timestamp, SharedService.dateFormatOptions)}
+                                                                    </Box>
+
+                                                                    <Box className={classes.level}>
+                                                                        {logEntry.level}
+                                                                    </Box>
+
+                                                                    <Box className={classes.service}>
+                                                                        {logEntry.service}
+                                                                    </Box>
+                                                                </Box>
+
+                                                                <Box className={classes.serviceMobile}>
+                                                                    {logEntry.service}
+                                                                </Box>
+
+                                                                <Box className={classes.message}>
+                                                                    {logEntry.message}
+                                                                </Box>
+                                                            </summary>
+
+                                                            {
+                                                                logEntry.stack &&
+                                                                <Box className={classes.stack}>
+                                                                    {logEntry.stack}
+                                                                </Box>
+                                                            }
+                                                        </details>
+                                                    </CardContent>
+                                                </Card>
+                                            )
+                                        })
                                     }
 
-                                    return (
-                                        <Card key={index}>
-                                            <CardContent className={`${className} ${classes.cardContent}`}>
-                                                <details className={classes.logEntry}>
-                                                    <summary>
-                                                        <Box className={classes.logContent}>
-                                                            <Box className={classes.timestamp}>
-                                                                {SharedService.formatISODateValue(logEntry.timestamp, dateFormatOptions)}
-                                                            </Box>
-
-                                                            <Box className={classes.level}>
-                                                                {logEntry.level}
-                                                            </Box>
-
-                                                            <Box className={classes.service}>
-                                                                {logEntry.service}
-                                                            </Box>
-                                                        </Box>
-
-                                                        <Box className={classes.message}>
-                                                            {logEntry.message}
-                                                        </Box>
-                                                    </summary>
-
-                                                    {
-                                                        logEntry.stack &&
-                                                        <Box className={classes.stack}>
-                                                            {logEntry.stack}
-                                                        </Box>
-                                                    }
-                                                </details>
-                                            </CardContent>
-                                        </Card>
-                                    )
-                                })
-                            }
-                        </Box>
+                                    <Box className={classes.loadMoreButton}>
+                                        <Button onClick={handleLoadMore} variant='contained' color='primary' disabled={loadingMore}>Load More
+                                            {loadingMore && (
+                                                <CircularProgress size={20} className={classes.loadIndicator} />
+                                            )}
+                                        </Button>
+                                    </Box>
+                                </Box>
+                            :
+                                <Box>No log data was found.</Box>
             }
         </>
     )

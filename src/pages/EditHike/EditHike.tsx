@@ -27,10 +27,10 @@ import { type AxiosProgressEvent } from 'axios';
 import { DateTime } from 'luxon';
 
 import useDocumentTitle from '../../hooks/useDocumentTitle';
-import { Colors } from '../../services/themeService';
 import { type Hike, type Hiker, type Photo } from '../../models/models';
 import { CustomLuxonAdapter} from '../../classes/customLuxonAdapter';
 import { MainContext, type MessageMap } from '../../contexts/MainContext';
+import { SaveIndicatorStyles } from '../../services/themeService';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
 import * as Constants from '../../constants/constants';
@@ -262,8 +262,7 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     saveIndicator: {
-        color: Colors.white,
-        marginLeft: '8px'
+        ...SaveIndicatorStyles
     },
 
     snackbar: {
@@ -695,6 +694,7 @@ const EditHike = () => {
             };
 
             handleException(error, 'An error occurred saving the hike', msgMap);
+            DataService.logError(error);
         } finally {
             setSaving(false);
             setSavingPhoto(false);

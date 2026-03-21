@@ -138,9 +138,15 @@ export const deleteSession = (sid: string) => {
     return Axios.delete(`${import.meta.env.VITE_API_URL}/admin/session/${sid}`, getRequestConfig());
 };
 
-export const getLogData = async (): Promise<LogEntry[]> => {
+export const getLogData = async (page: number = 1, pageSize: number = 20): Promise<LogEntry[]> => {
     const config = getRequestConfig();
-    const response = await Axios.get(`${import.meta.env.VITE_API_URL}/admin/log`, config);
+
+    config.params = {
+        page,
+        pageSize
+    }
+
+    const response = await Axios.get(`${import.meta.env.VITE_API_URL}/admin/log?`, config);
 
     return response.data.rows;
 };

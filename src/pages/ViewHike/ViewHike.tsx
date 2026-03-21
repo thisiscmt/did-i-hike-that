@@ -175,6 +175,7 @@ const ViewHike = () => {
                 };
 
                 handleException(error, 'An error occurred retrieving the hike', msgMap);
+                DataService.logError(error);
             } finally {
                 setRetrievedHike(true);
                 setLoading(false);
@@ -231,6 +232,7 @@ const ViewHike = () => {
                 navigate('/');
             } catch (error) {
                 handleException(error, 'An error occurred deleting the hike');
+                DataService.logError(error);
             }
         }
     };
