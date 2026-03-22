@@ -413,7 +413,7 @@ const EditHike = () => {
                 setRetrievedKnownTags(true);
             } catch(error) {
                 DataService.logError(error);
-                setBanner('An error occurred retrieving hikers', 'error');
+                setBanner('An error occurred retrieving tags', 'error');
                 window.scrollTo({ top: 0, behavior: 'smooth'});
             }
         };
@@ -561,7 +561,7 @@ const EditHike = () => {
 
                 setPhotos(newPhotos);
             } catch (error) {
-                DataService.logError(error)
+                DataService.logError(error);
             }
         }
     };
@@ -624,6 +624,8 @@ const EditHike = () => {
     };
 
     const handleSave = async () => {
+        let hike: Hike | undefined;
+
         try {
             if (validInput()) {
                 setSaving(true);
@@ -635,7 +637,7 @@ const EditHike = () => {
                 }
 
                 const hikersToSave = hikers.map((hiker: string) => ({ fullName: hiker }))
-                const hike: Hike = {
+                hike = {
                     trail,
                     dateOfHike: dateOfHike ? dateOfHike.toString() : '',
                     endDateOfHike: endDateOfHike ? endDateOfHike.toString() : '',
@@ -695,6 +697,10 @@ const EditHike = () => {
 
             handleException(error, 'An error occurred saving the hike', msgMap);
             DataService.logError(error);
+
+            if (hike) {
+                DataService.addLogEntry('Hike data', 'info', hike);
+            }
         } finally {
             setSaving(false);
             setSavingPhoto(false);

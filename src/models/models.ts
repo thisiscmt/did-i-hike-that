@@ -80,4 +80,5 @@ export interface LogEntry {
     service: string;
     timestamp: string;
     stack: string;
+    metadata: any;
 }

@@ -256,19 +256,23 @@ const ViewHike = () => {
     };
 
     const handleSavePhotoCaption = async (fileName: string) => {
-        const index = hike.photos?.findIndex((photo: Photo) => photo.fileName === fileName);
+        try {
+            const index = hike.photos?.findIndex((photo: Photo) => photo.fileName === fileName);
 
-        if (index !== undefined && index > -1) {
-            const newHike = structuredClone(hike);
-            newHike.photos![index].caption = captions[fileName];
-            newHike.photos![index].editCaption = false;
-            newHike.photos![index].action = 'update';
+            if (index !== undefined && index > -1) {
+                const newHike = structuredClone(hike);
+                newHike.photos![index].caption = captions[fileName];
+                newHike.photos![index].editCaption = false;
+                newHike.photos![index].action = 'update';
 
-            const response = await DataService.updateHike(newHike);
-            newHike.updatedAt = response.updatedAt;
+                const response = await DataService.updateHike(newHike);
+                newHike.updatedAt = response.updatedAt;
 
-            setCurrentHike(newHike);
-            setHike(newHike);
+                setCurrentHike(newHike);
+                setHike(newHike);
+            }
+        } catch (error) {
+            DataService.logError(error);
         }
     };
 

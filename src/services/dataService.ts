@@ -152,10 +152,16 @@ export const getLogData = async (page: number = 1, pageSize: number = 20): Promi
 };
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export const logError = (errorData: any) => {
-    Axios.post(`${import.meta.env.VITE_API_URL}/admin/log`, { errorData }, getRequestConfig()).catch((error) => {
+export const addLogEntry = (message: string, level: string, logData: any) => {
+    Axios.post(`${import.meta.env.VITE_API_URL}/admin/log`, { message, level, logData }, getRequestConfig()).catch((error) => {
         console.log('Something went wrong while logging error information: %o', error.message);
     });
+};
+
+export const logError = (error: unknown) => {
+    if (error instanceof Error) {
+        addLogEntry(error.message, 'error', { stack: error.stack });
+    }
 };
 
 export const login = async (email: string, password: string): Promise<LoginResponse> => {

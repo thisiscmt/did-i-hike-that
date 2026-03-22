@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Box, Button, Card, CardContent, CircularProgress } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 
 import { LogEntry } from '../../models/models.ts';
 import TableLoader from '../../components/TableLoader/TableLoader.tsx';
 import useDocumentTitle from '../../hooks/useDocumentTitle';
+import { MainContext } from '../../contexts/MainContext';
 import { Colors, SaveIndicatorStyles } from '../../services/themeService.ts';
 import * as DataService from '../../services/dataService.ts';
 import * as SharedService from '../../services/sharedService.ts';
-import {getDefaultPageSize} from '../../services/sharedService.ts';
 
 const useStyles = makeStyles()(() => ({
     mainContainer: {
@@ -104,6 +104,7 @@ const useStyles = makeStyles()(() => ({
 
 const ErrorLog = () => {
     const { classes } = useStyles();
+    const { handleException } = useContext(MainContext);
     const [ logData, setLogData ] = useState<LogEntry[]>([]);
     const [ page, setPage ] = useState<number>(1);
     const [ loading, setLoading ] = useState<boolean>(true);
@@ -119,7 +120,7 @@ const ErrorLog = () => {
                 const response = await DataService.getLogData(page, pageSize);
                 setLogData(response);
             } catch (error) {
-                // TODO
+                handleException(error, 'An error occurred retrieving log data');
             } finally {
                 setRetrievedData(true);
                 setLoading(false);
@@ -202,6 +203,13 @@ const ErrorLog = () => {
                                                                 logEntry.stack &&
                                                                 <Box className={classes.stack}>
                                                                     {logEntry.stack}
+                                                                </Box>
+                                                            }
+
+                                                            {
+                                                                logEntry.metadata &&
+                                                                <Box className={classes.stack}>
+                                                                    { JSON.stringify(logEntry.metadata, null, 4) }
                                                                 </Box>
                                                             }
                                                         </details>
