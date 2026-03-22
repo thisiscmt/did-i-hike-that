@@ -402,7 +402,7 @@ const EditHike = () => {
         if (!retrievedKnownHikers) {
             getKnownHikers();
         }
-    });
+    }, [retrievedKnownHikers, setBanner]);
 
     useEffect(() => {
         const getKnownTags = async () => {
@@ -421,7 +421,7 @@ const EditHike = () => {
         if (!retrievedKnownTags) {
             getKnownTags();
         }
-    });
+    }, [retrievedKnownTags, setBanner]);
 
     const validInput = () => {
         let valid = true;

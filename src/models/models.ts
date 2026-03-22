@@ -10,6 +10,10 @@ export interface Hike {
     linkLabel?: string;
     description?: string;
     tags?: string;
+    distance?: string;
+    elevationGain?: string;
+    timeUp?: string;
+    timeDown?: string;
     photos?: Photo[];
     user?: User;
     fullNames?: string;
@@ -80,5 +84,6 @@ export interface LogEntry {
     service: string;
     timestamp: string;
     stack: string;
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     metadata: any;
 }

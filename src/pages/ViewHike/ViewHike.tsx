@@ -33,7 +33,7 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     fieldLabel: {
-        minWidth: '90px'
+        minWidth: '110px'
     },
 
     shortFieldLabel: {
@@ -287,7 +287,8 @@ const ViewHike = () => {
     };
 
     const linkUrl = getValidUrl();
-    const hasHikeBasicData = hike.dateOfHike || hike.endDateOfHike || hike.conditions || hike.crowds;
+    const hasBasicHikeData = hike.dateOfHike || hike.endDateOfHike || hike.conditions || hike.crowds;
+    const hasExtraHikeData = hike.distance || hike.elevationGain || hike.timeUp || hike.timeDown;
     const formattedUpdatedAt = SharedService.formatISODateValue(hike.updatedAt);
     const loggedIn = isLoggedIn();
 
@@ -345,7 +346,7 @@ const ViewHike = () => {
                     }
 
                     {
-                        hasHikeBasicData &&
+                        hasBasicHikeData &&
                         <Card className={cx(classes.section)}>
                             <CardContent>
                                 <Box>
@@ -353,7 +354,7 @@ const ViewHike = () => {
                                         {
                                             hike.dateOfHike &&
                                             <Box className={cx(classes.field)}>
-                                                <Typography variant='body2' className={cx(classes.fieldLabel)}>Start date</Typography>
+                                                <Typography variant='body2' className={cx(classes.fieldLabel)}>Start date:</Typography>
                                                 <Typography variant='body2'>{SharedService.formatDateValue(hike.dateOfHike)}</Typography>
                                             </Box>
                                         }
@@ -361,7 +362,7 @@ const ViewHike = () => {
                                         {
                                             hike.endDateOfHike &&
                                             <Box className={cx(classes.field)}>
-                                                <Typography variant='body2' className={cx(classes.fieldLabel)}>End date</Typography>
+                                                <Typography variant='body2' className={cx(classes.fieldLabel)}>End date:</Typography>
                                                 <Typography variant='body2'>{SharedService.formatDateValue(hike.endDateOfHike)}</Typography>
                                             </Box>
                                         }
@@ -369,7 +370,7 @@ const ViewHike = () => {
                                         {
                                             hike.conditions &&
                                             <Box className={cx(classes.field)}>
-                                                <Typography variant='body2' className={cx(classes.fieldLabel)}>Conditions</Typography>
+                                                <Typography variant='body2' className={cx(classes.fieldLabel)}>Conditions:</Typography>
                                                 <Typography variant='body2'>{hike.conditions}</Typography>
                                             </Box>
                                         }
@@ -377,8 +378,51 @@ const ViewHike = () => {
                                         {
                                             hike.crowds &&
                                             <Box className={cx(classes.field)}>
-                                                <Typography variant='body2' className={cx(classes.fieldLabel)}>Crowds</Typography>
+                                                <Typography variant='body2' className={cx(classes.fieldLabel)}>Crowds:</Typography>
                                                 <Typography variant='body2'>{hike.crowds}</Typography>
+                                            </Box>
+                                        }
+                                    </>
+                                </Box>
+                            </CardContent>
+                        </Card>
+                    }
+
+                    {
+                        hasExtraHikeData &&
+                        <Card className={cx(classes.section)}>
+                            <CardContent>
+                                <Box>
+                                    <>
+                                        {
+                                            hike.distance &&
+                                            <Box className={cx(classes.field)}>
+                                                <Typography variant='body2' className={cx(classes.fieldLabel)}>Distance:</Typography>
+                                                <Typography variant='body2'>{hike.distance}</Typography>
+                                            </Box>
+                                        }
+
+                                        {
+                                            hike.elevationGain &&
+                                            <Box className={cx(classes.field)}>
+                                                <Typography variant='body2' className={cx(classes.fieldLabel)}>Elevation gain:</Typography>
+                                                <Typography variant='body2'>{hike.elevationGain}</Typography>
+                                            </Box>
+                                        }
+
+                                        {
+                                            hike.timeUp &&
+                                            <Box className={cx(classes.field)}>
+                                                <Typography variant='body2' className={cx(classes.fieldLabel)}>Time up:</Typography>
+                                                <Typography variant='body2'>{hike.timeUp}</Typography>
+                                            </Box>
+                                        }
+
+                                        {
+                                            hike.timeDown &&
+                                            <Box className={cx(classes.field)}>
+                                                <Typography variant='body2' className={cx(classes.fieldLabel)}>Time down:</Typography>
+                                                <Typography variant='body2'>{hike.timeDown}</Typography>
                                             </Box>
                                         }
                                     </>

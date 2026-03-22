@@ -142,7 +142,7 @@ const ErrorLog = () => {
             setLogData(logData.concat(response));
             setPage(newPage);
         } catch (error) {
-            // TODO
+            handleException(error, 'An error occurred retrieving log data');
         } finally {
             setLoadingMore(false);
         }
