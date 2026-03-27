@@ -24,7 +24,11 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     leftColumn: {
-        width: '20%',
+        width: '18%',
+
+        [theme.breakpoints.down(Constants.HOME_PAGE_FIRST_BREAKPOINT)]: {
+            width: '12%'
+        },
 
         [theme.breakpoints.down(Constants.HOME_PAGE_SECOND_BREAKPOINT)]: {
             width: '8%'
@@ -34,7 +38,11 @@ const useStyles = makeStyles()((theme) => ({
     contentColumn: {
         marginBottom: '30px',
         marginTop: '30px',
-        width: '60%',
+        width: '64%',
+
+        [theme.breakpoints.down(Constants.HOME_PAGE_FIRST_BREAKPOINT)]: {
+            width: '76%'
+        },
 
         [theme.breakpoints.down(Constants.HOME_PAGE_SECOND_BREAKPOINT)]: {
             width: '84%'
@@ -42,7 +50,11 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     rightColumn: {
-        width: '20%',
+        width: '18%',
+
+        [theme.breakpoints.down(Constants.HOME_PAGE_FIRST_BREAKPOINT)]: {
+            width: '12%'
+        },
 
         [theme.breakpoints.down(Constants.HOME_PAGE_SECOND_BREAKPOINT)]: {
             width: '8%'

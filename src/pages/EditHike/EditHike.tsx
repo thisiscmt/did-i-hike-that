@@ -30,7 +30,7 @@ import useDocumentTitle from '../../hooks/useDocumentTitle';
 import { type Hike, type Hiker, type Photo } from '../../models/models';
 import { CustomLuxonAdapter} from '../../classes/customLuxonAdapter';
 import { MainContext, type MessageMap } from '../../contexts/MainContext';
-import { SaveIndicatorStyles } from '../../services/themeService';
+import { Colors, SaveIndicatorStyles } from '../../services/themeService';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
 import * as Constants from '../../constants/constants';
@@ -54,6 +54,29 @@ const useStyles = makeStyles()((theme) => ({
         marginBottom: '12px'
     },
 
+    inlineRow: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        rowGap: '24px',
+
+        [theme.breakpoints.down(470)]: {
+            columnGap: '12px'
+        }
+    },
+
+    requiredFieldNote: {
+        'span:first-of-type': {
+            display: 'inline-block',
+            paddingRight: '16px',
+            minWidth: '120px'
+        },
+
+        'span:last-of-type': {
+            color: Colors.primaryText,
+            fontSize: '16px'
+        }
+    },
+
     field: {
         width: '500px',
 
@@ -74,14 +97,14 @@ const useStyles = makeStyles()((theme) => ({
             }
         },
 
-        [theme.breakpoints.down(700)]: {
+        [theme.breakpoints.down(768)]: {
             width: 'unset'
         }
     },
 
 
     wideField: {
-        width: '650px',
+        width: '640px',
 
         '& .MuiFormControlLabel-root': {
             marginLeft: 0,
@@ -92,11 +115,7 @@ const useStyles = makeStyles()((theme) => ({
             paddingRight: 0
         },
 
-        [theme.breakpoints.down(1024)]: {
-            width: '500px'
-        },
-
-        [theme.breakpoints.down(700)]: {
+        [theme.breakpoints.down(768)]: {
             width: '100%'
         }
     },
@@ -107,27 +126,24 @@ const useStyles = makeStyles()((theme) => ({
         }
     },
 
-    datePickerField: {
+    inlineField: {
         width: 'initial',
 
         '& .MuiTextField-root': {
             width: '170px'
         },
+    },
 
+    datePickerField: {
         // Prevents the picker button from being too far to the right
         '& .MuiInputBase-root': {
             paddingRight: '14px'
-        },
-
-        [theme.breakpoints.down(470)]: {
-            '&.endDatePickerField': {
-                marginLeft: '12px'
-            }
         }
     },
 
     fieldLabel: {
         fontSize: '14px',
+        fontWeight: 600,
         minWidth: '120px',
         paddingRight: '16px',
         textAlign: 'right',
@@ -135,20 +151,6 @@ const useStyles = makeStyles()((theme) => ({
         [theme.breakpoints.down(470)]: {
             marginBottom: '4px',
             paddingRight: 0,
-            textAlign: 'left',
-            width: '100%'
-        }
-    },
-
-    endDateLabel: {
-        fontSize: '14px',
-        marginRight: '16px',
-        minWidth: '120px',
-        textAlign: 'right',
-
-        [theme.breakpoints.down(470)]: {
-            marginBottom: '4px',
-            marginRight: '0',
             textAlign: 'left',
             width: '100%'
         }
@@ -255,7 +257,7 @@ const useStyles = makeStyles()((theme) => ({
             width: 'unset'
         },
 
-        [theme.breakpoints.down(700)]: {
+        [theme.breakpoints.down(768)]: {
             marginLeft: 0,
             width: '100%'
         }
@@ -287,6 +289,10 @@ const EditHike = () => {
     const [ endDateOfHike, setEndDateOfHike ] = useState<DateTime | null>(null);
     const [ conditions, setConditions ] = useState<string>('');
     const [ crowds, setCrowds ] = useState<string>('');
+    const [ distance, setDistance ] = useState<string>('');
+    const [ elevationGain, setElevationGain ] = useState<string>('');
+    const [ timeUp, setTimeUp ] = useState<string>('');
+    const [ timeDown, setTimeDown ] = useState<string>('');
     const [ description, setDescription ] = useState<string>('');
     const [ knownHikers, setKnownHikers ] = useState<string[]>([]);
     const [ knownTags, setKnownTags ] = useState<string[]>([]);
@@ -317,6 +323,10 @@ const EditHike = () => {
             setEndDateOfHike(hike.endDateOfHike ? DateTime.fromFormat(hike.endDateOfHike, 'yyyy-MM-dd') : null);
             setConditions(hike.conditions || '');
             setCrowds(hike.crowds || '');
+            setDistance(hike.distance || '');
+            setElevationGain(hike.elevationGain || '');
+            setTimeUp(hike.timeUp || '');
+            setTimeDown(hike.timeDown || '');
             setHikers(hike.hikers?.map((hiker: Hiker) => hiker.fullName) || []);
             setLink(hike.link || '');
             setLinkLabel(hike.linkLabel || '');
@@ -340,6 +350,10 @@ const EditHike = () => {
             setEndDateOfHike(null);
             setConditions('');
             setCrowds('');
+            setDistance('');
+            setElevationGain('');
+            setTimeUp('');
+            setTimeDown('');
             setHikers([]);
             setLink('');
             setLinkLabel('');
@@ -726,11 +740,16 @@ const EditHike = () => {
 
     return (
         <>
+            <Grid item xs={12} className={cx(classes.row, classes.requiredFieldNote)}>
+                <span></span>
+                <span>* Required field</span>
+            </Grid>
+
             <Grid item xs={12} className={cx(classes.row)}>
                 <FormControl className={cx(classes.field)}>
                     <FormControlLabel
                         labelPlacement='start'
-                        label='Trail *'
+                        label='* Trail'
                         classes={{ label: classes.fieldLabel }}
                         control={
                             <TextField
@@ -750,11 +769,11 @@ const EditHike = () => {
                 </FormControl>
             </Grid>
 
-            <Grid item xs={12} className={cx(classes.row)}>
-                <FormControl className={cx(classes.field, classes.datePickerField)}>
+            <Grid item xs={12} className={cx(classes.row, classes.inlineRow)}>
+                <FormControl className={cx(classes.field, classes.inlineField, classes.datePickerField)}>
                     <FormControlLabel
                         labelPlacement='start'
-                        label='Start date *'
+                        label='* Start date'
                         classes={{ label: classes.fieldLabel }}
                         control={
                             <LocalizationProvider dateAdapter={CustomLuxonAdapter}>
@@ -768,11 +787,11 @@ const EditHike = () => {
                     />
                 </FormControl>
 
-                <FormControl className={`${cx(classes.field, classes.datePickerField)} endDatePickerField`}>
+                <FormControl className={`${cx(classes.field, classes.inlineField, classes.datePickerField)}`}>
                     <FormControlLabel
                         labelPlacement='start'
                         label='End date'
-                        classes={{ label: classes.endDateLabel }}
+                        classes={{ label: classes.fieldLabel }}
                         control={
                             <LocalizationProvider dateAdapter={CustomLuxonAdapter}>
                                 <DatePicker
@@ -787,7 +806,7 @@ const EditHike = () => {
             </Grid>
 
             <Grid item xs={12} className={cx(classes.row)}>
-                <FormControl className={cx(classes.field)}>
+                <FormControl className={cx(classes.wideField)}>
                     <FormControlLabel
                         labelPlacement='start'
                         label='Conditions'
@@ -810,7 +829,7 @@ const EditHike = () => {
             </Grid>
 
             <Grid item xs={12} className={cx(classes.row)}>
-                <FormControl className={cx(classes.field)}>
+                <FormControl className={cx(classes.wideField)}>
                     <FormControlLabel
                         labelPlacement='start'
                         label='Crowds'
@@ -826,6 +845,94 @@ const EditHike = () => {
                                 autoCorrect='off'
                                 inputProps={{ maxLength: 255 }}
                                 onChange={(event) => setCrowds(event.target.value)}
+                            />
+                        }
+                    />
+                </FormControl>
+            </Grid>
+
+            <Grid item xs={12} className={cx(classes.row, classes.inlineRow)}>
+                <FormControl className={cx(classes.field, classes.inlineField)}>
+                    <FormControlLabel
+                        labelPlacement='start'
+                        label='Distance'
+                        classes={{ label: classes.fieldLabel }}
+                        control={
+                            <TextField
+                                name='Distance'
+                                margin='none'
+                                variant='outlined'
+                                value={distance}
+                                size='small'
+                                // fullWidth={true}
+                                autoCorrect='off'
+                                inputProps={{ maxLength: 255 }}
+                                onChange={(event) => setDistance(event.target.value)}
+                            />
+                        }
+                    />
+                </FormControl>
+
+                <FormControl className={`${cx(classes.field, classes.inlineField)}`}>
+                    <FormControlLabel
+                        labelPlacement='start'
+                        label='Time up'
+                        classes={{ label: classes.fieldLabel }}
+                        control={
+                            <TextField
+                                name='TimeUp'
+                                margin='none'
+                                variant='outlined'
+                                value={timeUp}
+                                size='small'
+//                                fullWidth={true}
+                                autoCorrect='off'
+                                inputProps={{ maxLength: 255 }}
+                                onChange={(event) => setTimeUp(event.target.value)}
+                            />
+                        }
+                    />
+                </FormControl>
+            </Grid>
+
+            <Grid item xs={12} className={cx(classes.row, classes.inlineRow)}>
+                <FormControl className={cx(classes.field, classes.inlineField)}>
+                    <FormControlLabel
+                        labelPlacement='start'
+                        label='Elevation gain'
+                        classes={{ label: classes.fieldLabel }}
+                        control={
+                            <TextField
+                                name='ElevationGain'
+                                margin='none'
+                                variant='outlined'
+                                value={elevationGain}
+                                size='small'
+                                fullWidth={true}
+                                autoCorrect='off'
+                                inputProps={{ maxLength: 255 }}
+                                onChange={(event) => setElevationGain(event.target.value)}
+                            />
+                        }
+                    />
+                </FormControl>
+
+                <FormControl className={`${cx(classes.field, classes.inlineField)}`}>
+                    <FormControlLabel
+                        labelPlacement='start'
+                        label='Time down'
+                        classes={{ label: classes.fieldLabel }}
+                        control={
+                            <TextField
+                                name='TimeDown'
+                                margin='none'
+                                variant='outlined'
+                                value={timeDown}
+                                size='small'
+                                fullWidth={true}
+                                autoCorrect='off'
+                                inputProps={{ maxLength: 255 }}
+                                onChange={(event) => setTimeDown(event.target.value)}
                             />
                         }
                     />
@@ -938,7 +1045,7 @@ const EditHike = () => {
                 <FormControl className={`${cx(classes.field)} shortField`}>
                     <FormControlLabel
                         labelPlacement='start'
-                        label=''
+                        label='Link label'
                         classes={{ label: classes.fieldLabel }}
                         control={
                             <TextField
