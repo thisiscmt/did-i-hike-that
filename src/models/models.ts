@@ -80,7 +80,7 @@ export interface LoginResponse {
 
 export interface LogEntry {
     level: string;
-    message: string;
+    message: string | object;
     service: string;
     timestamp: string;
     stack: string;

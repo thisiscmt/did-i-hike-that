@@ -218,6 +218,18 @@ const ErrorLog = () => {
                                                     break;
                                             }
 
+                                            let formattedMessage = '';
+
+                                            if (typeof logEntry.message === 'string') {
+                                                formattedMessage = logEntry.message;
+                                            } else {
+                                                formattedMessage = 'DIHT event'
+
+                                                if (!logEntry.metadata) {
+                                                    logEntry.metadata = logEntry.message;
+                                                }
+                                            }
+
                                             return (
                                                 <Card key={index}>
                                                     <CardContent className={`${className} ${classes.cardContent}`}>
@@ -242,7 +254,7 @@ const ErrorLog = () => {
                                                                 </Box>
 
                                                                 <Box className={classes.message}>
-                                                                    {logEntry.message}
+                                                                    {formattedMessage}
                                                                 </Box>
                                                             </summary>
 
