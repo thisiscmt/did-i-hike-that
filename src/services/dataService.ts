@@ -138,12 +138,16 @@ export const deleteSession = (sid: string) => {
     return Axios.delete(`${import.meta.env.VITE_API_URL}/admin/session/${sid}`, getRequestConfig());
 };
 
-export const getLogData = async (page: number = 1, pageSize: number = 20): Promise<LogEntry[]> => {
+export const getLogData = async (page: number = 1, pageSize: number = 20, service?: string): Promise<LogEntry[]> => {
     const config = getRequestConfig();
 
     config.params = {
         page,
         pageSize
+    }
+
+    if (service && service !== 'all') {
+        config.params.service = service;
     }
 
     const response = await Axios.get(`${import.meta.env.VITE_API_URL}/admin/log?`, config);
@@ -204,6 +208,22 @@ const getFormData = (hike: Hike) => {
 
     if (hike.crowds) {
         formData.append('crowds', hike.crowds);
+    }
+
+    if (hike.distance) {
+        formData.append('distance', hike.distance);
+    }
+
+    if (hike.elevationGain) {
+        formData.append('elevationGain', hike.elevationGain);
+    }
+
+    if (hike.timeUp) {
+        formData.append('timeUp', hike.timeUp);
+    }
+
+    if (hike.timeDown) {
+        formData.append('timeDown', hike.timeDown);
     }
 
     if (hike.description) {

@@ -65,10 +65,17 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     requiredFieldNote: {
+        marginBottom: '16px',
+
         'span:first-of-type': {
             display: 'inline-block',
+            minWidth: '100px',
             paddingRight: '16px',
-            minWidth: '120px'
+
+            [theme.breakpoints.down(470)]: {
+                minWidth: 0,
+                paddingRight: 0
+            }
         },
 
         'span:last-of-type': {
@@ -144,7 +151,7 @@ const useStyles = makeStyles()((theme) => ({
     fieldLabel: {
         fontSize: '14px',
         fontWeight: 600,
-        minWidth: '120px',
+        minWidth: '100px',
         paddingRight: '16px',
         textAlign: 'right',
 
@@ -174,7 +181,7 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     photoList: {
-        marginLeft: '136px',
+        marginLeft: '116px',
         marginTop: '10px',
 
         '& .MuiListItem-padding': {
@@ -236,7 +243,7 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     actions: {
-        marginLeft: '136px',
+        marginLeft: '116px',
         marginTop: '24px',
 
         [theme.breakpoints.down(470)]: {
@@ -249,7 +256,7 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     progressIndicator: {
-        marginLeft: '128px',
+        marginLeft: '118px',
         marginTop: '16px',
         width: '522px',
 
@@ -397,7 +404,7 @@ const EditHike = () => {
                 clearHikeData();
             }
         }
-    }, [clearedHike, currentHike, hikeId, retrievedHike, retrievedKnownHikers, setBanner, setCurrentHike]);
+    }, [clearedHike, currentHike, hikeId, retrievedHike, setBanner, setCurrentHike]);
 
     useEffect(() => {
         const getKnownHikers = async () => {
@@ -651,12 +658,17 @@ const EditHike = () => {
                 }
 
                 const hikersToSave = hikers.map((hiker: string) => ({ fullName: hiker }))
+
                 hike = {
                     trail,
                     dateOfHike: dateOfHike ? dateOfHike.toString() : '',
                     endDateOfHike: endDateOfHike ? endDateOfHike.toString() : '',
                     conditions,
                     crowds,
+                    distance,
+                    elevationGain,
+                    timeUp,
+                    timeDown,
                     hikers: hikersToSave,
                     description,
                     link,
@@ -664,6 +676,7 @@ const EditHike = () => {
                     tags: tags.join(','),
                     photos
                 };
+
                 let hikeIdForNav = hikeId;
                 let response: Hike;
 
@@ -710,11 +723,9 @@ const EditHike = () => {
             };
 
             handleException(error, 'An error occurred saving the hike', msgMap);
-            DataService.logError(error);
 
-            if (hike) {
-                DataService.addLogEntry('Hike data', 'info', hike);
-            }
+            DataService.logError(error);
+            DataService.addLogEntry('Edit Hike - Metadata', 'info', { metadata: SharedService.cloneHike(hike) });
         } finally {
             setSaving(false);
             setSavingPhoto(false);
@@ -864,7 +875,6 @@ const EditHike = () => {
                                 variant='outlined'
                                 value={distance}
                                 size='small'
-                                // fullWidth={true}
                                 autoCorrect='off'
                                 inputProps={{ maxLength: 255 }}
                                 onChange={(event) => setDistance(event.target.value)}
@@ -885,7 +895,6 @@ const EditHike = () => {
                                 variant='outlined'
                                 value={timeUp}
                                 size='small'
-//                                fullWidth={true}
                                 autoCorrect='off'
                                 inputProps={{ maxLength: 255 }}
                                 onChange={(event) => setTimeUp(event.target.value)}
@@ -908,7 +917,6 @@ const EditHike = () => {
                                 variant='outlined'
                                 value={elevationGain}
                                 size='small'
-                                fullWidth={true}
                                 autoCorrect='off'
                                 inputProps={{ maxLength: 255 }}
                                 onChange={(event) => setElevationGain(event.target.value)}
@@ -929,7 +937,6 @@ const EditHike = () => {
                                 variant='outlined'
                                 value={timeDown}
                                 size='small'
-                                fullWidth={true}
                                 autoCorrect='off'
                                 inputProps={{ maxLength: 255 }}
                                 onChange={(event) => setTimeDown(event.target.value)}

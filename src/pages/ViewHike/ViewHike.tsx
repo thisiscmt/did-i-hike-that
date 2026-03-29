@@ -19,6 +19,10 @@ const useStyles = makeStyles()((theme) => ({
         '&.chips, &.photos': {
             marginBottom: '14px'
         },
+
+        ':last-of-type': {
+            marginBottom: '14px'
+        }
     },
 
     field: {

@@ -1,7 +1,7 @@
 import Resizer from 'react-image-file-resizer';
 import { DateTime } from 'luxon';
 
-import { HikeSearchParams } from '../models/models';
+import { Hike, Photo, HikeSearchParams } from '../models/models';
 import * as Constants from '../constants/constants';
 
 export const dateFormatOptions: Intl.DateTimeFormatOptions = {
@@ -95,4 +95,45 @@ export const getDefaultPageSize = () => {
     }
 
     return pageSize;
+};
+
+export const cloneHike = (hike: Hike | undefined): Hike | null => {
+    if (hike) {
+        const newHike: Hike = {
+            trail: hike.trail,
+            dateOfHike: hike.dateOfHike ? hike.dateOfHike.toString() : '',
+            endDateOfHike: hike.endDateOfHike ? hike.endDateOfHike.toString() : '',
+            conditions: hike.conditions,
+            crowds: hike.crowds,
+            distance: hike.distance,
+            elevationGain: hike.elevationGain,
+            timeUp: hike.timeUp,
+            timeDown: hike.timeDown,
+            hikers: hike.hikers ? [...hike.hikers] : [],
+            description: hike.description,
+            link: hike.link,
+            linkLabel: hike.linkLabel,
+            tags: hike.tags,
+        };
+
+        let newPhoto: Photo;
+
+        if (hike.photos) {
+            newHike.photos = [];
+
+            for (const photo of hike.photos) {
+                newPhoto = {...photo};
+
+                if (newPhoto.thumbnailSrc && newPhoto.thumbnailSrc.startsWith('data:')) {
+                    newPhoto.thumbnailSrc = ''
+                }
+
+                newHike.photos.push(newPhoto);
+            }
+        }
+
+        return newHike;
+    } else {
+        return null;
+    }
 };

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Box, Button, Card, CardContent, CircularProgress } from '@mui/material';
+import { Box, Button, Card, CardContent, CircularProgress, FormControl, FormControlLabel, MenuItem, Select } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 
 import { LogEntry } from '../../models/models.ts';
@@ -15,6 +15,23 @@ const useStyles = makeStyles()(() => ({
         display: 'flex',
         flexDirection: 'column',
         gap: '8px'
+    },
+
+    serviceSelectorRow: {
+        marginBottom: '8px'
+    },
+
+    serviceSelectorField: {
+        marginLeft: 0
+    },
+
+    serviceSelector: {
+        width: '200px'
+    },
+
+    fieldLabel: {
+        fontWeight: 600,
+        paddingRight: '16px'
     },
 
     cardContent: {
@@ -40,7 +57,7 @@ const useStyles = makeStyles()(() => ({
     logEntry: {
         summary: {
             cursor: 'pointer',
-            transition: 'margin 250ms ease-out'
+            transition: 'margin 300ms ease-out'
         },
 
         ':open': {
@@ -103,10 +120,11 @@ const useStyles = makeStyles()(() => ({
 }));
 
 const ErrorLog = () => {
-    const { classes } = useStyles();
+    const { classes, cx } = useStyles();
     const { handleException } = useContext(MainContext);
     const [ logData, setLogData ] = useState<LogEntry[]>([]);
     const [ page, setPage ] = useState<number>(1);
+    const [ service, setService ] = useState<string>('all');
     const [ loading, setLoading ] = useState<boolean>(true);
     const [ loadingMore, setLoadingMore ] = useState<boolean>(false);
     const [ retrievedData, setRetrievedData ] = useState<boolean>(false);
@@ -117,7 +135,7 @@ const ErrorLog = () => {
     useEffect(() => {
         const getLogData = async () => {
             try {
-                const response = await DataService.getLogData(page, pageSize);
+                const response = await DataService.getLogData(page, pageSize, service);
                 setLogData(response);
             } catch (error) {
                 handleException(error, 'An error occurred retrieving log data');
@@ -130,17 +148,19 @@ const ErrorLog = () => {
         if (!retrievedData) {
             getLogData();
         }
-    });
+    }, [service, page, pageSize, retrievedData, handleException]);
 
     const handleLoadMore = async () => {
         try {
             setLoadingMore(true);
 
             const newPage = page + 1;
-            const response = await DataService.getLogData(newPage, pageSize);
+            const response = await DataService.getLogData(newPage, pageSize, service);
 
-            setLogData(logData.concat(response));
-            setPage(newPage);
+            if (response.length > 0) {
+                setLogData(logData.concat(response));
+                setPage(newPage);
+            }
         } catch (error) {
             handleException(error, 'An error occurred retrieving log data');
         } finally {
@@ -158,6 +178,33 @@ const ErrorLog = () => {
                         logData.length > 0
                             ?
                                 <Box className={classes.mainContainer}>
+                                    <Box className={cx(classes.serviceSelectorRow)}>
+                                        <FormControl size='small'>
+                                            <FormControlLabel
+                                                labelPlacement='start'
+                                                label='Service'
+                                                className={cx(classes.serviceSelectorField)}
+                                                classes={{label: classes.fieldLabel}}
+                                                control={
+                                                    <Box>
+                                                        <Select
+                                                            value={service}
+                                                            onChange={(event) => {
+                                                                setService(event.target.value);
+                                                                setRetrievedData(false);
+                                                            }}
+                                                            className={cx(classes.serviceSelector)}
+                                                        >
+                                                            <MenuItem value='all'>All</MenuItem>
+                                                            <MenuItem value='diht-api'>DIHT API</MenuItem>
+                                                            <MenuItem value='diht-ui'>DIHT UI</MenuItem>
+                                                        </Select>
+                                                    </Box>
+                                                }
+                                            />
+                                        </FormControl>
+                                    </Box>
+
                                     {
                                         logData.map((logEntry: LogEntry, index: number) => {
                                             let className = classes.infoLevel;
