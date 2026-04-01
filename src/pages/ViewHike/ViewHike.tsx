@@ -21,7 +21,7 @@ const useStyles = makeStyles()((theme) => ({
         },
 
         ':last-of-type': {
-            marginBottom: '14px'
+            marginBottom: '16px'
         }
     },
 

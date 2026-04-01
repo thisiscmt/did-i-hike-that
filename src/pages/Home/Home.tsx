@@ -371,8 +371,13 @@ const Home = () => {
                                                     {
                                                         searchResultsToRender.map((hike: Hike) => {
                                                             return (
-                                                                <Box key={hike.id} className={cx(classes.searchResult)} onClick={() =>
-                                                                    navigate(`/hike/${hike.id}`, { state: searchParams.toString() })}
+                                                                <Box key={hike.id} className={cx(classes.searchResult)} onClick={() => {
+                                                                    // If there are no query string params, we set the cache value to the one used
+                                                                    // for this case when the cache is first populated
+                                                                    const stateValue = searchParams.size === 0 ? '/' : searchParams.toString();
+
+                                                                    navigate(`/hike/${hike.id}`, { state: stateValue })}
+                                                                }
                                                                 >
                                                                     <SearchResult hike={hike} />
                                                                 </Box>
