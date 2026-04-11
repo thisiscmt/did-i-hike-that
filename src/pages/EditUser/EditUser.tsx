@@ -53,6 +53,7 @@ const useStyles = makeStyles()((theme) => ({
 
     fieldLabel: {
         fontSize: '14px',
+        fontWeight: 600,
         minWidth: '120px',
         paddingRight: '16px',
         textAlign: 'right',

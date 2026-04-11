@@ -41,7 +41,7 @@ export const getSearchRequestParams = (searchParams: URLSearchParams) => {
 };
 
 export const getThumbnailSrc = (filePath: string) => {
-    let thumbnailSrc = '/images/no_hike_images.png';
+    let thumbnailSrc = `/images/${Constants.SEARCH_RESULT_PLACEHOLDER_IMAGE}`;
 
     if (filePath) {
         const photoExt = filePath.split('.').pop() || '';

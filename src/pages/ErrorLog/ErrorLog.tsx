@@ -175,119 +175,123 @@ const ErrorLog = () => {
                     ?
                         <TableLoader />
                     :
-                        logData.length > 0
-                            ?
-                                <Box className={classes.mainContainer}>
-                                    <Box className={cx(classes.serviceSelectorRow)}>
-                                        <FormControl size='small'>
-                                            <FormControlLabel
-                                                labelPlacement='start'
-                                                label='Service'
-                                                className={cx(classes.serviceSelectorField)}
-                                                classes={{label: classes.fieldLabel}}
-                                                control={
-                                                    <Box>
-                                                        <Select
-                                                            value={service}
-                                                            onChange={(event) => {
-                                                                setService(event.target.value);
-                                                                setRetrievedData(false);
-                                                            }}
-                                                            className={cx(classes.serviceSelector)}
-                                                        >
-                                                            <MenuItem value='all'>All</MenuItem>
-                                                            <MenuItem value='diht-api'>DIHT API</MenuItem>
-                                                            <MenuItem value='diht-ui'>DIHT UI</MenuItem>
-                                                        </Select>
-                                                    </Box>
-                                                }
-                                            />
-                                        </FormControl>
-                                    </Box>
+                        <Box className={classes.mainContainer}>
+                            <Box className={cx(classes.serviceSelectorRow)}>
+                                <FormControl size='small'>
+                                    <FormControlLabel
+                                        labelPlacement='start'
+                                        label='Service'
+                                        className={cx(classes.serviceSelectorField)}
+                                        classes={{label: classes.fieldLabel}}
+                                        control={
+                                            <Box>
+                                                <Select
+                                                    value={service}
+                                                    onChange={(event) => {
+                                                        setService(event.target.value);
+                                                        setRetrievedData(false);
+                                                    }}
+                                                    className={cx(classes.serviceSelector)}
+                                                >
+                                                    <MenuItem value='all'>All</MenuItem>
+                                                    <MenuItem value='diht-api'>DIHT API</MenuItem>
+                                                    <MenuItem value='diht-ui'>DIHT UI</MenuItem>
+                                                </Select>
+                                            </Box>
+                                        }
+                                    />
+                                </FormControl>
+                            </Box>
 
-                                    {
-                                        logData.map((logEntry: LogEntry, index: number) => {
-                                            let className = classes.infoLevel;
+                            {
+                                logData.length > 0
+                                    ?
+                                        <>
+                                            {
+                                                logData.map((logEntry: LogEntry, index: number) => {
+                                                    let className = classes.infoLevel;
 
-                                            switch (logEntry.level) {
-                                                case 'warn':
-                                                    className = classes.warnLevel;
-                                                    break;
-                                                case 'error':
-                                                    className = classes.errorLevel;
-                                                    break;
+                                                    switch (logEntry.level) {
+                                                        case 'warn':
+                                                            className = classes.warnLevel;
+                                                            break;
+                                                        case 'error':
+                                                            className = classes.errorLevel;
+                                                            break;
+                                                    }
+
+                                                    let formattedMessage = '';
+
+                                                    if (typeof logEntry.message === 'string') {
+                                                        formattedMessage = logEntry.message;
+                                                    } else {
+                                                        formattedMessage = 'DIHT event'
+
+                                                        if (!logEntry.metadata) {
+                                                            logEntry.metadata = logEntry.message;
+                                                        }
+                                                    }
+
+                                                    return (
+                                                        <Card key={index}>
+                                                            <CardContent className={`${className} ${classes.cardContent}`}>
+                                                                <details className={classes.logEntry}>
+                                                                    <summary>
+                                                                        <Box className={classes.logContent}>
+                                                                            <Box className={classes.timestamp}>
+                                                                                {SharedService.formatISODateValue(logEntry.timestamp, SharedService.dateFormatOptions)}
+                                                                            </Box>
+
+                                                                            <Box className={classes.level}>
+                                                                                {logEntry.level}
+                                                                            </Box>
+
+                                                                            <Box className={classes.service}>
+                                                                                {logEntry.service}
+                                                                            </Box>
+                                                                        </Box>
+
+                                                                        <Box className={classes.serviceMobile}>
+                                                                            {logEntry.service}
+                                                                        </Box>
+
+                                                                        <Box className={classes.message}>
+                                                                            {formattedMessage}
+                                                                        </Box>
+                                                                    </summary>
+
+                                                                    {
+                                                                        logEntry.stack &&
+                                                                        <Box className={classes.stack}>
+                                                                            {logEntry.stack}
+                                                                        </Box>
+                                                                    }
+
+                                                                    {
+                                                                        logEntry.metadata &&
+                                                                        <Box className={classes.stack}>
+                                                                            { JSON.stringify(logEntry.metadata, null, 4) }
+                                                                        </Box>
+                                                                    }
+                                                                </details>
+                                                            </CardContent>
+                                                        </Card>
+                                                    )
+                                                })
                                             }
 
-                                            let formattedMessage = '';
-
-                                            if (typeof logEntry.message === 'string') {
-                                                formattedMessage = logEntry.message;
-                                            } else {
-                                                formattedMessage = 'DIHT event'
-
-                                                if (!logEntry.metadata) {
-                                                    logEntry.metadata = logEntry.message;
-                                                }
-                                            }
-
-                                            return (
-                                                <Card key={index}>
-                                                    <CardContent className={`${className} ${classes.cardContent}`}>
-                                                        <details className={classes.logEntry}>
-                                                            <summary>
-                                                                <Box className={classes.logContent}>
-                                                                    <Box className={classes.timestamp}>
-                                                                        {SharedService.formatISODateValue(logEntry.timestamp, SharedService.dateFormatOptions)}
-                                                                    </Box>
-
-                                                                    <Box className={classes.level}>
-                                                                        {logEntry.level}
-                                                                    </Box>
-
-                                                                    <Box className={classes.service}>
-                                                                        {logEntry.service}
-                                                                    </Box>
-                                                                </Box>
-
-                                                                <Box className={classes.serviceMobile}>
-                                                                    {logEntry.service}
-                                                                </Box>
-
-                                                                <Box className={classes.message}>
-                                                                    {formattedMessage}
-                                                                </Box>
-                                                            </summary>
-
-                                                            {
-                                                                logEntry.stack &&
-                                                                <Box className={classes.stack}>
-                                                                    {logEntry.stack}
-                                                                </Box>
-                                                            }
-
-                                                            {
-                                                                logEntry.metadata &&
-                                                                <Box className={classes.stack}>
-                                                                    { JSON.stringify(logEntry.metadata, null, 4) }
-                                                                </Box>
-                                                            }
-                                                        </details>
-                                                    </CardContent>
-                                                </Card>
-                                            )
-                                        })
-                                    }
-
-                                    <Box className={classes.loadMoreButton}>
-                                        <Button onClick={handleLoadMore} variant='contained' color='primary' disabled={loadingMore}>Load More
-                                            {loadingMore && (
-                                                <CircularProgress size={20} className={classes.loadIndicator} />
-                                            )}
-                                        </Button>
-                                    </Box>
-                                </Box>
-                            :
-                                <Box>No log data was found.</Box>
+                                            <Box className={classes.loadMoreButton}>
+                                                <Button onClick={handleLoadMore} variant='contained' color='primary' disabled={loadingMore}>Load More
+                                                    {loadingMore && (
+                                                        <CircularProgress size={20} className={classes.loadIndicator} />
+                                                    )}
+                                                </Button>
+                                            </Box>
+                                        </>
+                                    :
+                                        <Box>No log data was found.</Box>
+                            }
+                    </Box>
             }
         </>
     )

@@ -7,6 +7,8 @@ export const STORAGE_DEFAULT_PAGE_SIZE = 'DIHT_Default_Page_Size';
 export const PHOTO_THUMBNAIL_SIZE = 250;
 export const PHOTO_MAX_SIZE = 15728640;  // 15 MB
 
+export const SEARCH_RESULT_PLACEHOLDER_IMAGE = 'no_hike_images.png';
+
 export const HOME_PAGE_FIRST_BREAKPOINT = 1025;
 export const HOME_PAGE_SECOND_BREAKPOINT = 865;
 export const SESSION_COOKIE = 'sid';

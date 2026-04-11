@@ -381,7 +381,7 @@ const Home = () => {
                                                                 >
                                                                     <SearchResult hike={hike} />
                                                                 </Box>
-                                                            )
+                                                            );
                                                         })
                                                     }
                                                 </Box>

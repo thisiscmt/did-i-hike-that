@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Alert, Button, Fade, IconButton, SwipeableDrawer, Typography } from '@mui/material';
+import { Box, Menu, MenuItem, Alert, Button, Fade, IconButton, SwipeableDrawer, Typography } from '@mui/material';
 import { MenuOutlined, PersonOutlineOutlined } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
 
@@ -75,11 +75,13 @@ const useStyles = makeStyles()((theme) => ({
 const Header = () => {
     const { classes, cx } = useStyles();
     const [ mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+    const [ anchorEl, setAnchorEl ] = useState<null | HTMLElement>(null);
     const { bannerMessage, bannerSeverity, isLoggedIn, setBanner } = useContext(MainContext);
     const location = useLocation();
 
     const currentUserFullName = localStorage.getItem(Constants.STORAGE_FULL_NAME) || 'User';
     const currentUserRole = localStorage.getItem(Constants.STORAGE_ROLE);
+    const isAdmin = currentUserRole === 'Admin';
 
     useEffect(() => {
         setBanner('');
@@ -88,6 +90,14 @@ const Header = () => {
 
     const handleMobileMenuClick = (value: boolean) => {
         setMobileMenuOpen(value);
+    };
+
+    const handleAdminMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleAdminMenuClose = () => {
+        setAnchorEl(null);
     };
 
     const handleLogout = async () => {
@@ -105,6 +115,7 @@ const Header = () => {
         }
     }
 
+    const adminMenuOpen = Boolean(anchorEl);
     const loggedIn = isLoggedIn();
 
     return (
@@ -129,14 +140,46 @@ const Header = () => {
 
                 <Typography variant='h5' component={Link} to='/' className={cx(classes.headerText)}>Did I Hike That?</Typography>
 
-                <Button variant='text' className={cx(classes.headerButton)} component={Link} to='/preferences'>Preferences</Button>
+                <Button variant='text' className={cx(classes.headerButton)} disableRipple={true} component={Link} to='/preferences'>Preferences</Button>
+
+                {
+                    isAdmin
+                        ?
+                            <Box>
+                                <Button
+                                    id="admin-button"
+                                    className={cx(classes.headerButton)}
+                                    aria-controls={adminMenuOpen ? 'admin-menu' : undefined}
+                                    aria-haspopup="true"
+                                    aria-expanded={adminMenuOpen ? 'true' : undefined}
+                                    onClick={handleAdminMenuClick}
+                                    disableRipple={true}
+                                >
+                                    Admin
+                                </Button>
+
+                                <Menu
+                                    id="admin-menu"
+                                    anchorEl={anchorEl}
+                                    open={adminMenuOpen}
+                                    onClose={handleAdminMenuClose}
+                                    MenuListProps={{ 'aria-labelledby': 'admin-button' }}
+                                >
+                                    <MenuItem onClick={handleAdminMenuClose} component={Link} to="/admin/user">Users</MenuItem>
+                                    <MenuItem onClick={handleAdminMenuClose} component={Link} to="/admin/session">Sessions</MenuItem>
+                                    <MenuItem onClick={handleAdminMenuClose} component={Link} to="/admin/log">System Log</MenuItem>
+                                </Menu>
+                            </Box>
+                        :
+                            <></>
+                }
 
                 {
                     loggedIn
                         ?
-                            <Button variant='text' className={cx(classes.headerButton)} onClick={handleLogout}>Logout</Button>
+                            <Button variant='text' className={cx(classes.headerButton)} disableRipple={true} onClick={handleLogout}>Logout</Button>
                         :
-                            <Button variant='text' className={cx(classes.headerButton)} component={Link} to='/login'>Login</Button>
+                            <Button variant='text' className={cx(classes.headerButton)} disableRipple={true} component={Link} to='/login'>Login</Button>
                 }
 
 
@@ -145,7 +188,7 @@ const Header = () => {
                         loggedIn
                             ?
                                 <div className={cx(classes.userDetails)}>
-                                    <PersonOutlineOutlined color={currentUserRole === 'Admin' ? 'secondary' : 'primary'} />
+                                    <PersonOutlineOutlined color={isAdmin ? 'secondary' : 'primary'} />
                                     <Typography variant='subtitle1' className={cx(classes.fullName)}>{currentUserFullName}</Typography>
                                 </div>
                             :
