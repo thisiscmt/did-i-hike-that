@@ -17,7 +17,10 @@ const useStyles = makeStyles()(() => ({
         gap: '8px'
     },
 
-    serviceSelectorRow: {
+    controlPanel: {
+        alignItems: 'center',
+        columnGap: '30px',
+        display: 'flex',
         marginBottom: '8px'
     },
 
@@ -119,7 +122,7 @@ const useStyles = makeStyles()(() => ({
     }
 }));
 
-const ErrorLog = () => {
+const SystemLog = () => {
     const { classes, cx } = useStyles();
     const { handleException } = useContext(MainContext);
     const [ logData, setLogData ] = useState<LogEntry[]>([]);
@@ -127,6 +130,7 @@ const ErrorLog = () => {
     const [ service, setService ] = useState<string>('all');
     const [ loading, setLoading ] = useState<boolean>(true);
     const [ loadingMore, setLoadingMore ] = useState<boolean>(false);
+    const [ clearing, setClearing ] = useState<boolean>(false);
     const [ retrievedData, setRetrievedData ] = useState<boolean>(false);
     const pageSize = SharedService.getDefaultPageSize();
 
@@ -168,6 +172,18 @@ const ErrorLog = () => {
         }
     };
 
+    const handleClear = async () => {
+        try {
+            setClearing(true);
+            await DataService.clearLog();
+            setLogData([]);
+        } catch (error) {
+            handleException(error, 'An error occurred retrieving log data');
+        } finally {
+            setClearing(false);
+        }
+    };
+
     return (
         <>
             {
@@ -176,7 +192,7 @@ const ErrorLog = () => {
                         <TableLoader />
                     :
                         <Box className={classes.mainContainer}>
-                            <Box className={cx(classes.serviceSelectorRow)}>
+                            <Box className={cx(classes.controlPanel)}>
                                 <FormControl size='small'>
                                     <FormControlLabel
                                         labelPlacement='start'
@@ -201,6 +217,12 @@ const ErrorLog = () => {
                                         }
                                     />
                                 </FormControl>
+
+                                <Button onClick={handleClear} variant='contained' color='primary' disabled={clearing}>Clear Log
+                                    {clearing && (
+                                        <CircularProgress size={20} className={cx(classes.loadIndicator)} />
+                                    )}
+                                </Button>
                             </Box>
 
                             {
@@ -297,4 +319,4 @@ const ErrorLog = () => {
     )
 };
 
-export default ErrorLog;
+export default SystemLog;

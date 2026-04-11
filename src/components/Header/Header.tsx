@@ -167,6 +167,7 @@ const Header = () => {
                                 >
                                     <MenuItem onClick={handleAdminMenuClose} component={Link} to="/admin/user">Users</MenuItem>
                                     <MenuItem onClick={handleAdminMenuClose} component={Link} to="/admin/session">Sessions</MenuItem>
+                                    <MenuItem onClick={handleAdminMenuClose} component={Link} to="/admin/deleted-hikes">Deleted Hikes</MenuItem>
                                     <MenuItem onClick={handleAdminMenuClose} component={Link} to="/admin/log">System Log</MenuItem>
                                 </Menu>
                             </Box>

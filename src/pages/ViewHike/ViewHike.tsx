@@ -339,7 +339,10 @@ const ViewHike = () => {
                                     aria-label='go back home'
                                     className={cx(classes.buttonSpacer)}
                                     title='Go back home'
-                                    onClick={() => navigate(`/?${location.state}`)}
+                                    onClick={() => {
+                                        const newPath = location.state && location.state.length > 2 ? '/?' + location.state : '/'
+                                        navigate(newPath)
+                                    }}
                                     size='small'
                                     color='secondary'
                                 >
@@ -578,7 +581,10 @@ const ViewHike = () => {
                                 </Box>
                             }
 
-                            <Button variant='contained' color='primary' onClick={() => navigate(-1)}>Go Back</Button>
+                            <Button variant='contained' color='primary' onClick={() => {
+                                const newPath = location.state && location.state.length > 2 ? '/?' + location.state : '/'
+                                navigate(newPath);
+                            }}>Go Home</Button>
                         </>
                     }
 

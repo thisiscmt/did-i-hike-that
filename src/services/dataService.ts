@@ -168,6 +168,10 @@ export const logError = (error: unknown) => {
     }
 };
 
+export const clearLog = () => {
+    return Axios.delete(`${import.meta.env.VITE_API_URL}/admin/log`, getRequestConfig());
+};
+
 export const login = async (email: string, password: string): Promise<LoginResponse> => {
     const response = await Axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, { email, password }, getRequestConfig());
 
