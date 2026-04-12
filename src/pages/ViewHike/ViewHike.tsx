@@ -37,10 +37,12 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     fieldLabel: {
+        fontWeight: 600,
         minWidth: '110px'
     },
 
     shortFieldLabel: {
+        fontWeight: 600,
         minWidth: '60px'
     },
 
@@ -451,7 +453,7 @@ const ViewHike = () => {
                     {
                         hike.hikers && hike.hikers.length > 0 &&
                         <Box className={`${cx(classes.field)} ${cx(classes.section)} chips`}>
-                            <Typography variant='body2' className={cx(classes.shortFieldLabel)}>Hikers</Typography>
+                            <Typography variant='body2' className={cx(classes.shortFieldLabel)}>Hikers:</Typography>
 
                             <Box className={cx(classes.chipContainer)}>
                                 {
@@ -466,7 +468,7 @@ const ViewHike = () => {
                     {
                         hike.tags &&
                         <Box className={`${cx(classes.field)} ${cx(classes.section)} chips`}>
-                            <Typography variant='body2' className={cx(classes.shortFieldLabel)}>Tags</Typography>
+                            <Typography variant='body2' className={cx(classes.shortFieldLabel)}>Tags:</Typography>
 
                             <Box className={cx(classes.chipContainer)}>
                                 {
