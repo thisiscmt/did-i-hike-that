@@ -1,7 +1,8 @@
-import React, { FC, useContext } from 'react';
+import React, { FC, useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Box, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { CloseOutlined, HomeOutlined, LoginOutlined, LogoutOutlined, SettingsOutlined } from '@mui/icons-material';
+import { Box, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Collapse } from '@mui/material';
+import { CloseOutlined, HomeOutlined, LoginOutlined, LogoutOutlined, SettingsOutlined, AdminPanelSettingsOutlined, PeopleAltOutlined, Groups3Outlined,
+    DeleteSweepOutlined, LibraryBooksOutlined, ExpandLess, ExpandMore } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
 
 import { Colors } from '../../services/themeService';
@@ -12,7 +13,7 @@ import * as Constants from '../../constants/constants';
 const useStyles = makeStyles()(() => ({
     mainContainer: {
         height: '100%',
-        width: '180px'
+        width: '200px'
     },
 
     closeButton: {
@@ -33,6 +34,10 @@ const useStyles = makeStyles()(() => ({
         '& .MuiListItemIcon-root': {
             minWidth: '36px'
         }
+    },
+
+    submenuItem: {
+        paddingLeft: '32px'
     }
 }));
 
@@ -42,11 +47,19 @@ interface MobileMenuProps {
 
 const MobileMenu: FC<MobileMenuProps> = ({ onClose }) => {
     const { classes, cx } = useStyles();
+    const [ adminMenuOpen, setAdminMenuOpen] = useState<boolean>(true);
     const { setBanner, isLoggedIn } = useContext(MainContext);
     const navigate = useNavigate();
 
+    const currentUserRole = localStorage.getItem(Constants.STORAGE_ROLE);
+    const isAdmin = currentUserRole === 'Admin';
+
     const handleMenuClose = () => {
         onClose();
+    };
+
+    const handleAdminMenuClose = () => {
+        setAdminMenuOpen(!adminMenuOpen);
     };
 
     const handleLogout = async () => {
@@ -82,11 +95,46 @@ const MobileMenu: FC<MobileMenuProps> = ({ onClose }) => {
                 </ListItem>
 
                 <ListItem disablePadding={true}>
-                    <ListItemButton to='/preferences' component={Link} onClick={handleMenuClose}>
+                    <ListItemButton component={Link} to='/preferences' onClick={handleMenuClose}>
                         <ListItemIcon><SettingsOutlined /></ListItemIcon>
                         <ListItemText primary='Preferences' />
                     </ListItemButton>
                 </ListItem>
+
+                {
+                    isAdmin
+                        ?
+                            <>
+                                <ListItemButton onClick={handleAdminMenuClose} disableRipple={true}>
+                                    <ListItemIcon><AdminPanelSettingsOutlined /></ListItemIcon>
+                                    <ListItemText primary="Admin" />
+                                    { adminMenuOpen ? <ExpandLess /> : <ExpandMore /> }
+                                </ListItemButton>
+
+                                <Collapse in={adminMenuOpen} timeout="auto" unmountOnExit>
+                                    <List component="div" disablePadding>
+                                        <ListItemButton className={cx(classes.submenuItem)} onClick={handleMenuClose} component={Link} to='/admin/user'>
+                                            <ListItemIcon><PeopleAltOutlined /></ListItemIcon>
+                                            <ListItemText primary="Users" />
+                                        </ListItemButton>
+                                        <ListItemButton className={cx(classes.submenuItem)} onClick={handleMenuClose} component={Link} to='/admin/session'>
+                                            <ListItemIcon><Groups3Outlined /></ListItemIcon>
+                                            <ListItemText primary="Sessions" />
+                                        </ListItemButton>
+                                        <ListItemButton className={cx(classes.submenuItem)} onClick={handleMenuClose} component={Link} to='/admin/deleted-hike'>
+                                            <ListItemIcon><DeleteSweepOutlined /></ListItemIcon>
+                                            <ListItemText primary="Deleted Hikes" />
+                                        </ListItemButton>
+                                        <ListItemButton className={cx(classes.submenuItem)} onClick={handleMenuClose} component={Link} to='/admin/log'>
+                                            <ListItemIcon><LibraryBooksOutlined /></ListItemIcon>
+                                            <ListItemText primary="System Log" />
+                                        </ListItemButton>
+                                    </List>
+                                </Collapse>
+                            </>
+                        :
+                            <></>
+                }
 
                 {
                     isLoggedIn()

@@ -10,18 +10,20 @@ import { Colors, SaveIndicatorStyles } from '../../services/themeService.ts';
 import * as DataService from '../../services/dataService.ts';
 import * as SharedService from '../../services/sharedService.ts';
 
-const useStyles = makeStyles()(() => ({
+const useStyles = makeStyles()((theme) => ({
     mainContainer: {
         display: 'flex',
         flexDirection: 'column',
-        gap: '8px'
+        rowGap: '10px'
     },
 
     controlPanel: {
         alignItems: 'center',
         columnGap: '30px',
         display: 'flex',
-        marginBottom: '8px'
+        flexWrap: 'wrap',
+        marginBottom: '10px',
+        rowGap: '20px'
     },
 
     serviceSelectorField: {
@@ -89,7 +91,7 @@ const useStyles = makeStyles()(() => ({
     service: {
         width: '56px',
 
-        '@media (max-width: 450px)': {
+        [theme.breakpoints.down(450)]: {
             display: 'none'
         }
     },
@@ -97,7 +99,7 @@ const useStyles = makeStyles()(() => ({
     serviceMobile: {
         display: 'none',
 
-        '@media (max-width: 450px)': {
+        [theme.breakpoints.down(450)]: {
             display: 'block',
             marginTop: '4px'
         }

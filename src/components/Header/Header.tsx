@@ -27,17 +27,16 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     headerText: {
-        marginRight: '30px',
+        marginRight: '16px',
         textDecoration: 'none',
 
-        [theme.breakpoints.down(630)]: {
-            fontSize: '1.0rem',
-            marginRight: 0
+        [theme.breakpoints.down(431)]: {
+            fontSize: '1.0rem'
         },
     },
 
     headerButton: {
-        [theme.breakpoints.down(630)]: {
+        [theme.breakpoints.down(820)]: {
             display: 'none'
         }
     },
@@ -52,7 +51,7 @@ const useStyles = makeStyles()((theme) => ({
         display: 'flex',
         alignItems: 'center',
 
-        [theme.breakpoints.down(768)]: {
+        [theme.breakpoints.down(820)]: {
             display: 'none'
         }
     },
@@ -65,9 +64,10 @@ const useStyles = makeStyles()((theme) => ({
     mobileMenuButton: {
         display: 'none',
 
-        [theme.breakpoints.down('md')]: {
+        [theme.breakpoints.down(820)]: {
             display: 'inline-flex',
-            marginRight: '10px'
+            marginRight: '10px',
+            paddingLeft: 0
         }
     },
 }));
@@ -167,7 +167,7 @@ const Header = () => {
                                 >
                                     <MenuItem onClick={handleAdminMenuClose} component={Link} to="/admin/user">Users</MenuItem>
                                     <MenuItem onClick={handleAdminMenuClose} component={Link} to="/admin/session">Sessions</MenuItem>
-                                    <MenuItem onClick={handleAdminMenuClose} component={Link} to="/admin/deleted-hikes">Deleted Hikes</MenuItem>
+                                    <MenuItem onClick={handleAdminMenuClose} component={Link} to="/admin/deleted-hike">Deleted Hikes</MenuItem>
                                     <MenuItem onClick={handleAdminMenuClose} component={Link} to="/admin/log">System Log</MenuItem>
                                 </Menu>
                             </Box>

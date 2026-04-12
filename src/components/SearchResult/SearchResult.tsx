@@ -12,7 +12,7 @@ const useStyles = makeStyles()((theme) => ({
 
         [theme.breakpoints.down(500)]: {
             flexDirection: 'column'
-        },
+        }
     },
 
     thumbnail: {
@@ -20,7 +20,11 @@ const useStyles = makeStyles()((theme) => ({
         display: 'flex',
         justifyContent: 'center',
         minWidth: `${Constants.PHOTO_THUMBNAIL_SIZE}px`,
-        width: `${Constants.PHOTO_THUMBNAIL_SIZE}px`
+        width: `${Constants.PHOTO_THUMBNAIL_SIZE}px`,
+
+        [theme.breakpoints.down(500)]: {
+            justifyContent: 'unset'
+        }
     },
 
     details: {
@@ -42,7 +46,7 @@ const useStyles = makeStyles()((theme) => ({
         [theme.breakpoints.down(500)]: {
             marginLeft: 0,
             marginTop: '8px',
-        },
+        }
     },
 
     hikers: {

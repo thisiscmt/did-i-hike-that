@@ -83,7 +83,7 @@ function App() {
                         <Route path='/admin/user' element={<Users />} />
                         <Route path='/admin/user/:userId' element={<EditUser />} />
                         <Route path='/admin/user/add' element={<EditUser />} />
-                        <Route path='/admin/deleted-hikes' element={<DeletedHikes />} />
+                        <Route path='/admin/deleted-hike' element={<DeletedHikes />} />
                         <Route path='/admin/log' element={<SystemLog />} />
                         <Route path='/login' element={<Login />} />
                         <Route path='*' element={<ErrorPage />} />
