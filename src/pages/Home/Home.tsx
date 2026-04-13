@@ -130,7 +130,7 @@ const useStyles = makeStyles()((theme) => ({
     totalCount: {
         color: Colors.primaryText,
         fontSize: '14px',
-        marginTop: '10px',
+        marginTop: '16px',
         textAlign: 'center'
     }
 }));
@@ -390,7 +390,7 @@ const Home = () => {
                                                             showFirstButton={true} showLastButton={true} />
 
                                                 <Box className={`${cx(classes.searchResults)} ${cx(classes.totalCount)}`}>
-                                                    Adventures: {totalCount}
+                                                    <span style={{ fontWeight: 600 }}>Adventures</span>: {totalCount}
                                                 </Box>
                                             </>
                                             :
