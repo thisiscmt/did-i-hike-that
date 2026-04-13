@@ -9,6 +9,7 @@ export const Colors = {
     infoLogEntry: 'rgba(3, 169, 244, 0.50)',
     warnLogEntry: 'rgba(255, 152, 0, 0.50)',
     errorLogEntry: 'rgba(239, 83, 80, 0.50)',
+    trailName: '#4A7628',
     white: '#FFFFFF'
 };
 

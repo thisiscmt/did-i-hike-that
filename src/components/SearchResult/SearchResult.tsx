@@ -3,6 +3,7 @@ import { Box, Typography, Chip, Card, CardContent } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 
 import { Hike } from '../../models/models';
+import { Colors } from '../../services/themeService.ts';
 import * as SharedService from '../../services/sharedService';
 import * as Constants from '../../constants/constants';
 
@@ -24,6 +25,16 @@ const useStyles = makeStyles()((theme) => ({
 
         [theme.breakpoints.down(500)]: {
             justifyContent: 'unset'
+        }
+    },
+
+    trail: {
+        color: Colors.trailName,
+        fontSize: '18px',
+        fontWeight: '600',
+
+        [theme.breakpoints.down(500)]: {
+            fontSize: '18px'
         }
     },
 
@@ -103,8 +114,8 @@ const SearchResult: FC<SearchResultProps> = ({ hike }) => {
                 </Box>
 
                 <Box className={cx(classes.details)}>
-                    <Typography variant='body2'>{hike.trail}</Typography>
-                    <Typography variant='body2'>{getHikeDateValue()}</Typography>
+                    <Typography variant='body1' className={cx(classes.trail)}>{hike.trail}</Typography>
+                    <Typography variant='body1'>{getHikeDateValue()}</Typography>
 
                     {
                         hikers && hikers.length > 0 &&
