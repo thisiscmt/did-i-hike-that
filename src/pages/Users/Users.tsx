@@ -1,5 +1,6 @@
 import React, { FC, useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import Axios, { AxiosProgressEvent, AxiosRequestConfig } from 'axios';
 import { Typography, Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 
@@ -30,7 +31,7 @@ const Users: FC = () => {
     const [ users, setUsers ] = useState<User[]>([]);
     const [ retrievedData, setRetrievedData ] = useState<boolean>(false);
     const [ loading, setLoading ] = useState<boolean>(true);
-    const { handleException } = useContext(MainContext);
+    const { handleError } = useContext(MainContext);
     const navigate = useNavigate();
 
     useDocumentTitle('Users - Did I Hike That?');
@@ -41,8 +42,7 @@ const Users: FC = () => {
                 const response = await DataService.getUsers();
                 setUsers(response);
             } catch (error) {
-                const msgMap: MessageMap = {'403': { message: 'You are not authorized to view this page', severity: 'error' }};
-                handleException(error, 'An error occurred retrieving users', msgMap);
+                handleError(error, 'An error occurred retrieving users');
             } finally {
                 setRetrievedData(true);
                 setLoading(false);

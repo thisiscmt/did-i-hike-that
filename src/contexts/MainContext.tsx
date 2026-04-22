@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Hike, HikeSearchResults, SearchResultsCache } from '../models/models';
+import { Hike, HikeSearchResults, SearchResultsCache, SystemError } from '../models/models';
 
 interface MainContextProps {
     bannerMessage: string;
@@ -8,7 +8,8 @@ interface MainContextProps {
     searchResultsCache: SearchResultsCache;
     currentHike: Hike | null;
     isLoggedIn: () => boolean;
-    handleException: (error: unknown, msg?: string, msgMap?: MessageMap) => void;
+    handleError: (error: unknown, msg?: string) => void;
+    normalizeError: (error: unknown) => SystemError;
     setBanner: (message: string, severity?: AlertSeverity) => void;
     storeSearchResults: (hikes: HikeSearchResults, key: string) => void;
     clearSearchResults: () => void;
@@ -21,7 +22,8 @@ export const MainContext = React.createContext<MainContextProps>({
     searchResultsCache: {},
     currentHike: null,
     isLoggedIn: () => false,
-    handleException: () => {},
+    handleError: () => {},
+    normalizeError: () => { return {message: ''} },
     setBanner: () => {},
     storeSearchResults: () => {},
     clearSearchResults: () => {},

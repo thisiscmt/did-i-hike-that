@@ -158,7 +158,7 @@ const ViewHike = () => {
     const [ retrievedHike, setRetrievedHike ] = useState<boolean>(false);
     const [ openDeleteConfirmation, setOpenDeleteConfirmation ] = useState<boolean>(false);
     const [ loading, setLoading ] = useState<boolean>(true);
-    const { currentHike, isLoggedIn, setCurrentHike, clearSearchResults, setBanner, handleException } = useContext(MainContext);
+    const { currentHike, isLoggedIn, setCurrentHike, clearSearchResults, setBanner, handleError } = useContext(MainContext);
     const { hikeId } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
@@ -179,11 +179,7 @@ const ViewHike = () => {
                     setBanner('Missing a hike ID', 'error');
                 }
             } catch(error) {
-                const msgMap: MessageMap = {
-                    '404': { message: 'Could not find the hike', severity: 'warning' }
-                };
-
-                handleException(error, 'An error occurred retrieving the hike', msgMap);
+                handleError(error, 'An error occurred retrieving the hike');
                 DataService.logError(error);
             } finally {
                 setRetrievedHike(true);
@@ -201,7 +197,7 @@ const ViewHike = () => {
                 getHike();
             }
         }
-    }, [hikeId, retrievedHike, currentHike, setCurrentHike, setBanner, handleException]);
+    }, [hikeId, retrievedHike, currentHike, setCurrentHike, setBanner, handleError]);
 
     const getValidUrl = () => {
         let valueToCheck = hike.link;
@@ -240,7 +236,7 @@ const ViewHike = () => {
                 setCurrentHike(null);
                 navigate('/');
             } catch (error) {
-                handleException(error, 'An error occurred deleting the hike');
+                handleError(error, 'An error occurred deleting the hike');
                 DataService.logError(error);
             }
         }

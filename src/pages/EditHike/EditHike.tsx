@@ -285,7 +285,7 @@ const MAX_PHOTOS_FOR_UPLOAD = 10;
 
 const EditHike = () => {
     const { classes, cx } = useStyles();
-    const { currentHike, searchResultsCache, setCurrentHike, setBanner, storeSearchResults, handleException } = useContext(MainContext);
+    const { currentHike, searchResultsCache, setCurrentHike, setBanner, storeSearchResults, handleError } = useContext(MainContext);
     const { hikeId } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
@@ -717,12 +717,7 @@ const EditHike = () => {
                 navigate(`/hike/${hikeIdForNav}`, { state: location.state });
             }
         } catch (error) {
-            const msgMap: MessageMap = {
-                'ERR_CANCELED': { message: 'Save was cancelled', severity: 'warning' },
-                '400': { message: 'One of the picture files is too large', severity: 'error' }
-            };
-
-            handleException(error, 'An error occurred saving the hike', msgMap);
+            handleError(error, 'An error occurred saving the hike');
 
             DataService.logError(error);
             DataService.addLogEntry('Edit Hike - Metadata', 'info', { metadata: SharedService.cloneHike(hike) });

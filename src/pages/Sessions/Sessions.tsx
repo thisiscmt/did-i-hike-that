@@ -32,12 +32,12 @@ const useStyles = makeStyles()(() => ({
 
 const Sessions: FC = () => {
     const { classes, cx } = useStyles();
+    const { handleError } = useContext(MainContext);
     const [ sessions, setSessions ] = useState<Session[]>([]);
     const [ retrievedData, setRetrievedData ] = useState<boolean>(false);
     const [ loading, setLoading ] = useState<boolean>(true);
     const [ openDeleteConfirmation, setOpenDeleteConfirmation ] = useState<boolean>(false);
     const [ sessionIdToDelete, setSessionIdToDelete ] = useState<string>('');
-    const { handleException } = useContext(MainContext);
 
     useDocumentTitle('Sessions - Did I Hike That?');
 
@@ -47,8 +47,7 @@ const Sessions: FC = () => {
                 const response = await DataService.getSessions();
                 setSessions(response);
             } catch (error) {
-                const msgMap: MessageMap = {'403': { message: 'You are not authorized to view this page', severity: 'error' }};
-                handleException(error, 'An error occurred retrieving sessions', msgMap);
+                handleError(error, 'An error occurred retrieving sessions');
             } finally {
                 setRetrievedData(true);
                 setLoading(false);
@@ -75,7 +74,7 @@ const Sessions: FC = () => {
                 await DataService.deleteSession(sessionIdToDelete);
                 window.location.reload();
             } catch (error) {
-                handleException(error, 'An error occurred deleting the session');
+                handleError(error, 'An error occurred deleting the session');
             }
         }
     };

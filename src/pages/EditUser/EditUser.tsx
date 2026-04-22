@@ -112,7 +112,7 @@ const EditUser = () => {
     const [ retrieveduser, setRetrievedUser ] = useState<boolean>(false);
     const [ openDeleteConfirmation, setOpenDeleteConfirmation ] = useState<boolean>(false);
 
-    const { isLoggedIn, handleException, setBanner } = useContext(MainContext);
+    const { isLoggedIn, handleError, setBanner } = useContext(MainContext);
     const navigate = useNavigate();
 
     useDocumentTitle('Login - Did I Hike That?');
@@ -130,18 +130,14 @@ const EditUser = () => {
                     setRetrievedUser(true);
                 }
             } catch (error) {
-                const msgMap: MessageMap = {
-                    '403': { message: 'You are not authorized to view this page', severity: 'error' },
-                    '404': { message: 'Could not find the user', severity: 'warning' }
-                };
-                handleException(error, 'An error occurred retrieving the user', msgMap);
+                handleError(error, 'An error occurred retrieving the user');
             }
         }
 
         if (userId && !retrieveduser) {
             getUser();
         }
-    }, [userId, retrieveduser, handleException]);
+    }, [userId, retrieveduser, handleError]);
 
     const validInput = () => {
         let valid = true;
@@ -215,11 +211,7 @@ const EditUser = () => {
                 navigate('/admin/user');
             }
         } catch (error) {
-            const msgMap: MessageMap = {
-                '403': { message: 'You are not authorized to create a user', severity: 'error' },
-            };
-
-            handleException(error, 'An error occurred saving the user', msgMap);
+            handleError(error, 'An error occurred saving the user');
             window.scrollTo({ top: 0, behavior: 'smooth'});
         } finally {
             setSaving(false);

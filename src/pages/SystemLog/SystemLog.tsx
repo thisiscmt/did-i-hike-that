@@ -5,7 +5,7 @@ import { makeStyles } from 'tss-react/mui';
 import { LogEntry } from '../../models/models.ts';
 import TableLoader from '../../components/TableLoader/TableLoader.tsx';
 import useDocumentTitle from '../../hooks/useDocumentTitle';
-import { MainContext } from '../../contexts/MainContext';
+import {MainContext, MessageMap} from '../../contexts/MainContext';
 import { Colors, SaveIndicatorStyles } from '../../services/themeService.ts';
 import * as DataService from '../../services/dataService.ts';
 import * as SharedService from '../../services/sharedService.ts';
@@ -126,7 +126,7 @@ const useStyles = makeStyles()((theme) => ({
 
 const SystemLog = () => {
     const { classes, cx } = useStyles();
-    const { handleException } = useContext(MainContext);
+    const { handleError } = useContext(MainContext);
     const [ logData, setLogData ] = useState<LogEntry[]>([]);
     const [ page, setPage ] = useState<number>(1);
     const [ service, setService ] = useState<string>('all');
@@ -144,7 +144,7 @@ const SystemLog = () => {
                 const response = await DataService.getLogData(page, pageSize, service);
                 setLogData(response);
             } catch (error) {
-                handleException(error, 'An error occurred retrieving log data');
+                handleError(error);
             } finally {
                 setRetrievedData(true);
                 setLoading(false);
@@ -154,7 +154,7 @@ const SystemLog = () => {
         if (!retrievedData) {
             getLogData();
         }
-    }, [service, page, pageSize, retrievedData, handleException]);
+    }, [service, page, pageSize, retrievedData, handleError]);
 
     const handleLoadMore = async () => {
         try {
@@ -168,7 +168,7 @@ const SystemLog = () => {
                 setPage(newPage);
             }
         } catch (error) {
-            handleException(error, 'An error occurred retrieving log data');
+            handleError(error, 'An error occurred retrieving log data');
         } finally {
             setLoadingMore(false);
         }
@@ -180,7 +180,7 @@ const SystemLog = () => {
             await DataService.clearLog();
             setLogData([]);
         } catch (error) {
-            handleException(error, 'An error occurred retrieving log data');
+            handleError(error, 'An error occurred clearing log data');
         } finally {
             setClearing(false);
         }

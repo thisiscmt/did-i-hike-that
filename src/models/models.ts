@@ -87,3 +87,11 @@ export interface LogEntry {
     /* eslint-disable @typescript-eslint/no-explicit-any */
     metadata: any;
 }
+
+export interface SystemError {
+    message: string;
+    code?: string;
+    status?: number;
+    statusText?: string;
+    data?: any;
+}

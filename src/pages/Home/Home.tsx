@@ -231,6 +231,11 @@ const Home = () => {
     };
 
     const handleClickSearch = () => {
+        if (!isLoggedIn()) {
+            navigate('/login');
+            return;
+        }
+
         if (searchText) {
             searchParams.set('searchText', searchText);
         } else {

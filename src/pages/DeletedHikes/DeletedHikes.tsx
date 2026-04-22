@@ -38,7 +38,7 @@ const DeletedHikes: FC = () => {
     const [ loading, setLoading ] = useState<boolean>(true);
     const [ openDeleteConfirmation, setOpenDeleteConfirmation ] = useState<boolean>(false);
     const [ hikeIdToDelete, setHikeIdToDelete ] = useState<string>('');
-    const { handleException } = useContext(MainContext);
+    const { handleError } = useContext(MainContext);
 
     useDocumentTitle('Deleted Hikes - Did I Hike That?');
 
@@ -48,8 +48,7 @@ const DeletedHikes: FC = () => {
                 const response = await DataService.getDeletedHikes();
                 setDeletedHikes(response);
             } catch (error) {
-                const msgMap: MessageMap = {'403': { message: 'You are not authorized to view this page', severity: 'error' }};
-                handleException(error, 'An error occurred retrieving deleted hikes', msgMap);
+                handleError(error, 'An error occurred retrieving deleted hikes');
             } finally {
                 setRetrievedData(true);
                 setLoading(false);
@@ -76,7 +75,7 @@ const DeletedHikes: FC = () => {
                 await DataService.deleteHikePermanently(hikeIdToDelete);
                 window.location.reload();
             } catch (error) {
-                handleException(error, 'An error occurred deleting the hike');
+                handleError(error, 'An error occurred deleting the hike');
             }
         }
     };

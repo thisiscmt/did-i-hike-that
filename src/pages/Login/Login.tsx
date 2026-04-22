@@ -82,7 +82,7 @@ const Login = () => {
     const [ emailInputError, setEmailInputError ] = useState<boolean>(false);
     const [ passwordInputError, setPasswordInputError ] = useState<boolean>(false);
     const [ loading, setLoading ] = useState<boolean>(false);
-    const { setBanner, handleException } = useContext(MainContext);
+    const { setBanner, handleError } = useContext(MainContext);
     const navigate = useNavigate();
     const [ searchParams ] = useSearchParams();
 
@@ -147,7 +147,7 @@ const Login = () => {
                 navigate(returnUrl);
             }
         } catch (error) {
-            handleException(error, 'An error occurred during login');
+            handleError(error, 'An error occurred during login');
         } finally {
             setLoading(false);
         }

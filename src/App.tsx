@@ -15,6 +15,7 @@ import SystemLog from './pages/SystemLog/SystemLog.tsx';
 import Login from './pages/Login/Login';
 import ErrorPage from './pages/ErrorPage/ErrorPage';
 import Header from './components/Header/Header';
+import AuthenticationChecker from './components/AuthenticationChecker/AuthenticationChecker.tsx';
 import * as Constants from './constants/constants';
 
 const useStyles = makeStyles()((theme) => ({
@@ -75,16 +76,16 @@ function App() {
                 <Box className={cx(classes.contentColumn)}>
                     <Routes>
                         <Route path='/' element={<Home />} />
-                        <Route path='/hike' element={<EditHike />} />
-                        <Route path='/hike/:hikeId' element={<ViewHike />} />
-                        <Route path='/hike/:hikeId/edit' element={<EditHike />} />
+                        <Route path='/hike' element={<AuthenticationChecker targetComponent={<EditHike />} />} />
+                        <Route path='/hike/:hikeId' element={<AuthenticationChecker targetComponent={<ViewHike />} />} />
+                        <Route path='/hike/:hikeId/edit' element={<AuthenticationChecker targetComponent={<EditHike />} />} />
                         <Route path='/preferences' element={<Preferences />} />
-                        <Route path='/admin/session' element={<Sessions />} />
-                        <Route path='/admin/user' element={<Users />} />
-                        <Route path='/admin/user/:userId' element={<EditUser />} />
-                        <Route path='/admin/user/add' element={<EditUser />} />
-                        <Route path='/admin/deleted-hike' element={<DeletedHikes />} />
-                        <Route path='/admin/log' element={<SystemLog />} />
+                        <Route path='/admin/user' element={<AuthenticationChecker targetComponent={<Users />} />} />
+                        <Route path='/admin/user/:userId' element={<AuthenticationChecker targetComponent={<EditUser />} />} />
+                        <Route path='/admin/user/add' element={<AuthenticationChecker targetComponent={<EditUser />} />} />
+                        <Route path='/admin/session' element={<AuthenticationChecker targetComponent={<Sessions />} />} />
+                        <Route path='/admin/deleted-hike' element={<AuthenticationChecker targetComponent={<DeletedHikes />} />} />
+                        <Route path='/admin/log' element={<AuthenticationChecker targetComponent={<SystemLog />} />} />
                         <Route path='/login' element={<Login />} />
                         <Route path='*' element={<ErrorPage />} />
                     </Routes>
