@@ -88,6 +88,7 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     chip: {
+        cursor: 'pointer',
         height: 'auto',
         marginBottom: '8px',
         marginRight: '8px',
@@ -101,6 +102,10 @@ const useStyles = makeStyles()((theme) => ({
 
         ':last-child': {
             marginRight: 0
+        },
+
+        ':hover': {
+            backgroundColor: Colors.secondaryLinkColor
         }
     },
 
@@ -457,7 +462,7 @@ const ViewHike = () => {
                             <Box className={cx(classes.chipContainer)}>
                                 {
                                     hike.hikers.map((hiker: Hiker) => (
-                                        <Chip key={hiker.fullName} label={hiker.fullName} className={cx(classes.chip)}></Chip>
+                                        <Chip key={hiker.fullName} label={hiker.fullName} className={cx(classes.chip)} title="Search for this hiker" component={Link} href={`/?searchText=${hiker.fullName}`}></Chip>
                                     ))
                                 }
                             </Box>
@@ -472,7 +477,7 @@ const ViewHike = () => {
                             <Box className={cx(classes.chipContainer)}>
                                 {
                                     hike.tags.split(',').map((tag: string) => (
-                                        <Chip key={tag} label={tag} className={cx(classes.chip)}></Chip>
+                                        <Chip key={tag} label={tag} className={cx(classes.chip)} title="Search for this tag" component={Link} href={`/?searchText=${tag}`}></Chip>
                                     ))
                                 }
                             </Box>
