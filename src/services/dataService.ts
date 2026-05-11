@@ -3,6 +3,8 @@ import Axios, { AxiosProgressEvent, AxiosRequestConfig } from 'axios';
 import { Hike, Hiker, HikeSearchParams, HikeSearchResults, LogEntry, LoginResponse, Photo, Session, User } from '../models/models';
 import * as Constants from '../constants/constants';
 
+export type LogService = 'all' | 'diht-api' | 'diht-ui' | 'api' | 'checkpoint';
+
 Axios.interceptors.response.use(function (response) {
     return response;
 }, function (error) {
@@ -153,6 +155,13 @@ export const getLogData = async (page: number = 1, pageSize: number = 20, servic
     const response = await Axios.get(`${import.meta.env.VITE_API_URL}/admin/log?`, config);
 
     return response.data.rows;
+};
+
+export const getPM2LogData = async (log: LogService): Promise<string> => {
+    const config = getRequestConfig();
+    const response = await Axios.get(`${import.meta.env.VITE_API_URL}/admin/log/pm2/${log}?`, config);
+
+    return response.data.logData;
 };
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
