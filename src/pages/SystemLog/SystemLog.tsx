@@ -107,7 +107,8 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     message: {
-        marginTop: '6px'
+        marginTop: '6px',
+        overflowX: 'auto'
     },
 
     stack: {
