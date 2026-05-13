@@ -152,9 +152,13 @@ const SystemLog = () => {
             try {
                 if (service === 'api' || service === 'checkpoint') {
                     const response = await DataService.getPM2LogData(service);
-                    setPM2LogData(response)
+
+                    setPM2LogData(response);
+                    setLogData([]);
                 } else {
                     const response = await DataService.getLogData(page, pageSize, service);
+
+                    setPM2LogData('');
                     setLogData(response);
                 }
             } catch (error) {
@@ -221,6 +225,7 @@ const SystemLog = () => {
                                                     value={service}
                                                     onChange={(event) => {
                                                         setService(event.target.value as LogService);
+                                                        setLoading(true);
                                                         setRetrievedData(false);
                                                     }}
                                                     className={cx(classes.serviceSelector)}
