@@ -177,8 +177,14 @@ export const logError = (error: unknown) => {
     }
 };
 
-export const clearLog = () => {
-    return Axios.delete(`${import.meta.env.VITE_API_URL}/admin/log`, getRequestConfig());
+export const clearLog = (service: LogService) => {
+    let requestPath = 'log';
+
+    if (service === 'api' || service === 'checkpoint') {
+        requestPath = `log/pm2/${service}`;
+    }
+
+    return Axios.delete(`${import.meta.env.VITE_API_URL}/admin/${requestPath}`, getRequestConfig());
 };
 
 export const login = async (email: string, password: string): Promise<LoginResponse> => {

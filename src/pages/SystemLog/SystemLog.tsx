@@ -195,8 +195,13 @@ const SystemLog = () => {
     const handleClear = async () => {
         try {
             setClearing(true);
-            await DataService.clearLog();
-            setLogData([]);
+            await DataService.clearLog(service);
+
+            if (service === 'api' || service === 'checkpoint') {
+                setPM2LogData('');
+            } else {
+                setLogData([]);
+            }
         } catch (error) {
             handleError(error, 'An error occurred clearing log data');
         } finally {
@@ -241,11 +246,14 @@ const SystemLog = () => {
                                     />
                                 </FormControl>
 
-                                <Button onClick={handleClear} variant='contained' color='primary' disabled={clearing}>Clear Log
-                                    {clearing && (
-                                        <CircularProgress size={20} className={cx(classes.loadIndicator)} />
-                                    )}
-                                </Button>
+                                {
+                                    (logData.length > 0 || pm2LogData) &&
+                                    <Button onClick={handleClear} variant='contained' color='primary' disabled={clearing}>Clear Log
+                                        {clearing && (
+                                            <CircularProgress size={20} className={cx(classes.loadIndicator)} />
+                                        )}
+                                    </Button>
+                                }
                             </Box>
 
                             {
