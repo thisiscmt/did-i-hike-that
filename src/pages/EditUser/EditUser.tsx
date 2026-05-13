@@ -240,7 +240,7 @@ const EditUser = () => {
                         <FormControl className={cx(classes.field)}>
                             <FormControlLabel
                                 labelPlacement='start'
-                                label='Name *'
+                                label='* Name'
                                 classes={{ label: classes.fieldLabel }}
                                 control={
                                     <TextField
@@ -264,7 +264,7 @@ const EditUser = () => {
                         <FormControl className={cx(classes.field)}>
                             <FormControlLabel
                                 labelPlacement='start'
-                                label='Email *'
+                                label='* Email'
                                 classes={{ label: classes.fieldLabel }}
                                 control={
                                     <TextField
@@ -288,7 +288,7 @@ const EditUser = () => {
                         <FormControl className={cx(classes.field)}>
                             <FormControlLabel
                                 labelPlacement='start'
-                                label='Password *'
+                                label='* Password'
                                 classes={{ label: classes.fieldLabel }}
                                 control={
                                     <TextField
@@ -317,7 +317,7 @@ const EditUser = () => {
                         <FormControl className={cx(classes.field)} size='small'>
                             <FormControlLabel
                                 labelPlacement='start'
-                                label='Role *'
+                                label='* Role'
                                 classes={{ label: classes.fieldLabel }}
                                 control={
                                     <Box className={cx(classes.roleSelectorField)}>
