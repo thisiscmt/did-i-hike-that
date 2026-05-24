@@ -31,6 +31,3 @@ export const MainContext = React.createContext<MainContextProps>({
 });
 
 export type AlertSeverity = 'error' | 'info' | 'success' | 'warning';
-
-export type MessageMap = Record<string, { message: string, severity: AlertSeverity }>;
-

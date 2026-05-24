@@ -29,7 +29,7 @@ import { DateTime } from 'luxon';
 import useDocumentTitle from '../../hooks/useDocumentTitle';
 import { type Hike, type Hiker, type Photo } from '../../models/models';
 import { CustomLuxonAdapter} from '../../classes/customLuxonAdapter';
-import { MainContext, type MessageMap } from '../../contexts/MainContext';
+import { MainContext } from '../../contexts/MainContext';
 import { Colors, SaveIndicatorStyles } from '../../services/themeService';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
@@ -55,6 +55,7 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     inlineRow: {
+        columnGap: '24px',
         display: 'flex',
         flexWrap: 'wrap',
         rowGap: '24px',
@@ -878,28 +879,6 @@ const EditHike = () => {
                     />
                 </FormControl>
 
-                <FormControl className={`${cx(classes.field, classes.inlineField)}`}>
-                    <FormControlLabel
-                        labelPlacement='start'
-                        label='Time up'
-                        classes={{ label: classes.fieldLabel }}
-                        control={
-                            <TextField
-                                name='TimeUp'
-                                margin='none'
-                                variant='outlined'
-                                value={timeUp}
-                                size='small'
-                                autoCorrect='off'
-                                inputProps={{ maxLength: 255 }}
-                                onChange={(event) => setTimeUp(event.target.value)}
-                            />
-                        }
-                    />
-                </FormControl>
-            </Grid>
-
-            <Grid item xs={12} className={cx(classes.row, classes.inlineRow)}>
                 <FormControl className={cx(classes.field, classes.inlineField)}>
                     <FormControlLabel
                         labelPlacement='start'
@@ -915,6 +894,28 @@ const EditHike = () => {
                                 autoCorrect='off'
                                 inputProps={{ maxLength: 255 }}
                                 onChange={(event) => setElevationGain(event.target.value)}
+                            />
+                        }
+                    />
+                </FormControl>
+            </Grid>
+
+            <Grid item xs={12} className={cx(classes.row, classes.inlineRow)}>
+                <FormControl className={`${cx(classes.field, classes.inlineField)}`}>
+                    <FormControlLabel
+                        labelPlacement='start'
+                        label='Time up'
+                        classes={{ label: classes.fieldLabel }}
+                        control={
+                            <TextField
+                                name='TimeUp'
+                                margin='none'
+                                variant='outlined'
+                                value={timeUp}
+                                size='small'
+                                autoCorrect='off'
+                                inputProps={{ maxLength: 255 }}
+                                onChange={(event) => setTimeUp(event.target.value)}
                             />
                         }
                     />

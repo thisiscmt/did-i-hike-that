@@ -8,7 +8,7 @@ import ConfirmationPrompt from '../../components/ConfirmationPrompt/Confirmation
 import TableLoader from '../../components/TableLoader/TableLoader';
 import useDocumentTitle from '../../hooks/useDocumentTitle';
 import { Hike, Hiker } from '../../models/models';
-import { MainContext, MessageMap } from '../../contexts/MainContext';
+import { MainContext } from '../../contexts/MainContext';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
 

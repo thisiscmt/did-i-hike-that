@@ -5,7 +5,7 @@ import { makeStyles } from 'tss-react/mui';
 
 import useDocumentTitle from '../../hooks/useDocumentTitle';
 import ConfirmationPrompt from '../../components/ConfirmationPrompt/ConfirmationPrompt';
-import { MainContext, MessageMap } from '../../contexts/MainContext';
+import { MainContext } from '../../contexts/MainContext';
 import { Colors } from '../../services/themeService';
 import { User } from '../../models/models';
 import * as DataService from '../../services/dataService';

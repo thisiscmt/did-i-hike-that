@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Axios from 'axios';
 import { useCookies } from 'react-cookie';
 
-import { MainContext, AlertSeverity, MessageMap } from '../contexts/MainContext.tsx';
+import { MainContext, AlertSeverity } from '../contexts/MainContext.tsx';
 import { Hike, HikeSearchResults, SearchResultsCache, SystemError } from '../models/models.ts';
 import * as Constants from '../constants/constants';
 

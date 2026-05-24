@@ -8,7 +8,7 @@ import ConfirmationPrompt from '../../components/ConfirmationPrompt/Confirmation
 import ViewHikeLoader from '../../components/ViewHikeLoader/ViewHikeLoader';
 import useDocumentTitle from '../../hooks/useDocumentTitle';
 import { Hike, Hiker, Photo } from '../../models/models';
-import { MainContext, MessageMap } from '../../contexts/MainContext';
+import { MainContext } from '../../contexts/MainContext';
 import { Colors } from '../../services/themeService.ts';
 import * as DataService from '../../services/dataService';
 import * as SharedService from '../../services/sharedService';
