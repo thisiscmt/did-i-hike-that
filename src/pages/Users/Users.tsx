@@ -1,6 +1,5 @@
 import React, { FC, useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Axios, { AxiosProgressEvent, AxiosRequestConfig } from 'axios';
 import { Typography, Box, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button } from '@mui/material';
 import { makeStyles } from 'tss-react/mui';
 
