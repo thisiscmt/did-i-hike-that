@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import {useNavigate, useParams, useSearchParams} from 'react-router-dom';
 import { Box, Button, Card, CardContent, Chip, IconButton, Link, TextField, Typography } from '@mui/material';
 import { DeleteOutlineOutlined, EditOutlined, SaveOutlined, CancelOutlined, HomeOutlined } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
@@ -165,8 +165,8 @@ const ViewHike = () => {
     const [ loading, setLoading ] = useState<boolean>(true);
     const { currentHike, isLoggedIn, setCurrentHike, clearSearchResults, setBanner, handleError } = useContext(MainContext);
     const { hikeId } = useParams();
+    const [ searchParams, ] = useSearchParams();
     const navigate = useNavigate();
-    const location = useLocation();
 
     useDocumentTitle('View Hike - Did I Hike That?');
 
@@ -301,6 +301,7 @@ const ViewHike = () => {
     const hasExtraHikeData = hike.distance || hike.elevationGain || hike.timeUp || hike.timeDown;
     const formattedUpdatedAt = SharedService.formatISODateValue(hike.updatedAt);
     const loggedIn = isLoggedIn();
+    const homeQueryParams = searchParams.get('state') ? '/?state=' + encodeURIComponent(searchParams.get('state') || '') : '';
 
     return (
         <>
@@ -320,7 +321,7 @@ const ViewHike = () => {
                             <IconButton
                                 aria-label='edit hike'
                                 title='Edit hike'
-                                onClick={() => navigate(`/hike/${hike.id}/edit`, { state: location.state })}
+                                onClick={() => navigate(`/hike/${hike.id}/edit${homeQueryParams}`)}
                                 size='small'
                                 color='primary'
                                 disabled={hike.deleted}
@@ -340,14 +341,13 @@ const ViewHike = () => {
                             </IconButton>
 
                             {
-                                location.state &&
+                                searchParams.get('state') &&
                                 <IconButton
                                     aria-label='go back home'
                                     className={cx(classes.buttonSpacer)}
                                     title='Go back home'
                                     onClick={() => {
-                                        const newPath = location.state && location.state.length > 2 ? '/?' + location.state : '/'
-                                        navigate(newPath)
+                                        navigate('/?' + searchParams.get('state') || '');
                                     }}
                                     size='small'
                                     color='secondary'
@@ -588,8 +588,8 @@ const ViewHike = () => {
                             }
 
                             <Button variant='contained' color='primary' onClick={() => {
-                                const newPath = location.state && location.state.length > 2 ? '/?' + location.state : '/'
-                                navigate(newPath);
+                                const homePath = searchParams.get('state') ? '/?' + searchParams.get('state') : '/';
+                                navigate(homePath);
                             }}>Go Home</Button>
                         </>
                     }

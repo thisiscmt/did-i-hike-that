@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import {
     Autocomplete,
     type AutocompleteChangeDetails,
@@ -288,8 +288,8 @@ const EditHike = () => {
     const { classes, cx } = useStyles();
     const { currentHike, searchResultsCache, setCurrentHike, setBanner, storeSearchResults, handleError } = useContext(MainContext);
     const { hikeId } = useParams();
+    const [ searchParams, ] = useSearchParams();
     const navigate = useNavigate();
-    const location = useLocation();
     const abortController = useRef<AbortController>(new AbortController());
 
     const [ trail, setTrail ] = useState<string>('');
@@ -646,6 +646,7 @@ const EditHike = () => {
     };
 
     const handleSave = async () => {
+        const homeQueryParams = searchParams.get('state');
         let hike: Hike | undefined;
 
         try {
@@ -685,14 +686,14 @@ const EditHike = () => {
                     hike.id = hikeId;
                     response = await DataService.updateHike(hike, abortController.current.signal, uploadProgressHandler);
 
-                    if (searchResultsCache && location.state && searchResultsCache[location.state]) {
+                    if (searchResultsCache && homeQueryParams && searchResultsCache[homeQueryParams]) {
                         // If this hike is in the cache, update its properties with the latest values
-                        const hikeIndex = searchResultsCache[location.state].rows.findIndex((item: Hike) => {
+                        const hikeIndex = searchResultsCache[homeQueryParams].rows.findIndex((item: Hike) => {
                             return item.id === hikeId;
                         });
 
                         if (hikeIndex > -1) {
-                            const newHikes = {...searchResultsCache[location.state]};
+                            const newHikes = {...searchResultsCache[homeQueryParams]};
 
                             newHikes.rows[hikeIndex] = {
                                 id: hikeId,
@@ -706,7 +707,7 @@ const EditHike = () => {
                                 trail: response.trail,
                             };
 
-                            storeSearchResults(newHikes, location.state);
+                            storeSearchResults(newHikes, homeQueryParams);
                         }
                     }
                 } else {
@@ -715,7 +716,9 @@ const EditHike = () => {
                 }
 
                 setCurrentHike(response);
-                navigate(`/hike/${hikeIdForNav}`, { state: location.state });
+
+                const newHomeQueryParams = homeQueryParams ? `/?state=${encodeURIComponent(homeQueryParams)}` : '';
+                navigate(`/hike/${hikeIdForNav}${newHomeQueryParams}`);
             }
         } catch (error) {
             handleError(error, 'An error occurred saving the hike');

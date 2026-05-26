@@ -1,6 +1,6 @@
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { TextField, Box, Typography, Button, InputAdornment, IconButton, Pagination, Popover } from '@mui/material';
+import { TextField, Box, Typography, Button, InputAdornment, IconButton, Pagination, Popover, Link } from '@mui/material';
 import { CloseOutlined } from '@mui/icons-material';
 import { makeStyles } from 'tss-react/mui';
 
@@ -102,6 +102,10 @@ const useStyles = makeStyles()((theme) => ({
         ':last-child': {
             marginBottom: '20px'
         }
+    },
+
+    hikeLink: {
+        textDecoration: 'none'
     },
 
     noResults: {
@@ -375,17 +379,16 @@ const Home = () => {
                                                 <Box className={cx(classes.searchResults)}>
                                                     {
                                                         searchResultsToRender.map((hike: Hike) => {
-                                                            return (
-                                                                <Box key={hike.id} className={cx(classes.searchResult)} onClick={() => {
-                                                                    // If there are no query string params, we set the cache value to the one used
-                                                                    // for this case when the cache is first populated
-                                                                    const stateValue = searchParams.size === 0 ? '/' : searchParams.toString();
+                                                            const homeQueryParams = searchParams.size > 0 ? `/?state=${encodeURIComponent(searchParams.toString())}` : '';
 
-                                                                    navigate(`/hike/${hike.id}`, { state: stateValue })}
-                                                                }
+                                                            return (
+                                                                <Link key={hike.id} href={`/hike/${hike.id}${homeQueryParams}`}
+                                                                      className={cx(classes.hikeLink)}
                                                                 >
-                                                                    <SearchResult hike={hike} />
-                                                                </Box>
+                                                                    <Box key={hike.id} className={cx(classes.searchResult)}>
+                                                                        <SearchResult hike={hike} />
+                                                                    </Box>
+                                                                </Link>
                                                             );
                                                         })
                                                     }
