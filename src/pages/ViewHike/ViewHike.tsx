@@ -7,6 +7,7 @@ import { makeStyles } from 'tss-react/mui';
 import ConfirmationPrompt from '../../components/ConfirmationPrompt/ConfirmationPrompt';
 import ViewHikeLoader from '../../components/ViewHikeLoader/ViewHikeLoader';
 import useDocumentTitle from '../../hooks/useDocumentTitle';
+import GoToTop from '../../components/GoToTop/GoToTop.tsx';
 import { Hike, Hiker, Photo } from '../../models/models';
 import { MainContext } from '../../contexts/MainContext';
 import { Colors } from '../../services/themeService.ts';
@@ -591,6 +592,8 @@ const ViewHike = () => {
                                 const homePath = searchParams.get('state') ? '/?' + searchParams.get('state') : '/';
                                 navigate(homePath);
                             }}>Go Home</Button>
+
+                            <GoToTop showAtPosition={120} />
                         </>
                     }
 

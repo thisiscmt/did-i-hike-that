@@ -7,6 +7,7 @@ import { makeStyles } from 'tss-react/mui';
 import SearchResult from '../../components/SearchResult/SearchResult';
 import SearchResultLoader from '../../components/SearchResultLoader/SearchResultLoader';
 import useDocumentTitle from '../../hooks/useDocumentTitle';
+import GoToTop from '../../components/GoToTop/GoToTop.tsx';
 import { MainContext } from '../../contexts/MainContext';
 import { type Hike, type HikeSearchResults } from '../../models/models';
 import { Colors } from '../../services/themeService';
@@ -400,6 +401,8 @@ const Home = () => {
                                                 <Box className={`${cx(classes.searchResults)} ${cx(classes.totalCount)}`}>
                                                     <span style={{ fontWeight: 600 }}>Adventures</span>: {totalCount}
                                                 </Box>
+
+                                                <GoToTop showAtPosition={120} />
                                             </>
                                             :
                                             <>

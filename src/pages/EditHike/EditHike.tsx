@@ -27,6 +27,7 @@ import { type AxiosProgressEvent } from 'axios';
 import { DateTime } from 'luxon';
 
 import useDocumentTitle from '../../hooks/useDocumentTitle';
+import GoToTop from '../../components/GoToTop/GoToTop.tsx';
 import { type Hike, type Hiker, type Photo } from '../../models/models';
 import { CustomLuxonAdapter} from '../../classes/customLuxonAdapter';
 import { MainContext } from '../../contexts/MainContext';
@@ -545,6 +546,7 @@ const EditHike = () => {
     const handleSelectPhoto = async (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files.length > 0) {
             if (photos.length === MAX_PHOTOS_FOR_UPLOAD) {
+                DataService.addLogEntry('Max photos reached', 'info', { metadata: { hikeId, photoCount: photos.length }});
                 return;
             }
 
@@ -567,7 +569,6 @@ const EditHike = () => {
 
                     if (index > -1) {
                         if (hikeId && newPhotos[index].action !== 'add') {
-
                             newPhotos[index].file = file;
                             newPhotos[index].action = 'update';
                             newPhotos[index].thumbnailSrc = thumbnailSrc;
@@ -585,6 +586,8 @@ const EditHike = () => {
             } catch (error) {
                 DataService.logError(error);
             }
+        } else {
+            DataService.addLogEntry('No photo selected', 'info', { metadata: { hikeId, value: event.target.value }});
         }
     };
 
@@ -1194,6 +1197,8 @@ const EditHike = () => {
                 message={snackbarMessage}
                 className={classes.snackbar}
             />
+
+            <GoToTop showAtPosition={120} />
         </>
     )
 };
