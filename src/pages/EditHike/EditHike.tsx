@@ -20,6 +20,7 @@ import {
 } from '@mui/material';
 import { DeleteOutlineOutlined } from '@mui/icons-material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
 import { makeStyles } from 'tss-react/mui';
 import { DragDropContext, Droppable, Draggable, type DropResult } from '@hello-pangea/dnd';
 import { arrayMoveImmutable } from 'array-move';
@@ -29,7 +30,6 @@ import { DateTime } from 'luxon';
 import useDocumentTitle from '../../hooks/useDocumentTitle';
 import GoToTop from '../../components/GoToTop/GoToTop.tsx';
 import { type Hike, type Hiker, type Photo } from '../../models/models';
-import { CustomLuxonAdapter} from '../../classes/customLuxonAdapter';
 import { MainContext } from '../../contexts/MainContext';
 import { Colors, SaveIndicatorStyles } from '../../services/themeService';
 import * as DataService from '../../services/dataService';
@@ -789,7 +789,7 @@ const EditHike = () => {
                         label='* Start date'
                         classes={{ label: classes.fieldLabel }}
                         control={
-                            <LocalizationProvider dateAdapter={CustomLuxonAdapter}>
+                            <LocalizationProvider dateAdapter={AdapterLuxon}>
                                 <DatePicker
                                     value={dateOfHike}
                                     onChange={(newValue) => setDateOfHike(newValue || null) }
@@ -806,7 +806,7 @@ const EditHike = () => {
                         label='End date'
                         classes={{ label: classes.fieldLabel }}
                         control={
-                            <LocalizationProvider dateAdapter={CustomLuxonAdapter}>
+                            <LocalizationProvider dateAdapter={AdapterLuxon}>
                                 <DatePicker
                                     value={endDateOfHike}
                                     onChange={(newValue) => setEndDateOfHike(newValue || null) }

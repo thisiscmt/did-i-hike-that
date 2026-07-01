@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Box } from '@mui/material';
+import { Settings, Info } from 'luxon';
 import { makeStyles } from 'tss-react/mui';
 
 import Home from './pages/Home/Home';
@@ -65,6 +66,15 @@ const useStyles = makeStyles()((theme) => ({
 
 function App() {
     const { classes, cx } = useStyles();
+
+    // We need to explicitly set Sunday as the first day of the week here for Firefox
+    Settings.defaultWeekSettings = {
+        // Sunday = 7, Monday = 1.
+        firstDay: 7,
+        // Makes sure we don't lose the other information from `defaultWeekSettings`
+        minimalDays: Info.getMinimumDaysInFirstWeek(),
+        weekend: Info.getWeekendWeekdays(),
+    };
 
     return (
         <BrowserRouter>
