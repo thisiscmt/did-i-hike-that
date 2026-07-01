@@ -18,8 +18,12 @@ const useStyles = makeStyles()((theme) => ({
     section: {
         marginBottom: '24px',
 
-        '&.chips, &.photos': {
+        '&.chips': {
             marginBottom: '14px'
+        },
+
+        '&.photos': {
+            marginBottom: '8px'
         },
 
         ':last-of-type': {
@@ -132,6 +136,7 @@ const useStyles = makeStyles()((theme) => ({
     },
 
     photoCaptionEditContainer: {
+        marginBottom: '14px',
         marginTop: '4px',
 
         '& .MuiButtonBase-root': {
